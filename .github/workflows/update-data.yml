@@ -1,0 +1,45 @@
+name: Update Labor Market Data
+
+on:
+  # Run on the 7th of each month at 10:00 AM UTC
+  # JOLTS data releases ~35 days after reference month (around 6th-10th)
+  schedule:
+    - cron: '0 10 7 * *'
+  
+  # Allow manual trigger from GitHub UI
+  workflow_dispatch:
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Run update script
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python scripts/update_data.py
+      
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --exit-code data.json || echo "changes=true" >> $GITHUB_OUTPUT
+      
+      - name: Commit and push if changed
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data.json
+          git commit -m "Update data.json with latest BLS data"
+          git push
