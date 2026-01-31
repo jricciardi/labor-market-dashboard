@@ -713,7 +713,7 @@
         <header>
             <div class="header-top">
                 <h1>Labor Market Dashboard</h1>
-                <span class="last-updated">Updated: Jan 8, 2026 â€¢ Data through Nov 2025</span>
+                <span class="last-updated" id="lastUpdated">Loading...</span>
             </div>
             <p class="subtitle">Quantitative signals for job search timing decisions. Tracking employee leverage indicators since 2015.</p>
         </header>
@@ -932,890 +932,637 @@
         </footer>
     </div>
 
-    <script>
-        // Complete monthly data from 2015-2025
-        const monthlyData = {
-            labels: [
-                'Jan-15','Feb-15','Mar-15','Apr-15','May-15','Jun-15','Jul-15','Aug-15','Sep-15','Oct-15','Nov-15','Dec-15',
-                'Jan-16','Feb-16','Mar-16','Apr-16','May-16','Jun-16','Jul-16','Aug-16','Sep-16','Oct-16','Nov-16','Dec-16',
-                'Jan-17','Feb-17','Mar-17','Apr-17','May-17','Jun-17','Jul-17','Aug-17','Sep-17','Oct-17','Nov-17','Dec-17',
-                'Jan-18','Feb-18','Mar-18','Apr-18','May-18','Jun-18','Jul-18','Aug-18','Sep-18','Oct-18','Nov-18','Dec-18',
-                'Jan-19','Feb-19','Mar-19','Apr-19','May-19','Jun-19','Jul-19','Aug-19','Sep-19','Oct-19','Nov-19','Dec-19',
-                'Jan-20','Feb-20','Mar-20','Apr-20','May-20','Jun-20','Jul-20','Aug-20','Sep-20','Oct-20','Nov-20','Dec-20',
-                'Jan-21','Feb-21','Mar-21','Apr-21','May-21','Jun-21','Jul-21','Aug-21','Sep-21','Oct-21','Nov-21','Dec-21',
-                'Jan-22','Feb-22','Mar-22','Apr-22','May-22','Jun-22','Jul-22','Aug-22','Sep-22','Oct-22','Nov-22','Dec-22',
-                'Jan-23','Feb-23','Mar-23','Apr-23','May-23','Jun-23','Jul-23','Aug-23','Sep-23','Oct-23','Nov-23','Dec-23',
-                'Jan-24','Feb-24','Mar-24','Apr-24','May-24','Jun-24','Jul-24','Aug-24','Sep-24','Oct-24','Nov-24','Dec-24',
-                'Jan-25','Feb-25','Mar-25','Apr-25','May-25','Jun-25','Jul-25','Aug-25','Sep-25','Oct-25','Nov-25'
-            ],
-            quitRate: [
-                1.9,1.9,1.9,1.9,1.9,2.0,2.0,2.0,2.0,2.0,2.0,2.0,
-                2.1,2.1,2.1,2.1,2.1,2.1,2.1,2.1,2.1,2.1,2.1,2.1,
-                2.2,2.2,2.2,2.2,2.2,2.2,2.2,2.2,2.2,2.2,2.2,2.2,
-                2.2,2.3,2.3,2.3,2.3,2.4,2.4,2.4,2.4,2.3,2.3,2.3,
-                2.3,2.3,2.3,2.3,2.3,2.3,2.4,2.3,2.3,2.3,2.3,2.3,
-                2.3,2.3,2.2,1.4,1.6,1.9,2.1,2.2,2.2,2.3,2.2,2.2,
-                2.3,2.4,2.5,2.6,2.5,2.5,2.6,2.7,2.8,2.8,2.9,2.9,
-                2.8,2.8,2.9,2.8,2.8,2.7,2.7,2.6,2.6,2.6,2.5,2.6,
-                2.5,2.4,2.4,2.4,2.4,2.3,2.3,2.3,2.2,2.2,2.2,2.2,
-                2.1,2.1,2.1,2.1,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,
-                2.1,2.1,2.1,2.0,2.0,2.0,2.0,1.9,2.0,1.8,2.0
-            ],
-            openingsRatio: [
-                1.09,1.12,1.14,1.15,1.18,1.17,1.16,1.15,1.12,1.15,1.17,1.17,
-                1.18,1.20,1.22,1.24,1.22,1.24,1.26,1.28,1.30,1.28,1.26,1.24,
-                1.26,1.28,1.30,1.32,1.34,1.36,1.38,1.40,1.42,1.44,1.42,1.35,
-                1.40,1.42,1.44,1.46,1.48,1.50,1.52,1.54,1.52,1.50,1.48,1.48,
-                1.46,1.48,1.50,1.52,1.50,1.48,1.46,1.44,1.42,1.44,1.46,1.45,
-                1.42,1.40,1.02,0.30,0.36,0.52,0.62,0.74,0.82,0.88,0.92,0.95,
-                1.05,1.18,1.32,1.48,1.58,1.68,1.78,1.85,1.88,1.92,1.98,2.00,
-                1.98,1.95,2.00,1.95,1.92,1.85,1.78,1.72,1.65,1.58,1.52,1.82,
-                1.78,1.72,1.65,1.58,1.52,1.48,1.44,1.42,1.40,1.38,1.36,1.40,
-                1.35,1.32,1.28,1.25,1.22,1.18,1.15,1.12,1.10,1.08,1.08,1.10,
-                1.13,1.10,1.05,1.02,1.00,0.99,0.98,0.96,1.01,0.99,0.94
-            ],
-            hiresRate: [
-                3.5,3.6,3.6,3.5,3.6,3.6,3.5,3.5,3.5,3.5,3.6,3.6,
-                3.6,3.6,3.7,3.7,3.7,3.7,3.7,3.7,3.7,3.7,3.7,3.7,
-                3.7,3.7,3.8,3.8,3.8,3.8,3.8,3.8,3.8,3.9,3.8,3.8,
-                3.8,3.8,3.9,3.9,3.9,3.9,3.9,3.9,4.0,3.9,3.9,3.9,
-                3.8,3.8,3.9,3.9,3.9,3.9,3.9,3.8,3.8,3.8,3.9,3.9,
-                3.9,3.8,3.2,2.0,2.8,3.5,3.8,3.9,3.8,3.8,3.7,3.7,
-                3.8,3.9,4.0,4.1,4.2,4.3,4.4,4.4,4.4,4.5,4.5,4.6,
-                4.5,4.5,4.6,4.4,4.3,4.2,4.1,4.1,4.0,3.9,3.8,4.0,
-                3.9,3.8,3.7,3.7,3.6,3.6,3.6,3.6,3.6,3.6,3.6,3.6,
-                3.5,3.5,3.5,3.5,3.4,3.4,3.4,3.4,3.3,3.3,3.4,3.4,
-                3.4,3.4,3.4,3.3,3.3,3.3,3.3,3.3,3.4,3.2,3.2
-            ],
-            layoffsRate: [
-                1.2,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,
-                1.1,1.1,1.1,1.0,1.1,1.0,1.0,1.0,1.0,1.0,1.1,1.1,
-                1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,
-                1.1,1.1,1.2,1.1,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,
-                1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,
-                1.2,1.2,1.8,4.8,2.5,1.4,1.2,1.2,1.2,1.2,1.3,1.3,
-                1.2,1.1,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.9,1.0,
-                1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.1,1.0,
-                1.0,1.0,1.1,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,
-                1.0,1.0,1.0,1.0,1.0,1.1,1.1,1.1,1.1,1.1,1.1,1.1,
-                1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.2,1.1
-            ],
-            unempRate: [
-                5.7,5.5,5.5,5.4,5.5,5.3,5.3,5.1,5.1,5.0,5.0,5.0,
-                4.9,4.9,5.0,5.0,4.7,4.9,4.9,4.9,5.0,4.9,4.6,4.7,
-                4.8,4.7,4.5,4.4,4.3,4.4,4.3,4.4,4.2,4.1,4.1,4.1,
-                4.1,4.1,4.1,3.9,3.8,4.0,3.9,3.9,3.7,3.7,3.7,3.9,
-                4.0,3.8,3.8,3.6,3.6,3.7,3.7,3.7,3.5,3.6,3.5,3.5,
-                3.6,3.5,4.4,14.7,13.3,11.1,10.2,8.4,7.8,6.9,6.7,6.7,
-                6.4,6.2,6.0,6.1,5.8,5.9,5.4,5.2,4.8,4.6,4.2,3.9,
-                4.0,3.8,3.6,3.6,3.6,3.6,3.5,3.7,3.5,3.7,3.6,3.5,
-                3.4,3.6,3.5,3.4,3.7,3.6,3.5,3.8,3.8,3.9,3.7,3.7,
-                3.7,3.9,3.8,3.9,4.0,4.1,4.3,4.2,4.1,4.1,4.2,4.1,
-                4.0,4.1,4.2,4.2,4.2,4.1,4.2,4.3,4.4,null,4.6
-            ],
-            fedRate: [
-                0.11,0.11,0.11,0.12,0.12,0.13,0.13,0.14,0.14,0.12,0.12,0.24,
-                0.34,0.38,0.36,0.37,0.37,0.38,0.39,0.40,0.40,0.41,0.41,0.55,
-                0.65,0.66,0.79,0.90,0.91,1.04,1.15,1.16,1.15,1.15,1.16,1.30,
-                1.42,1.42,1.51,1.69,1.70,1.82,1.91,1.91,2.00,2.19,2.20,2.27,
-                2.40,2.40,2.41,2.42,2.39,2.38,2.40,2.13,1.90,1.83,1.55,1.55,
-                1.55,1.58,0.65,0.05,0.05,0.08,0.09,0.10,0.09,0.09,0.09,0.09,
-                0.08,0.08,0.07,0.07,0.06,0.08,0.10,0.09,0.08,0.08,0.08,0.08,
-                0.08,0.08,0.20,0.33,0.77,1.21,1.68,2.33,2.56,3.08,3.78,4.33,
-                4.33,4.57,4.65,4.83,5.06,5.08,5.12,5.33,5.33,5.33,5.33,5.33,
-                5.33,5.33,5.33,5.33,5.33,5.33,5.33,5.33,4.83,4.58,4.58,4.48,
-                4.375,4.375,4.375,4.375,4.375,4.375,4.375,4.375,4.125,3.875,3.625
-            ],
-            wageGrowth: [
-                2.2,2.1,2.3,2.2,2.2,2.1,2.2,2.2,2.3,2.4,2.3,2.3,
-                2.4,2.3,2.2,2.5,2.4,2.5,2.6,2.5,2.5,2.6,2.5,2.5,
-                2.6,2.7,2.6,2.5,2.6,2.5,2.5,2.5,2.6,2.4,2.5,2.6,
-                2.8,2.7,2.7,2.6,2.7,2.7,2.8,2.9,2.8,3.0,3.1,3.0,
-                3.1,3.4,3.2,3.1,3.1,3.1,3.2,3.2,2.9,3.0,3.1,3.0,
-                3.0,3.0,3.1,3.0,6.2,5.0,4.7,4.5,4.4,4.3,4.5,4.8,
-                5.0,5.0,4.8,4.2,3.5,3.5,4.0,4.2,4.5,4.8,4.9,4.7,
-                5.5,5.2,5.5,5.5,5.2,5.0,5.2,5.2,5.0,4.8,4.8,4.6,
-                4.4,4.5,4.2,4.4,4.2,4.3,4.4,4.3,4.2,4.0,4.0,4.1,
-                4.4,4.3,4.1,3.9,4.0,3.9,3.7,3.8,3.8,4.0,4.0,4.0,
-                4.1,4.0,3.9,3.8,3.8,3.7,3.6,3.6,3.6,null,3.9
-            ],
-            lfpr: [
-                80.8,80.9,80.9,81.0,81.0,81.0,81.1,81.1,81.1,81.2,81.3,81.3,
-                81.4,81.4,81.5,81.6,81.6,81.6,81.6,81.7,81.7,81.7,81.7,81.7,
-                81.7,81.8,81.8,81.9,82.0,82.0,82.0,82.0,82.0,82.0,82.0,82.0,
-                82.0,82.1,82.2,82.2,82.2,82.3,82.3,82.3,82.3,82.3,82.3,82.3,
-                82.5,82.6,82.7,82.7,82.8,82.8,82.8,82.9,82.9,82.9,82.9,82.9,
-                83.0,83.0,82.5,79.8,79.6,80.0,80.2,80.4,80.5,80.6,80.6,80.6,
-                80.9,81.0,81.2,81.4,81.5,81.6,81.7,81.8,81.9,82.0,82.0,82.0,
-                82.1,82.2,82.3,82.4,82.4,82.4,82.4,82.4,82.4,82.4,82.4,82.4,
-                82.5,83.0,83.0,83.1,83.2,83.2,83.2,83.0,83.0,83.0,83.1,83.0,
-                83.2,83.3,83.3,83.4,83.4,83.4,83.4,83.4,83.4,83.4,83.4,83.4,
-                83.5,83.5,83.5,83.4,83.4,83.4,83.5,83.3,83.4,null,83.3
-            ]
-        };
+        <script>
+        // Fetch data and initialize dashboard
+        async function initDashboard() {
+            // Fetch data from JSON file
+            const response = await fetch('data.json');
+            const data = await response.json();
+            
+            // Build monthlyData object from fetched data
+            const monthlyData = {
+                labels: data.labels,
+                quitRate: data.quitRate,
+                openingsRatio: data.openingsRatio,
+                hiresRate: data.hiresRate,
+                layoffsRate: data.layoffsRate,
+                unempRate: data.unempRate,
+                fedRate: data.fedRate,
+                wageGrowth: data.wageGrowth,
+                lfpr: data.lfpr
+            };
+            
+            // Update the last-updated text from metadata
+            const lastUpdated = new Date(data.metadata.lastUpdated);
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            const formattedDate = lastUpdated.toLocaleDateString('en-US', options);
+            const dataMonth = data.metadata.dataThrough.split('-');
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const dataThrough = monthNames[parseInt(dataMonth[1]) - 1] + ' ' + dataMonth[0];
+            document.getElementById('lastUpdated').textContent = `Updated: ${formattedDate} • Data through ${dataThrough}`;
 
-        // Calculate composite scores with improved formula
-        function calculateCompositeScore(idx) {
-            const quit = monthlyData.quitRate[idx];
-            const ratio = monthlyData.openingsRatio[idx];
-            const hires = monthlyData.hiresRate[idx];
-            const layoffs = monthlyData.layoffsRate[idx];
-            const unemp = monthlyData.unempRate[idx];
-            const fed = monthlyData.fedRate[idx];
-            const wage = monthlyData.wageGrowth[idx];
-            const lfpr = monthlyData.lfpr[idx];
-            
-            // Skip if missing critical data
-            if (quit == null || ratio == null) return null;
-            
-            // Score each metric (0-1 scale) - adjusted for better historical accuracy
-            // Quit rate: 1.5% = 0, 3.0% = 1.0 (captures Great Resignation peak)
-            const quitScore = Math.min(1, Math.max(0, (quit - 1.5) / 1.5));
-            
-            // Openings ratio: 0.3 = 0, 2.0 = 1.0 (captures COVID crash to Great Resignation)
-            const ratioScore = Math.min(1, Math.max(0, (ratio - 0.3) / 1.7));
-            
-            // Hires rate: 2.0% = 0, 4.5% = 1.0
-            const hiresScore = Math.min(1, Math.max(0, (hires - 2.0) / 2.5));
-            
-            // Layoffs rate: inverted, 2.5% = 0, 0.8% = 1.0
-            const layoffsScore = Math.min(1, Math.max(0, (2.5 - layoffs) / 1.7));
-            
-            // Unemployment: inverted, 7% = 0, 3.5% = 1.0
-            const unempScore = unemp != null ? Math.min(1, Math.max(0, (7.0 - unemp) / 3.5)) : 0.5;
-            
-            // Fed rate: inverted, 5.5% = 0, 0% = 1.0 (low rates = stimulative = good for workers)
-            const fedScore = Math.min(1, Math.max(0, (5.5 - fed) / 5.5));
-            
-            // Wage growth: 2% = 0, 5% = 1.0
-            const wageScore = wage != null ? Math.min(1, Math.max(0, (wage - 2.0) / 3.0)) : 0.5;
-            
-            // Prime-age LFPR: 79% = 0, 83% = 1.0
-            const lfprScore = lfpr != null ? Math.min(1, Math.max(0, (lfpr - 79) / 4.0)) : 0.5;
-            
-            // Weighted average - Tier 1 (direct leverage measures) gets 60% weight
-            const tier1 = (quitScore + ratioScore + hiresScore + layoffsScore) / 4 * 0.6;
-            const tier2 = (unempScore + fedScore + wageScore + lfprScore) / 4 * 0.4;
-            
-            let baseScore = (tier1 + tier2) * 100;
-            
-            // === INTERACTION EFFECTS ===
-            
-            // 1. Sub-1.0 Ratio Penalty
-            // Falling below 1.0 openings/unemployed is a qualitative bright line:
-            // more job seekers than jobs = employers have structural leverage
-            if (ratio < 1.0) {
-                baseScore *= 0.92; // 8% penalty
+            // Calculate composite scores with improved formula
+            function calculateCompositeScore(idx) {
+                const quit = monthlyData.quitRate[idx];
+                const ratio = monthlyData.openingsRatio[idx];
+                const hires = monthlyData.hiresRate[idx];
+                const layoffs = monthlyData.layoffsRate[idx];
+                const unemp = monthlyData.unempRate[idx];
+                const fed = monthlyData.fedRate[idx];
+                const wage = monthlyData.wageGrowth[idx];
+                const lfpr = monthlyData.lfpr[idx];
+                
+                if (quit == null || ratio == null) return null;
+                
+                const quitScore = Math.min(1, Math.max(0, (quit - 1.5) / 1.5));
+                const ratioScore = Math.min(1, Math.max(0, (ratio - 0.3) / 1.7));
+                const hiresScore = Math.min(1, Math.max(0, (hires - 2.0) / 2.5));
+                const layoffsScore = Math.min(1, Math.max(0, (2.5 - layoffs) / 1.7));
+                const unempScore = unemp != null ? Math.min(1, Math.max(0, (7.0 - unemp) / 3.5)) : 0.5;
+                const fedScore = Math.min(1, Math.max(0, (5.5 - fed) / 5.5));
+                const wageScore = wage != null ? Math.min(1, Math.max(0, (wage - 2.0) / 3.0)) : 0.5;
+                const lfprScore = lfpr != null ? Math.min(1, Math.max(0, (lfpr - 79) / 4.0)) : 0.5;
+                
+                const tier1 = (quitScore + ratioScore + hiresScore + layoffsScore) / 4 * 0.6;
+                const tier2 = (unempScore + fedScore + wageScore + lfprScore) / 4 * 0.4;
+                
+                let baseScore = (tier1 + tier2) * 100;
+                
+                if (ratio < 1.0) baseScore *= 0.92;
+                const churnPenalty = 0.12 * (1 - Math.min(quitScore, hiresScore));
+                baseScore *= (1 - churnPenalty);
+                if (fed < 0.5) baseScore *= 1.08;
+                
+                return Math.min(100, Math.round(baseScore));
             }
-            
-            // 2. Market Churn Multiplier  
-            // When BOTH quit rate AND hires rate are depressed, the market is "frozen"
-            // Low layoffs in a frozen market isn't actually good for job seekers
-            // Penalty scales with how depressed both metrics are
-            const churnPenalty = 0.12 * (1 - Math.min(quitScore, hiresScore));
-            baseScore *= (1 - churnPenalty);
-            
-            // 3. Near-Zero Fed Bonus
-            // Emergency/highly stimulative rates (<0.5%) create tailwinds:
-            // cheap capital = companies more willing to hire, take risks, expand
-            if (fed < 0.5) {
-                baseScore *= 1.08; // 8% bonus
-            }
-            
-            // Cap at 100 to keep scale clean
-            return Math.min(100, Math.round(baseScore));
-        }
 
-        const compositeScores = monthlyData.labels.map((_, idx) => calculateCompositeScore(idx));
-        
-        // Find peak score and its date
-        let peakScore = 0;
-        let peakIdx = 0;
-        compositeScores.forEach((score, idx) => {
-            if (score !== null && score > peakScore) {
-                peakScore = score;
-                peakIdx = idx;
-            }
-        });
-        
-        // Get current score (last non-null)
-        let currentScore = compositeScores[compositeScores.length - 1];
-        let currentIdx = compositeScores.length - 1;
-        while (currentScore === null && currentIdx > 0) {
-            currentIdx--;
-            currentScore = compositeScores[currentIdx];
-        }
-        
-        // Update hero score display
-        document.getElementById('currentScore').textContent = currentScore;
-        const scoreEl = document.getElementById('currentScore');
-        const verdictEl = document.getElementById('scoreVerdict');
-        const verdictIconEl = document.getElementById('verdictIcon');
-        const verdictTextEl = document.getElementById('verdictText');
-        const changeEl = document.getElementById('scoreChange');
-        const interpEl = document.getElementById('interpretation');
-        
-        if (currentScore >= 70) {
-            scoreEl.className = 'score-value favorable';
-            verdictEl.className = 'score-verdict favorable';
-            verdictIconEl.className = 'verdict-icon favorable';
-            verdictTextEl.textContent = 'Favorable';
-            interpEl.innerHTML = '<strong>Employee-favorable market.</strong> Active job searching is rational. High quit rates signal worker confidence. Apply aggressively and accept informational interviews.';
-            interpEl.style.borderLeftColor = 'var(--accent-green)';
-        } else if (currentScore >= 55) {
-            scoreEl.className = 'score-value lean-favorable';
-            verdictEl.className = 'score-verdict lean-favorable';
-            verdictIconEl.className = 'verdict-icon lean-favorable';
-            verdictTextEl.textContent = 'Lean Favorable';
-            interpEl.innerHTML = '<strong>Functional market with opportunities.</strong> Selective job searching is reasonable. Focus on strong-fit opportunities and maintain your network. Patience and targeting will pay off.';
-            interpEl.style.borderLeftColor = 'var(--accent-yellow)';
-        } else if (currentScore >= 40) {
-            scoreEl.className = 'score-value lean-unfavorable';
-            verdictEl.className = 'score-verdict lean-unfavorable';
-            verdictIconEl.className = 'verdict-icon lean-unfavorable';
-            verdictTextEl.textContent = 'Lean Unfavorable';
-            interpEl.innerHTML = '<strong>Headwinds present.</strong> Hold steady unless you have a compelling reason to move. Market is competitive with more seekers than opportunities. Be strategic and don\'t jump at marginal offers.';
-            interpEl.style.borderLeftColor = 'var(--accent-orange)';
-        } else {
-            scoreEl.className = 'score-value unfavorable';
-            verdictEl.className = 'score-verdict unfavorable';
-            verdictIconEl.className = 'verdict-icon unfavorable';
-            verdictTextEl.textContent = 'Unfavorable';
-            interpEl.innerHTML = '<strong>Employer-favorable market.</strong> Hunker down and focus on stability. Significant difficulty finding new positions. Only move if necessary or for exceptional opportunities.';
-            interpEl.style.borderLeftColor = 'var(--accent-red)';
-        }
-        
-        const diff = peakScore - currentScore;
-        changeEl.textContent = `â†“ ${diff} pts from peak (${monthlyData.labels[peakIdx]}: ${peakScore})`;
-        
-        // Update historical context
-        document.getElementById('peakContext').textContent = `${peakScore} â€” ${monthlyData.labels[peakIdx]} (Great Resignation)`;
-        
-        // Find COVID trough (Apr 2020 = index 63)
-        const covidIdx = monthlyData.labels.indexOf('Apr-20');
-        const covidScore = compositeScores[covidIdx];
-        document.getElementById('covidContext').textContent = `${covidScore} â€” Lockdowns`;
-        
-        // Find pre-pandemic (Dec 2019 = index 59)
-        const prePandemicIdx = monthlyData.labels.indexOf('Dec-19');
-        const prePandemicScore = compositeScores[prePandemicIdx];
-        document.getElementById('prePandemicContext').textContent = `${prePandemicScore} â€” Tight Labor Market`;
-        
-        // Update cycle position based on current score
-        const cycleEl = document.getElementById('cyclePosition');
-        if (currentScore >= 70) {
-            cycleEl.textContent = 'Employee-Favorable';
-        } else if (currentScore >= 55) {
-            cycleEl.textContent = 'Balanced / Functional';
-        } else if (currentScore >= 40) {
-            cycleEl.textContent = 'Employer-Tilting';
-        } else {
-            cycleEl.textContent = 'Employer-Favorable';
-        }
-        
-        // Find historical analog - closest score match from pre-2020 period
-        // Excluding COVID crash (Mar-20 through Dec-20) and recent 12 months
-        const analogEl = document.getElementById('historicalAnalog');
-        let bestMatch = { idx: -1, diff: Infinity };
-        const excludeStart = monthlyData.labels.indexOf('Mar-20');
-        const excludeEnd = monthlyData.labels.indexOf('Dec-20');
-        const recentCutoff = compositeScores.length - 12; // Exclude last 12 months
-        
-        compositeScores.forEach((score, idx) => {
-            // Skip nulls, COVID period, and recent months
-            if (score === null) return;
-            if (idx >= excludeStart && idx <= excludeEnd) return;
-            if (idx >= recentCutoff) return;
+            const compositeScores = monthlyData.labels.map((_, idx) => calculateCompositeScore(idx));
             
-            const diff = Math.abs(score - currentScore);
-            if (diff < bestMatch.diff) {
-                bestMatch = { idx, diff, score };
-            }
-        });
-        
-        if (bestMatch.idx >= 0) {
-            const analogLabel = monthlyData.labels[bestMatch.idx];
-            const analogYear = '20' + analogLabel.split('-')[1];
-            
-            // Determine the context description
-            let analogDesc;
-            if (bestMatch.idx < 24) { // 2015-16
-                analogDesc = 'Post-Recession Recovery';
-            } else if (bestMatch.idx < 48) { // 2017-18
-                analogDesc = 'Mid-Cycle Expansion';
-            } else if (bestMatch.idx < 60) { // 2019
-                analogDesc = 'Late-Cycle Tight Market';
-            } else if (bestMatch.idx >= 72 && bestMatch.idx < 96) { // 2021-22
-                analogDesc = 'Great Resignation Era';
-            } else if (bestMatch.idx >= 96 && bestMatch.idx < 120) { // 2023-24
-                analogDesc = 'Post-Peak Normalization';
-            } else {
-                analogDesc = '';
-            }
-            
-            if (bestMatch.diff <= 3) {
-                analogEl.textContent = `${analogLabel} (Score: ${bestMatch.score})`;
-            } else if (bestMatch.diff <= 8) {
-                analogEl.textContent = `~${analogLabel} (Â±${bestMatch.diff} pts)`;
-            } else {
-                analogEl.textContent = `No close analog`;
-            }
-        } else {
-            analogEl.textContent = 'No historical match';
-        }
-
-        // === PATH TO LEAN FAVORABLE ANALYSIS ===
-        
-        // Get current metric values
-        const currentMetrics = {
-            quitRate: monthlyData.quitRate[currentIdx],
-            openingsRatio: monthlyData.openingsRatio[currentIdx],
-            hiresRate: monthlyData.hiresRate[currentIdx],
-            layoffsRate: monthlyData.layoffsRate[currentIdx],
-            unempRate: monthlyData.unempRate[currentIdx],
-            fedRate: monthlyData.fedRate[currentIdx],
-            wageGrowth: monthlyData.wageGrowth[currentIdx],
-            lfpr: monthlyData.lfpr[currentIdx]
-        };
-        
-        // Calculate individual metric scores (same logic as composite)
-        function getMetricScore(metric, value) {
-            switch(metric) {
-                case 'quitRate': return Math.min(1, Math.max(0, (value - 1.5) / 1.5));
-                case 'openingsRatio': return Math.min(1, Math.max(0, (value - 0.3) / 1.7));
-                case 'hiresRate': return Math.min(1, Math.max(0, (value - 2.0) / 2.5));
-                case 'layoffsRate': return Math.min(1, Math.max(0, (2.5 - value) / 1.7));
-                case 'unempRate': return Math.min(1, Math.max(0, (7.0 - value) / 3.5));
-                case 'fedRate': return Math.min(1, Math.max(0, (5.5 - value) / 5.5));
-                case 'wageGrowth': return Math.min(1, Math.max(0, (value - 2.0) / 3.0));
-                case 'lfpr': return Math.min(1, Math.max(0, (value - 79) / 4.0));
-                default: return 0.5;
-            }
-        }
-        
-        // Get score category for coloring
-        function getScoreCategory(score) {
-            if (score >= 0.7) return 'good';
-            if (score >= 0.5) return 'neutral';
-            if (score >= 0.3) return 'poor';
-            return 'bad';
-        }
-        
-        // Metric display names and info
-        const metricInfo = {
-            quitRate: { name: 'Quit Rate', tier: 1, format: v => v.toFixed(1) + '%', target: 2.3 },
-            openingsRatio: { name: 'Openings/Unemployed', tier: 1, format: v => v.toFixed(2), target: 1.1 },
-            hiresRate: { name: 'Hires Rate', tier: 1, format: v => v.toFixed(1) + '%', target: 3.6 },
-            layoffsRate: { name: 'Layoffs Rate', tier: 1, format: v => v.toFixed(1) + '%', target: 1.0, inverted: true },
-            unempRate: { name: 'Unemployment', tier: 2, format: v => v.toFixed(1) + '%', target: 4.2, inverted: true },
-            fedRate: { name: 'Fed Funds Rate', tier: 2, format: v => v.toFixed(2) + '%', target: 3.0, inverted: true },
-            wageGrowth: { name: 'Wage Growth', tier: 2, format: v => v.toFixed(1) + '%', target: 4.0 },
-            lfpr: { name: 'Prime-Age LFPR', tier: 2, format: v => v.toFixed(1) + '%', target: 83.0 }
-        };
-        
-        // Calculate scores and sort by contribution (lowest first = biggest drag)
-        const metricScores = Object.entries(currentMetrics)
-            .filter(([k, v]) => v != null)
-            .map(([metric, value]) => ({
-                metric,
-                value,
-                score: getMetricScore(metric, value),
-                info: metricInfo[metric]
-            }))
-            .sort((a, b) => a.score - b.score);
-        
-        // 1. Distance to Lean Favorable
-        const distanceToTarget = Math.max(0, 55 - currentScore);
-        document.getElementById('distancePoints').textContent = distanceToTarget;
-        
-        // 2. Score Decomposition with Layoffs Paradox footnote
-        // Check if we're in a "frozen market" (both quit and hires depressed)
-        const quitScoreVal = getMetricScore('quitRate', currentMetrics.quitRate);
-        const hiresScoreVal = getMetricScore('hiresRate', currentMetrics.hiresRate);
-        const isFrozenMarket = quitScoreVal < 0.5 && hiresScoreVal < 0.6;
-        
-        const decompositionEl = document.getElementById('decompositionList');
-        decompositionEl.innerHTML = metricScores.map(m => {
-            const isLayoffs = m.metric === 'layoffsRate';
-            const showFootnote = isLayoffs && isFrozenMarket && m.score > 0.7;
-            return `
-                <div class="decomposition-item">
-                    <span class="metric-name">${m.info.name}${showFootnote ? ' <span class="footnote-marker">â€ </span>' : ''}</span>
-                    <div class="metric-bar-container">
-                        <div class="metric-bar ${getScoreCategory(m.score)}" style="width: ${m.score * 100}%"></div>
-                    </div>
-                    <span class="metric-score">${Math.round(m.score * 100)}</span>
-                </div>
-            `;
-        }).join('');
-        
-        // Add footnote if in frozen market
-        if (isFrozenMarket) {
-            decompositionEl.innerHTML += `
-                <div class="decomposition-footnote">
-                    <span class="footnote-marker">â€ </span> Low layoffs in a frozen market (low quits + low hires) provides less benefit than the score suggests. 
-                    Employers aren't cutting, but they're also not hiring â€” limited opportunities for job seekers.
-                </div>
-            `;
-        }
-        
-        // 3. Trigger Conditions with Trend Analysis
-        // Get last 3 months of data for trends
-        const getRecentValues = (dataArray, count = 3) => {
-            const validIdx = currentIdx;
-            const values = [];
-            for (let i = 0; i < count && (validIdx - i) >= 0; i++) {
-                const val = dataArray[validIdx - i];
-                if (val != null) values.push(val);
-            }
-            return values;
-        };
-        
-        const getTrend = (values) => {
-            if (values.length < 2) return { arrow: 'â€“', direction: 'flat' };
-            const recent = values[0];
-            const older = values[values.length - 1];
-            const diff = recent - older;
-            const threshold = Math.abs(older) * 0.05; // 5% change threshold
-            
-            if (diff > threshold) return { arrow: 'â†‘', direction: 'up' };
-            if (diff < -threshold) return { arrow: 'â†“', direction: 'down' };
-            return { arrow: 'â†’', direction: 'flat' };
-        };
-        
-        const formatTrendHistory = (values, decimals = 2) => {
-            return values.slice(0, 3).reverse().map(v => v.toFixed(decimals)).join(' â†’ ');
-        };
-        
-        const triggers = [
-            {
-                condition: 'Quit Rate > 2.3% for 3+ months',
-                current: currentMetrics.quitRate,
-                target: 2.3,
-                recentValues: getRecentValues(monthlyData.quitRate),
-                decimals: 1,
-                goodDirection: 'up', // higher is better for this metric
-                status: currentMetrics.quitRate > 2.3 ? 'met' : 
-                        currentMetrics.quitRate > 2.1 ? 'watching' : ''
-            },
-            {
-                condition: 'Openings/Unemployed > 1.1',
-                current: currentMetrics.openingsRatio,
-                target: 1.1,
-                recentValues: getRecentValues(monthlyData.openingsRatio),
-                decimals: 2,
-                goodDirection: 'up',
-                status: currentMetrics.openingsRatio > 1.1 ? 'met' :
-                        currentMetrics.openingsRatio > 1.0 ? 'watching' : ''
-            },
-            {
-                condition: 'Hires Rate > 3.5%',
-                current: currentMetrics.hiresRate,
-                target: 3.5,
-                recentValues: getRecentValues(monthlyData.hiresRate),
-                decimals: 1,
-                goodDirection: 'up',
-                status: currentMetrics.hiresRate > 3.5 ? 'met' :
-                        currentMetrics.hiresRate > 3.3 ? 'watching' : ''
-            },
-            {
-                condition: 'Fed Funds Rate < 3.0%',
-                current: currentMetrics.fedRate,
-                target: 3.0,
-                recentValues: getRecentValues(monthlyData.fedRate),
-                decimals: 2,
-                goodDirection: 'down', // lower is better for this metric
-                status: currentMetrics.fedRate < 3.0 ? 'met' :
-                        currentMetrics.fedRate < 3.5 ? 'watching' : ''
-            }
-        ];
-        
-        const triggerEl = document.getElementById('triggerList');
-        triggerEl.innerHTML = triggers.map(t => {
-            const icon = t.status === 'met' ? 'âœ“' : t.status === 'watching' ? 'â—' : 'â—‹';
-            const trend = getTrend(t.recentValues);
-            const trendIsGood = (trend.direction === t.goodDirection) || 
-                               (trend.direction === 'flat' && t.status === 'met');
-            const trendClass = trendIsGood ? 'trend-good' : 
-                              trend.direction === 'flat' ? 'trend-flat' : 'trend-bad';
-            const trendHistory = formatTrendHistory(t.recentValues, t.decimals);
-            
-            const statusText = t.status === 'met' ? 'Condition met' :
-                              t.status === 'watching' ? 'Approaching threshold' :
-                              `Current: ${t.current.toFixed(t.decimals)}`;
-            return `
-                <div class="trigger-item ${t.status}">
-                    <span class="trigger-icon">${icon}</span>
-                    <div class="trigger-content">
-                        <div class="trigger-condition">${t.condition}</div>
-                        <div class="trigger-status">${statusText}</div>
-                        <div class="trigger-trend ${trendClass}">
-                            <span class="trend-arrow">${trend.arrow}</span>
-                            <span class="trend-history">Last 3mo: ${trendHistory}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-        
-        // Generate plain English summary based on trigger conditions and trends
-        const triggerAnalysis = triggers.map(t => {
-            const trend = getTrend(t.recentValues);
-            const trendIsGood = trend.direction === t.goodDirection;
-            const trendIsBad = trend.direction !== 'flat' && !trendIsGood;
-            return { ...t, trend, trendIsGood, trendIsBad };
-        });
-        
-        const metConditions = triggerAnalysis.filter(t => t.status === 'met');
-        const watchingConditions = triggerAnalysis.filter(t => t.status === 'watching');
-        const improvingConditions = triggerAnalysis.filter(t => t.trendIsGood);
-        const worseningConditions = triggerAnalysis.filter(t => t.trendIsBad);
-        
-        // Build the summary
-        let summaryParts = [];
-        
-        // Overall assessment
-        if (metConditions.length >= 3) {
-            summaryParts.push(`<strong>Recovery signals strengthening.</strong> ${metConditions.length} of 4 trigger conditions are now met.`);
-        } else if (metConditions.length >= 2) {
-            summaryParts.push(`<strong>Early recovery signals emerging.</strong> ${metConditions.length} of 4 conditions met â€” watch for sustained improvement.`);
-        } else if (watchingConditions.length >= 2 || improvingConditions.length >= 2) {
-            summaryParts.push(`<strong>Mixed signals, but some positive movement.</strong> No conditions met yet, but trends bear watching.`);
-        } else if (worseningConditions.length >= 3) {
-            summaryParts.push(`<strong>Conditions deteriorating.</strong> Most indicators moving in the wrong direction â€” hunker down.`);
-        } else {
-            summaryParts.push(`<strong>Holding pattern.</strong> No trigger conditions met, limited positive momentum.`);
-        }
-        
-        // Specific trends
-        if (improvingConditions.length > 0) {
-            const improvingNames = improvingConditions.map(t => {
-                if (t.condition.includes('Quit')) return 'quit rate';
-                if (t.condition.includes('Openings')) return 'openings ratio';
-                if (t.condition.includes('Hires')) return 'hires rate';
-                if (t.condition.includes('Fed')) return 'Fed rate';
-                return t.condition;
+            let peakScore = 0;
+            let peakIdx = 0;
+            compositeScores.forEach((score, idx) => {
+                if (score !== null && score > peakScore) {
+                    peakScore = score;
+                    peakIdx = idx;
+                }
             });
-            summaryParts.push(`<span class="trend-positive">â†‘ Improving:</span> ${improvingNames.join(', ')}.`);
-        }
-        
-        if (worseningConditions.length > 0) {
-            const worseningNames = worseningConditions.map(t => {
-                if (t.condition.includes('Quit')) return 'quit rate';
-                if (t.condition.includes('Openings')) return 'openings ratio';
-                if (t.condition.includes('Hires')) return 'hires rate';
-                if (t.condition.includes('Fed')) return 'Fed rate';
-                return t.condition;
-            });
-            summaryParts.push(`<span class="trend-negative">â†“ Worsening:</span> ${worseningNames.join(', ')}.`);
-        }
-        
-        // Bottom line recommendation
-        if (metConditions.length >= 2 && improvingConditions.length >= 1) {
-            summaryParts.push(`<span class="trend-positive">Consider increasing job search activity.</span>`);
-        } else if (improvingConditions.length >= 2 && worseningConditions.length === 0) {
-            summaryParts.push(`<span class="trend-neutral">Watch closely â€” conditions may be turning.</span>`);
-        } else if (worseningConditions.length > improvingConditions.length) {
-            summaryParts.push(`<span class="trend-negative">Not yet time to actively search.</span>`);
-        } else {
-            summaryParts.push(`<span class="trend-neutral">Continue monitoring monthly data releases.</span>`);
-        }
-        
-        document.getElementById('recoverySummary').innerHTML = summaryParts.join(' ');
-        
-        // 4. Sensitivity Analysis - Calculate hypothetical scores
-        function calculateHypotheticalScore(overrides) {
-            const metrics = { ...currentMetrics, ...overrides };
             
-            const quitScore = Math.min(1, Math.max(0, (metrics.quitRate - 1.5) / 1.5));
-            const ratioScore = Math.min(1, Math.max(0, (metrics.openingsRatio - 0.3) / 1.7));
-            const hiresScore = Math.min(1, Math.max(0, (metrics.hiresRate - 2.0) / 2.5));
-            const layoffsScore = Math.min(1, Math.max(0, (2.5 - metrics.layoffsRate) / 1.7));
-            const unempScore = Math.min(1, Math.max(0, (7.0 - metrics.unempRate) / 3.5));
-            const fedScore = Math.min(1, Math.max(0, (5.5 - metrics.fedRate) / 5.5));
-            const wageScore = Math.min(1, Math.max(0, (metrics.wageGrowth - 2.0) / 3.0));
-            const lfprScore = Math.min(1, Math.max(0, (metrics.lfpr - 79) / 4.0));
-            
-            const tier1 = (quitScore + ratioScore + hiresScore + layoffsScore) / 4 * 0.6;
-            const tier2 = (unempScore + fedScore + wageScore + lfprScore) / 4 * 0.4;
-            
-            let baseScore = (tier1 + tier2) * 100;
-            
-            // Apply interaction effects
-            if (metrics.openingsRatio < 1.0) baseScore *= 0.92;
-            const churnPenalty = 0.12 * (1 - Math.min(quitScore, hiresScore));
-            baseScore *= (1 - churnPenalty);
-            if (metrics.fedRate < 0.5) baseScore *= 1.08;
-            
-            return Math.min(100, Math.round(baseScore));
-        }
-        
-        const scenarios = [
-            {
-                name: 'Quit rate improves to 2.3%',
-                overrides: { quitRate: 2.3 },
-                score: calculateHypotheticalScore({ quitRate: 2.3 })
-            },
-            {
-                name: 'Openings/Unemployed returns to 1.1',
-                overrides: { openingsRatio: 1.1 },
-                score: calculateHypotheticalScore({ openingsRatio: 1.1 })
-            },
-            {
-                name: 'Fed cuts to 2.5%',
-                overrides: { fedRate: 2.5 },
-                score: calculateHypotheticalScore({ fedRate: 2.5 })
-            },
-            {
-                name: 'Hires rate recovers to 3.6%',
-                overrides: { hiresRate: 3.6 },
-                score: calculateHypotheticalScore({ hiresRate: 3.6 })
-            },
-            {
-                name: 'Combined: Quit 2.3% + Ratio 1.1',
-                overrides: { quitRate: 2.3, openingsRatio: 1.1 },
-                score: calculateHypotheticalScore({ quitRate: 2.3, openingsRatio: 1.1 })
+            let currentScore = compositeScores[compositeScores.length - 1];
+            let currentIdx = compositeScores.length - 1;
+            while (currentScore === null && currentIdx > 0) {
+                currentIdx--;
+                currentScore = compositeScores[currentIdx];
             }
-        ];
-        
-        const sensitivityEl = document.getElementById('sensitivityList');
-        sensitivityEl.innerHTML = scenarios.map(s => {
-            const delta = s.score - currentScore;
-            const deltaStr = delta >= 0 ? `+${delta}` : `${delta}`;
-            const category = s.score >= 55 ? 'positive' : s.score >= 48 ? 'neutral' : 'negative';
-            const reachesTarget = s.score >= 55 ? ' â†’ Lean Favorable' : '';
-            return `
-                <div class="sensitivity-item">
-                    <span class="sensitivity-scenario">${s.name}</span>
-                    <span class="sensitivity-result ${category}">Score: ${s.score} (${deltaStr})${reachesTarget}</span>
-                </div>
-            `;
-        }).join('');
+            
+            document.getElementById('currentScore').textContent = currentScore;
+            const scoreEl = document.getElementById('currentScore');
+            const verdictEl = document.getElementById('scoreVerdict');
+            const verdictIconEl = document.getElementById('verdictIcon');
+            const verdictTextEl = document.getElementById('verdictText');
+            const changeEl = document.getElementById('scoreChange');
+            const interpEl = document.getElementById('interpretation');
+            
+            if (currentScore >= 70) {
+                scoreEl.className = 'score-value favorable';
+                verdictEl.className = 'score-verdict favorable';
+                verdictIconEl.className = 'verdict-icon favorable';
+                verdictTextEl.textContent = 'Favorable';
+                interpEl.innerHTML = '<strong>Employee-favorable market.</strong> Active job searching is rational. High quit rates signal worker confidence. Apply aggressively and accept informational interviews.';
+                interpEl.style.borderLeftColor = 'var(--accent-green)';
+            } else if (currentScore >= 55) {
+                scoreEl.className = 'score-value lean-favorable';
+                verdictEl.className = 'score-verdict lean-favorable';
+                verdictIconEl.className = 'verdict-icon lean-favorable';
+                verdictTextEl.textContent = 'Lean Favorable';
+                interpEl.innerHTML = '<strong>Functional market with opportunities.</strong> Selective job searching is reasonable. Focus on strong-fit opportunities and maintain your network. Patience and targeting will pay off.';
+                interpEl.style.borderLeftColor = 'var(--accent-yellow)';
+            } else if (currentScore >= 40) {
+                scoreEl.className = 'score-value lean-unfavorable';
+                verdictEl.className = 'score-verdict lean-unfavorable';
+                verdictIconEl.className = 'verdict-icon lean-unfavorable';
+                verdictTextEl.textContent = 'Lean Unfavorable';
+                interpEl.innerHTML = '<strong>Headwinds present.</strong> Hold steady unless you have a compelling reason to move. Market is competitive with more seekers than opportunities. Be strategic and don\'t jump at marginal offers.';
+                interpEl.style.borderLeftColor = 'var(--accent-orange)';
+            } else {
+                scoreEl.className = 'score-value unfavorable';
+                verdictEl.className = 'score-verdict unfavorable';
+                verdictIconEl.className = 'verdict-icon unfavorable';
+                verdictTextEl.textContent = 'Unfavorable';
+                interpEl.innerHTML = '<strong>Employer-favorable market.</strong> Hunker down and focus on stability. Significant difficulty finding new positions. Only move if necessary or for exceptional opportunities.';
+                interpEl.style.borderLeftColor = 'var(--accent-red)';
+            }
+            
+            const diff = peakScore - currentScore;
+            changeEl.textContent = `↓ ${diff} pts from peak (${monthlyData.labels[peakIdx]}: ${peakScore})`;
+            
+            document.getElementById('peakContext').textContent = `${peakScore} — ${monthlyData.labels[peakIdx]} (Great Resignation)`;
+            
+            const covidIdx = monthlyData.labels.indexOf('Apr-20');
+            const covidScore = compositeScores[covidIdx];
+            document.getElementById('covidContext').textContent = `${covidScore} — Lockdowns`;
+            
+            const prePandemicIdx = monthlyData.labels.indexOf('Dec-19');
+            const prePandemicScore = compositeScores[prePandemicIdx];
+            document.getElementById('prePandemicContext').textContent = `${prePandemicScore} — Tight Labor Market`;
+            
+            const cycleEl = document.getElementById('cyclePosition');
+            if (currentScore >= 70) {
+                cycleEl.textContent = 'Employee-Favorable';
+            } else if (currentScore >= 55) {
+                cycleEl.textContent = 'Balanced / Functional';
+            } else if (currentScore >= 40) {
+                cycleEl.textContent = 'Employer-Tilting';
+            } else {
+                cycleEl.textContent = 'Employer-Favorable';
+            }
+            
+            const analogEl = document.getElementById('historicalAnalog');
+            let bestMatch = { idx: -1, diff: Infinity };
+            const excludeStart = monthlyData.labels.indexOf('Mar-20');
+            const excludeEnd = monthlyData.labels.indexOf('Dec-20');
+            const recentCutoff = compositeScores.length - 12;
+            
+            compositeScores.forEach((score, idx) => {
+                if (score === null) return;
+                if (idx >= excludeStart && idx <= excludeEnd) return;
+                if (idx >= recentCutoff) return;
+                
+                const diff = Math.abs(score - currentScore);
+                if (diff < bestMatch.diff) {
+                    bestMatch = { idx, diff, score };
+                }
+            });
+            
+            if (bestMatch.idx >= 0) {
+                if (bestMatch.diff <= 3) {
+                    analogEl.textContent = `${monthlyData.labels[bestMatch.idx]} (Score: ${bestMatch.score})`;
+                } else if (bestMatch.diff <= 8) {
+                    analogEl.textContent = `~${monthlyData.labels[bestMatch.idx]} (±${bestMatch.diff} pts)`;
+                } else {
+                    analogEl.textContent = `No close analog`;
+                }
+            } else {
+                analogEl.textContent = 'No historical match';
+            }
 
-        // Get colors based on score (four-tier system)
-        function getScoreColor(score) {
-            if (score >= 70) return 'rgba(0, 217, 160, 1)';      // Green - Favorable
-            if (score >= 55) return 'rgba(255, 201, 64, 1)';     // Yellow - Lean Favorable
-            if (score >= 40) return 'rgba(255, 140, 64, 1)';     // Orange - Lean Unfavorable
-            return 'rgba(255, 77, 106, 1)';                       // Red - Unfavorable
-        }
-
-        function getScoreColorDim(score) {
-            if (score >= 70) return 'rgba(0, 217, 160, 0.2)';
-            if (score >= 55) return 'rgba(255, 201, 64, 0.2)';
-            if (score >= 40) return 'rgba(255, 140, 64, 0.2)';
-            return 'rgba(255, 77, 106, 0.2)';
-        }
-
-        // Create gradient for main chart (four zones)
-        function createGradient(ctx, chartArea) {
-            const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-            gradient.addColorStop(0, 'rgba(255, 77, 106, 0.3)');     // Red at bottom (<40)
-            gradient.addColorStop(0.4, 'rgba(255, 140, 64, 0.3)');   // Orange (40-54)
-            gradient.addColorStop(0.55, 'rgba(255, 201, 64, 0.3)');  // Yellow (55-69)
-            gradient.addColorStop(0.7, 'rgba(0, 217, 160, 0.3)');    // Green at top (70+)
-            return gradient;
-        }
-
-        // Chart defaults
-        Chart.defaults.color = '#9898a8';
-        Chart.defaults.font.family = "'JetBrains Mono', monospace";
-        Chart.defaults.font.size = 10;
-
-        // Main composite score chart
-        const mainCtx = document.getElementById('mainChart').getContext('2d');
-        new Chart(mainCtx, {
-            type: 'line',
-            data: {
-                labels: monthlyData.labels,
-                datasets: [{
-                    label: 'Composite Score',
-                    data: compositeScores,
-                    borderColor: 'rgba(255, 201, 64, 1)',
-                    segment: {
-                        borderColor: ctx => {
-                            const val = ctx.p0.parsed.y;
-                            if (val >= 70) return 'rgba(0, 217, 160, 1)';    // Green - Favorable
-                            if (val >= 55) return 'rgba(255, 201, 64, 1)';   // Yellow - Lean Favorable
-                            if (val >= 40) return 'rgba(255, 140, 64, 1)';   // Orange - Lean Unfavorable
-                            return 'rgba(255, 77, 106, 1)';                   // Red - Unfavorable
-                        }
-                    },
-                    backgroundColor: function(context) {
-                        const chart = context.chart;
-                        const {ctx, chartArea} = chart;
-                        if (!chartArea) return 'rgba(255, 201, 64, 0.1)';
-                        return createGradient(ctx, chartArea);
-                    },
-                    fill: true,
-                    tension: 0.3,
-                    pointRadius: 0,
-                    pointHoverRadius: 6,
-                    pointHoverBackgroundColor: '#fff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
-                },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: 'rgba(22, 22, 32, 0.95)',
-                        titleColor: '#e8e8ed',
-                        bodyColor: '#9898a8',
-                        borderColor: '#28283a',
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: false,
-                        callbacks: {
-                            title: (items) => items[0].label,
-                            label: (item) => {
-                                const score = item.raw;
-                                let status = 'Unfavorable';
-                                if (score >= 70) status = 'Favorable';
-                                else if (score >= 55) status = 'Lean Favorable';
-                                else if (score >= 40) status = 'Lean Unfavorable';
-                                return [`Score: ${score}/100`, `Status: ${status}`];
-                            }
-                        }
-                    },
-                    annotation: {
-                        annotations: {
-                            line70: {
-                                type: 'line',
-                                yMin: 70,
-                                yMax: 70,
-                                borderColor: 'rgba(0, 217, 160, 0.4)',
-                                borderWidth: 1,
-                                borderDash: [5, 5]
-                            },
-                            line55: {
-                                type: 'line',
-                                yMin: 55,
-                                yMax: 55,
-                                borderColor: 'rgba(255, 201, 64, 0.4)',
-                                borderWidth: 1,
-                                borderDash: [5, 5]
-                            },
-                            line40: {
-                                type: 'line',
-                                yMin: 40,
-                                yMax: 40,
-                                borderColor: 'rgba(255, 140, 64, 0.4)',
-                                borderWidth: 1,
-                                borderDash: [5, 5]
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
-                        ticks: { 
-                            maxTicksLimit: 12,
-                            maxRotation: 0
-                        }
-                    },
-                    y: {
-                        min: 0,
-                        max: 100,
-                        grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
-                        ticks: {
-                            stepSize: 20,
-                            callback: (val) => val + ''
-                        }
-                    }
+            // Path to Lean Favorable Analysis
+            const currentMetrics = {
+                quitRate: monthlyData.quitRate[currentIdx],
+                openingsRatio: monthlyData.openingsRatio[currentIdx],
+                hiresRate: monthlyData.hiresRate[currentIdx],
+                layoffsRate: monthlyData.layoffsRate[currentIdx],
+                unempRate: monthlyData.unempRate[currentIdx],
+                fedRate: monthlyData.fedRate[currentIdx],
+                wageGrowth: monthlyData.wageGrowth[currentIdx],
+                lfpr: monthlyData.lfpr[currentIdx]
+            };
+            
+            function getMetricScore(metric, value) {
+                switch(metric) {
+                    case 'quitRate': return Math.min(1, Math.max(0, (value - 1.5) / 1.5));
+                    case 'openingsRatio': return Math.min(1, Math.max(0, (value - 0.3) / 1.7));
+                    case 'hiresRate': return Math.min(1, Math.max(0, (value - 2.0) / 2.5));
+                    case 'layoffsRate': return Math.min(1, Math.max(0, (2.5 - value) / 1.7));
+                    case 'unempRate': return Math.min(1, Math.max(0, (7.0 - value) / 3.5));
+                    case 'fedRate': return Math.min(1, Math.max(0, (5.5 - value) / 5.5));
+                    case 'wageGrowth': return Math.min(1, Math.max(0, (value - 2.0) / 3.0));
+                    case 'lfpr': return Math.min(1, Math.max(0, (value - 79) / 4.0));
+                    default: return 0.5;
                 }
             }
-        });
-
-        // Color constants
-        const COLOR_GOOD = 'rgba(0, 217, 160, 1)';
-        const COLOR_NEUTRAL = 'rgba(255, 201, 64, 1)';
-        const COLOR_BAD = 'rgba(255, 77, 106, 1)';
-        
-        // Threshold definitions for each metric
-        const thresholds = {
-            quitRate: { good: 2.5, neutral: 2.0 }, // Higher is better
-            openingsRatio: { good: 1.5, neutral: 1.0 }, // Higher is better
-            hiresRate: { good: 4.0, neutral: 3.5 }, // Higher is better
-            layoffsRate: { good: 1.0, neutral: 1.3 }, // Lower is better (inverted color logic)
-            unempRate: { good: 4.0, neutral: 5.0 }, // Lower is better (inverted color logic)
-            fedRate: { good: 2.0, neutral: 4.0 }, // Lower is better (inverted color logic)
-            wageGrowth: { good: 4.0, neutral: 3.0 }, // Higher is better
-            lfpr: { good: 82.5, neutral: 81.0 } // Higher is better
-        };
-        
-        // Get color based on value and thresholds
-        function getMetricColor(value, metric) {
-            const t = thresholds[metric];
-            const inverted = ['layoffsRate', 'unempRate', 'fedRate'].includes(metric);
             
-            if (inverted) {
-                // Lower is better
-                if (value <= t.good) return COLOR_GOOD;
-                if (value <= t.neutral) return COLOR_NEUTRAL;
-                return COLOR_BAD;
-            } else {
-                // Higher is better
-                if (value >= t.good) return COLOR_GOOD;
-                if (value >= t.neutral) return COLOR_NEUTRAL;
-                return COLOR_BAD;
+            function getScoreCategory(score) {
+                if (score >= 0.7) return 'good';
+                if (score >= 0.5) return 'neutral';
+                if (score >= 0.3) return 'poor';
+                return 'bad';
             }
-        }
-
-        // Mini sparkline charts with dynamic segment coloring
-        // Note: Y-axis is NOT inverted - spikes show as spikes for intuitive reading
-        // Color logic handles "good" vs "bad" interpretation
-        function createSparkline(canvasId, data, metric) {
-            const ctx = document.getElementById(canvasId).getContext('2d');
             
-            new Chart(ctx, {
+            const metricInfo = {
+                quitRate: { name: 'Quit Rate', tier: 1, format: v => v.toFixed(1) + '%', target: 2.3 },
+                openingsRatio: { name: 'Openings/Unemployed', tier: 1, format: v => v.toFixed(2), target: 1.1 },
+                hiresRate: { name: 'Hires Rate', tier: 1, format: v => v.toFixed(1) + '%', target: 3.6 },
+                layoffsRate: { name: 'Layoffs Rate', tier: 1, format: v => v.toFixed(1) + '%', target: 1.0, inverted: true },
+                unempRate: { name: 'Unemployment', tier: 2, format: v => v.toFixed(1) + '%', target: 4.2, inverted: true },
+                fedRate: { name: 'Fed Funds Rate', tier: 2, format: v => v.toFixed(2) + '%', target: 3.0, inverted: true },
+                wageGrowth: { name: 'Wage Growth', tier: 2, format: v => v.toFixed(1) + '%', target: 4.0 },
+                lfpr: { name: 'Prime-Age LFPR', tier: 2, format: v => v.toFixed(1) + '%', target: 83.0 }
+            };
+            
+            const metricScores = Object.entries(currentMetrics)
+                .filter(([k, v]) => v != null)
+                .map(([metric, value]) => ({
+                    metric,
+                    value,
+                    score: getMetricScore(metric, value),
+                    info: metricInfo[metric]
+                }))
+                .sort((a, b) => a.score - b.score);
+            
+            const distanceToTarget = Math.max(0, 55 - currentScore);
+            document.getElementById('distancePoints').textContent = distanceToTarget;
+            
+            const quitScoreVal = getMetricScore('quitRate', currentMetrics.quitRate);
+            const hiresScoreVal = getMetricScore('hiresRate', currentMetrics.hiresRate);
+            const isFrozenMarket = quitScoreVal < 0.5 && hiresScoreVal < 0.6;
+            
+            const decompositionEl = document.getElementById('decompositionList');
+            decompositionEl.innerHTML = metricScores.map(m => {
+                const isLayoffs = m.metric === 'layoffsRate';
+                const showFootnote = isLayoffs && isFrozenMarket && m.score > 0.7;
+                return `
+                    <div class="decomposition-item">
+                        <span class="metric-name">${m.info.name}${showFootnote ? ' <span class="footnote-marker">†</span>' : ''}</span>
+                        <div class="metric-bar-container">
+                            <div class="metric-bar ${getScoreCategory(m.score)}" style="width: ${m.score * 100}%"></div>
+                        </div>
+                        <span class="metric-score">${Math.round(m.score * 100)}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            if (isFrozenMarket) {
+                decompositionEl.innerHTML += `
+                    <div class="decomposition-footnote">
+                        <span class="footnote-marker">†</span> Low layoffs in a frozen market (low quits + low hires) provides less benefit than the score suggests. 
+                        Employers aren't cutting, but they're also not hiring — limited opportunities for job seekers.
+                    </div>
+                `;
+            }
+            
+            // Trigger Conditions
+            const getRecentValues = (dataArray, count = 3) => {
+                const validIdx = currentIdx;
+                const values = [];
+                for (let i = 0; i < count && (validIdx - i) >= 0; i++) {
+                    const val = dataArray[validIdx - i];
+                    if (val != null) values.push(val);
+                }
+                return values;
+            };
+            
+            const getTrend = (values) => {
+                if (values.length < 2) return { arrow: '—', direction: 'flat' };
+                const recent = values[0];
+                const older = values[values.length - 1];
+                const diff = recent - older;
+                const threshold = Math.abs(older) * 0.05;
+                
+                if (diff > threshold) return { arrow: '↑', direction: 'up' };
+                if (diff < -threshold) return { arrow: '↓', direction: 'down' };
+                return { arrow: '→', direction: 'flat' };
+            };
+            
+            const formatTrendHistory = (values, decimals = 2) => {
+                return values.slice(0, 3).reverse().map(v => v.toFixed(decimals)).join(' → ');
+            };
+            
+            const triggers = [
+                {
+                    condition: 'Quit Rate > 2.3% for 3+ months',
+                    current: currentMetrics.quitRate,
+                    target: 2.3,
+                    recentValues: getRecentValues(monthlyData.quitRate),
+                    decimals: 1,
+                    goodDirection: 'up',
+                    status: currentMetrics.quitRate > 2.3 ? 'met' : 
+                            currentMetrics.quitRate > 2.1 ? 'watching' : ''
+                },
+                {
+                    condition: 'Openings/Unemployed > 1.1',
+                    current: currentMetrics.openingsRatio,
+                    target: 1.1,
+                    recentValues: getRecentValues(monthlyData.openingsRatio),
+                    decimals: 2,
+                    goodDirection: 'up',
+                    status: currentMetrics.openingsRatio > 1.1 ? 'met' :
+                            currentMetrics.openingsRatio > 1.0 ? 'watching' : ''
+                },
+                {
+                    condition: 'Hires Rate > 3.5%',
+                    current: currentMetrics.hiresRate,
+                    target: 3.5,
+                    recentValues: getRecentValues(monthlyData.hiresRate),
+                    decimals: 1,
+                    goodDirection: 'up',
+                    status: currentMetrics.hiresRate > 3.5 ? 'met' :
+                            currentMetrics.hiresRate > 3.3 ? 'watching' : ''
+                },
+                {
+                    condition: 'Fed Funds Rate < 3.0%',
+                    current: currentMetrics.fedRate,
+                    target: 3.0,
+                    recentValues: getRecentValues(monthlyData.fedRate),
+                    decimals: 2,
+                    goodDirection: 'down',
+                    status: currentMetrics.fedRate < 3.0 ? 'met' :
+                            currentMetrics.fedRate < 3.5 ? 'watching' : ''
+                }
+            ];
+            
+            const triggerEl = document.getElementById('triggerList');
+            triggerEl.innerHTML = triggers.map(t => {
+                const icon = t.status === 'met' ? '✓' : t.status === 'watching' ? '◎' : '○';
+                const trend = getTrend(t.recentValues);
+                const trendIsGood = (trend.direction === t.goodDirection) || 
+                                   (trend.direction === 'flat' && t.status === 'met');
+                const trendClass = trendIsGood ? 'trend-good' : 
+                                  trend.direction === 'flat' ? 'trend-flat' : 'trend-bad';
+                const trendHistory = formatTrendHistory(t.recentValues, t.decimals);
+                
+                const statusText = t.status === 'met' ? 'Condition met' :
+                                  t.status === 'watching' ? 'Approaching threshold' :
+                                  `Current: ${t.current.toFixed(t.decimals)}`;
+                return `
+                    <div class="trigger-item ${t.status}">
+                        <span class="trigger-icon">${icon}</span>
+                        <div class="trigger-content">
+                            <div class="trigger-condition">${t.condition}</div>
+                            <div class="trigger-status">${statusText}</div>
+                            <div class="trigger-trend ${trendClass}">
+                                <span class="trend-arrow">${trend.arrow}</span>
+                                <span class="trend-history">Last 3mo: ${trendHistory}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Recovery Summary
+            const triggerAnalysis = triggers.map(t => {
+                const trend = getTrend(t.recentValues);
+                const trendIsGood = trend.direction === t.goodDirection;
+                const trendIsBad = trend.direction !== 'flat' && !trendIsGood;
+                return { ...t, trend, trendIsGood, trendIsBad };
+            });
+            
+            const metConditions = triggerAnalysis.filter(t => t.status === 'met');
+            const watchingConditions = triggerAnalysis.filter(t => t.status === 'watching');
+            const improvingConditions = triggerAnalysis.filter(t => t.trendIsGood);
+            const worseningConditions = triggerAnalysis.filter(t => t.trendIsBad);
+            
+            let summaryParts = [];
+            
+            if (metConditions.length >= 3) {
+                summaryParts.push(`<strong>Recovery signals strengthening.</strong> ${metConditions.length} of 4 trigger conditions are now met.`);
+            } else if (metConditions.length >= 2) {
+                summaryParts.push(`<strong>Early recovery signals emerging.</strong> ${metConditions.length} of 4 conditions met — watch for sustained improvement.`);
+            } else if (watchingConditions.length >= 2 || improvingConditions.length >= 2) {
+                summaryParts.push(`<strong>Mixed signals, but some positive movement.</strong> No conditions met yet, but trends bear watching.`);
+            } else if (worseningConditions.length >= 3) {
+                summaryParts.push(`<strong>Conditions deteriorating.</strong> Most indicators moving in the wrong direction — hunker down.`);
+            } else {
+                summaryParts.push(`<strong>Holding pattern.</strong> No trigger conditions met, limited positive momentum.`);
+            }
+            
+            if (improvingConditions.length > 0) {
+                const improvingNames = improvingConditions.map(t => {
+                    if (t.condition.includes('Quit')) return 'quit rate';
+                    if (t.condition.includes('Openings')) return 'openings ratio';
+                    if (t.condition.includes('Hires')) return 'hires rate';
+                    if (t.condition.includes('Fed')) return 'Fed rate';
+                    return t.condition;
+                });
+                summaryParts.push(`<span class="trend-positive">↑ Improving:</span> ${improvingNames.join(', ')}.`);
+            }
+            
+            if (worseningConditions.length > 0) {
+                const worseningNames = worseningConditions.map(t => {
+                    if (t.condition.includes('Quit')) return 'quit rate';
+                    if (t.condition.includes('Openings')) return 'openings ratio';
+                    if (t.condition.includes('Hires')) return 'hires rate';
+                    if (t.condition.includes('Fed')) return 'Fed rate';
+                    return t.condition;
+                });
+                summaryParts.push(`<span class="trend-negative">↓ Worsening:</span> ${worseningNames.join(', ')}.`);
+            }
+            
+            if (metConditions.length >= 2 && improvingConditions.length >= 1) {
+                summaryParts.push(`<span class="trend-positive">Consider increasing job search activity.</span>`);
+            } else if (improvingConditions.length >= 2 && worseningConditions.length === 0) {
+                summaryParts.push(`<span class="trend-neutral">Watch closely — conditions may be turning.</span>`);
+            } else if (worseningConditions.length > improvingConditions.length) {
+                summaryParts.push(`<span class="trend-negative">Not yet time to actively search.</span>`);
+            } else {
+                summaryParts.push(`<span class="trend-neutral">Continue monitoring monthly data releases.</span>`);
+            }
+            
+            document.getElementById('recoverySummary').innerHTML = summaryParts.join(' ');
+            
+            // Sensitivity Analysis
+            function calculateHypotheticalScore(overrides) {
+                const metrics = { ...currentMetrics, ...overrides };
+                
+                const quitScore = Math.min(1, Math.max(0, (metrics.quitRate - 1.5) / 1.5));
+                const ratioScore = Math.min(1, Math.max(0, (metrics.openingsRatio - 0.3) / 1.7));
+                const hiresScore = Math.min(1, Math.max(0, (metrics.hiresRate - 2.0) / 2.5));
+                const layoffsScore = Math.min(1, Math.max(0, (2.5 - metrics.layoffsRate) / 1.7));
+                const unempScore = Math.min(1, Math.max(0, (7.0 - metrics.unempRate) / 3.5));
+                const fedScore = Math.min(1, Math.max(0, (5.5 - metrics.fedRate) / 5.5));
+                const wageScore = Math.min(1, Math.max(0, (metrics.wageGrowth - 2.0) / 3.0));
+                const lfprScore = Math.min(1, Math.max(0, (metrics.lfpr - 79) / 4.0));
+                
+                const tier1 = (quitScore + ratioScore + hiresScore + layoffsScore) / 4 * 0.6;
+                const tier2 = (unempScore + fedScore + wageScore + lfprScore) / 4 * 0.4;
+                
+                let baseScore = (tier1 + tier2) * 100;
+                
+                if (metrics.openingsRatio < 1.0) baseScore *= 0.92;
+                const churnPenalty = 0.12 * (1 - Math.min(quitScore, hiresScore));
+                baseScore *= (1 - churnPenalty);
+                if (metrics.fedRate < 0.5) baseScore *= 1.08;
+                
+                return Math.min(100, Math.round(baseScore));
+            }
+            
+            const scenarios = [
+                { name: 'Quit rate improves to 2.3%', overrides: { quitRate: 2.3 }, score: calculateHypotheticalScore({ quitRate: 2.3 }) },
+                { name: 'Openings/Unemployed returns to 1.1', overrides: { openingsRatio: 1.1 }, score: calculateHypotheticalScore({ openingsRatio: 1.1 }) },
+                { name: 'Fed cuts to 2.5%', overrides: { fedRate: 2.5 }, score: calculateHypotheticalScore({ fedRate: 2.5 }) },
+                { name: 'Hires rate recovers to 3.6%', overrides: { hiresRate: 3.6 }, score: calculateHypotheticalScore({ hiresRate: 3.6 }) },
+                { name: 'Combined: Quit 2.3% + Ratio 1.1', overrides: { quitRate: 2.3, openingsRatio: 1.1 }, score: calculateHypotheticalScore({ quitRate: 2.3, openingsRatio: 1.1 }) }
+            ];
+            
+            const sensitivityEl = document.getElementById('sensitivityList');
+            sensitivityEl.innerHTML = scenarios.map(s => {
+                const delta = s.score - currentScore;
+                const deltaStr = delta >= 0 ? `+${delta}` : `${delta}`;
+                const category = s.score >= 55 ? 'positive' : s.score >= 48 ? 'neutral' : 'negative';
+                const reachesTarget = s.score >= 55 ? ' → Lean Favorable' : '';
+                return `
+                    <div class="sensitivity-item">
+                        <span class="sensitivity-scenario">${s.name}</span>
+                        <span class="sensitivity-result ${category}">Score: ${s.score} (${deltaStr})${reachesTarget}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // Charts
+            function getScoreColor(score) {
+                if (score >= 70) return 'rgba(0, 217, 160, 1)';
+                if (score >= 55) return 'rgba(255, 201, 64, 1)';
+                if (score >= 40) return 'rgba(255, 140, 64, 1)';
+                return 'rgba(255, 77, 106, 1)';
+            }
+
+            function createGradient(ctx, chartArea) {
+                const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+                gradient.addColorStop(0, 'rgba(255, 77, 106, 0.3)');
+                gradient.addColorStop(0.4, 'rgba(255, 140, 64, 0.3)');
+                gradient.addColorStop(0.55, 'rgba(255, 201, 64, 0.3)');
+                gradient.addColorStop(0.7, 'rgba(0, 217, 160, 0.3)');
+                return gradient;
+            }
+
+            Chart.defaults.color = '#9898a8';
+            Chart.defaults.font.family = "'JetBrains Mono', monospace";
+            Chart.defaults.font.size = 10;
+
+            const mainCtx = document.getElementById('mainChart').getContext('2d');
+            new Chart(mainCtx, {
                 type: 'line',
                 data: {
                     labels: monthlyData.labels,
                     datasets: [{
-                        data: data,
-                        borderColor: COLOR_NEUTRAL,
+                        label: 'Composite Score',
+                        data: compositeScores,
+                        borderColor: 'rgba(255, 201, 64, 1)',
                         segment: {
                             borderColor: ctx => {
                                 const val = ctx.p0.parsed.y;
-                                return getMetricColor(val, metric);
+                                if (val >= 70) return 'rgba(0, 217, 160, 1)';
+                                if (val >= 55) return 'rgba(255, 201, 64, 1)';
+                                if (val >= 40) return 'rgba(255, 140, 64, 1)';
+                                return 'rgba(255, 77, 106, 1)';
                             }
                         },
-                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                        backgroundColor: function(context) {
+                            const chart = context.chart;
+                            const {ctx, chartArea} = chart;
+                            if (!chartArea) return 'rgba(255, 201, 64, 0.1)';
+                            return createGradient(ctx, chartArea);
+                        },
                         fill: true,
-                        tension: 0.4,
+                        tension: 0.3,
                         pointRadius: 0,
-                        borderWidth: 1.5
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#fff',
+                        borderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(22, 22, 32, 0.95)',
+                            titleColor: '#e8e8ed',
+                            bodyColor: '#9898a8',
+                            borderColor: '#28283a',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                title: (items) => items[0].label,
+                                label: (item) => {
+                                    const score = item.raw;
+                                    let status = 'Unfavorable';
+                                    if (score >= 70) status = 'Favorable';
+                                    else if (score >= 55) status = 'Lean Favorable';
+                                    else if (score >= 40) status = 'Lean Unfavorable';
+                                    return [`Score: ${score}/100`, `Status: ${status}`];
+                                }
+                            }
+                        },
+                        annotation: {
+                            annotations: {
+                                line70: { type: 'line', yMin: 70, yMax: 70, borderColor: 'rgba(0, 217, 160, 0.4)', borderWidth: 1, borderDash: [5, 5] },
+                                line55: { type: 'line', yMin: 55, yMax: 55, borderColor: 'rgba(255, 201, 64, 0.4)', borderWidth: 1, borderDash: [5, 5] },
+                                line40: { type: 'line', yMin: 40, yMax: 40, borderColor: 'rgba(255, 140, 64, 0.4)', borderWidth: 1, borderDash: [5, 5] }
+                            }
+                        }
+                    },
                     scales: {
-                        x: { display: false },
-                        y: { display: false }
+                        x: { grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false }, ticks: { maxTicksLimit: 12, maxRotation: 0 } },
+                        y: { min: 0, max: 100, grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false }, ticks: { stepSize: 20, callback: (val) => val + '' } }
                     }
                 }
             });
+
+            const COLOR_GOOD = 'rgba(0, 217, 160, 1)';
+            const COLOR_NEUTRAL = 'rgba(255, 201, 64, 1)';
+            const COLOR_BAD = 'rgba(255, 77, 106, 1)';
+            
+            const thresholds = {
+                quitRate: { good: 2.5, neutral: 2.0 },
+                openingsRatio: { good: 1.5, neutral: 1.0 },
+                hiresRate: { good: 4.0, neutral: 3.5 },
+                layoffsRate: { good: 1.0, neutral: 1.3 },
+                unempRate: { good: 4.0, neutral: 5.0 },
+                fedRate: { good: 2.0, neutral: 4.0 },
+                wageGrowth: { good: 4.0, neutral: 3.0 },
+                lfpr: { good: 82.5, neutral: 81.0 }
+            };
+            
+            function getMetricColor(value, metric) {
+                const t = thresholds[metric];
+                const inverted = ['layoffsRate', 'unempRate', 'fedRate'].includes(metric);
+                
+                if (inverted) {
+                    if (value <= t.good) return COLOR_GOOD;
+                    if (value <= t.neutral) return COLOR_NEUTRAL;
+                    return COLOR_BAD;
+                } else {
+                    if (value >= t.good) return COLOR_GOOD;
+                    if (value >= t.neutral) return COLOR_NEUTRAL;
+                    return COLOR_BAD;
+                }
+            }
+
+            function createSparkline(canvasId, data, metric) {
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: monthlyData.labels,
+                        datasets: [{
+                            data: data,
+                            borderColor: COLOR_NEUTRAL,
+                            segment: { borderColor: ctx => getMetricColor(ctx.p0.parsed.y, metric) },
+                            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            borderWidth: 1.5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                        scales: { x: { display: false }, y: { display: false } }
+                    }
+                });
+            }
+
+            createSparkline('quitChart', monthlyData.quitRate, 'quitRate');
+            createSparkline('openingsChart', monthlyData.openingsRatio, 'openingsRatio');
+            createSparkline('hiresChart', monthlyData.hiresRate, 'hiresRate');
+            createSparkline('layoffsChart', monthlyData.layoffsRate, 'layoffsRate');
+            createSparkline('unempChart', monthlyData.unempRate.map(v => v || 0), 'unempRate');
+            createSparkline('fedChart', monthlyData.fedRate, 'fedRate');
+            createSparkline('wageChart', monthlyData.wageGrowth.map(v => v || 0), 'wageGrowth');
+            createSparkline('lfprChart', monthlyData.lfpr.map(v => v || 0), 'lfpr');
         }
 
-        // Create all sparklines with metric-specific thresholds
-        createSparkline('quitChart', monthlyData.quitRate, 'quitRate');
-        createSparkline('openingsChart', monthlyData.openingsRatio, 'openingsRatio');
-        createSparkline('hiresChart', monthlyData.hiresRate, 'hiresRate');
-        createSparkline('layoffsChart', monthlyData.layoffsRate, 'layoffsRate');
-        createSparkline('unempChart', monthlyData.unempRate.map(v => v || 0), 'unempRate');
-        createSparkline('fedChart', monthlyData.fedRate, 'fedRate');
-        createSparkline('wageChart', monthlyData.wageGrowth.map(v => v || 0), 'wageGrowth');
-        createSparkline('lfprChart', monthlyData.lfpr.map(v => v || 0), 'lfpr');
+        // Initialize on page load
+        initDashboard().catch(err => {
+            console.error('Failed to load dashboard:', err);
+            document.getElementById('lastUpdated').textContent = 'Error loading data';
+        });
     </script>
 </body>
 </html>
