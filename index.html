@@ -672,21 +672,165 @@
         .sensitivity-result.neutral { color: var(--accent-yellow); }
         .sensitivity-result.negative { color: var(--accent-orange); }
 
-        /* Footer */
+        /* Footer styles moved to end of CSS */
+
+        /* About Section */
+        .about-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 32px;
+        }
+
+        .about-main h2 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .about-main p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+
+        .about-main p:last-child {
+            margin-bottom: 0;
+        }
+
+        .about-main strong {
+            color: var(--text-primary);
+        }
+
+        .about-main em {
+            color: var(--accent-yellow);
+            font-style: normal;
+        }
+
+        .about-how {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px 20px;
+        }
+
+        .about-how h3 {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .about-how ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 16px 0;
+        }
+
+        .about-how li {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            padding-left: 12px;
+            position: relative;
+        }
+
+        .about-how li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--text-muted);
+            font-size: 0.65rem;
+        }
+
+        .about-how li strong {
+            color: var(--text-primary);
+        }
+
+        .methodology-link {
+            font-size: 0.7rem;
+            color: var(--accent-blue);
+            text-decoration: none;
+            display: inline-block;
+            padding-top: 4px;
+            border-top: 1px solid var(--border-color);
+            width: 100%;
+        }
+
+        .methodology-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Updated Footer */
         footer {
-            text-align: center;
-            padding: 24px;
+            text-align: left;
+            padding: 28px 0;
             font-size: 0.7rem;
             color: var(--text-muted);
             border-top: 1px solid var(--border-color);
+            margin-top: 20px;
         }
 
-        footer a {
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 20px;
+        }
+
+        .footer-content strong {
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .footer-about {
+            line-height: 1.6;
+        }
+
+        .footer-links a {
             color: var(--accent-blue);
             text-decoration: none;
         }
 
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.65rem;
+        }
+
         /* Responsive */
+        @media (max-width: 900px) {
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 16px;
@@ -718,6 +862,27 @@
             <p class="subtitle">Quantitative signals for job search timing decisions. Tracking employee leverage indicators since 2015.</p>
         </header>
 
+        <!-- What is this? -->
+        <section class="about-section">
+            <div class="about-content">
+                <div class="about-main">
+                    <h2>What is this?</h2>
+                    <p>This dashboard tracks whether the labor market currently favors <strong>job seekers</strong> or <strong>employers</strong>. It synthesizes eight key economic indicators into a single composite score to help you decide: <em>is now a good time to look for a new job?</em></p>
+                    <p>The score ranges from 0–100. Above 55 suggests conditions favor making a move. Below 45 suggests holding steady. The current reading reflects data from the Bureau of Labor Statistics and Federal Reserve, updated monthly.</p>
+                </div>
+                <div class="about-how">
+                    <h3>How to read this</h3>
+                    <ul>
+                        <li><strong>The score</strong> — A quick read on overall conditions. Higher = better for job seekers.</li>
+                        <li><strong>Tier 1 metrics</strong> — Direct measures of employee leverage (quit rate, hiring velocity).</li>
+                        <li><strong>Tier 2 metrics</strong> — Broader economic context (unemployment, Fed policy).</li>
+                        <li><strong>Path to Lean Favorable</strong> — What would need to change for conditions to improve.</li>
+                    </ul>
+                    <a href="docs/methodology.md" class="methodology-link">Read the full methodology →</a>
+                </div>
+            </div>
+        </section>
+
         <!-- Hero Score -->
         <section class="hero-score">
             <div class="score-header">
@@ -744,11 +909,11 @@
         <!-- Main Time Series Chart -->
         <section class="main-chart">
             <div class="chart-header">
-                <div class="chart-title">Composite Score: 10-Year History (2015â€“2025)</div>
+                <div class="chart-title">Composite Score: 10-Year History (2015—2025)</div>
                 <div class="chart-legend">
                     <div class="legend-item"><span class="legend-dot green"></span> Favorable (70+)</div>
-                    <div class="legend-item"><span class="legend-dot yellow"></span> Lean Favorable (55â€“69)</div>
-                    <div class="legend-item"><span class="legend-dot orange"></span> Lean Unfavorable (40â€“54)</div>
+                    <div class="legend-item"><span class="legend-dot yellow"></span> Lean Favorable (55—69)</div>
+                    <div class="legend-item"><span class="legend-dot orange"></span> Lean Unfavorable (40—54)</div>
                     <div class="legend-item"><span class="legend-dot red"></span> Unfavorable (&lt;40)</div>
                 </div>
             </div>
@@ -761,7 +926,7 @@
         <section class="tier-section">
             <div class="tier-header">
                 <span class="tier-badge tier1">Tier 1</span>
-                <span class="tier-title">Core Indicators â€” Direct measures of employee leverage</span>
+                <span class="tier-title">Core Indicators — Direct measures of employee leverage</span>
             </div>
             <div class="metrics-grid">
                 <div class="metric-card">
@@ -811,7 +976,7 @@
         <section class="tier-section">
             <div class="tier-header">
                 <span class="tier-badge tier2">Tier 2</span>
-                <span class="tier-title">Macro Context â€” Economic environment shaping labor dynamics</span>
+                <span class="tier-title">Macro Context — Economic environment shaping labor dynamics</span>
             </div>
             <div class="metrics-grid">
                 <div class="metric-card">
@@ -902,7 +1067,7 @@
             <div class="recovery-grid">
                 <!-- Score Decomposition -->
                 <div class="recovery-panel">
-                    <div class="panel-title">Score Decomposition â€” What's Dragging Us Down?</div>
+                    <div class="panel-title">Score Decomposition — What's Dragging Us Down?</div>
                     <div class="decomposition-list" id="decompositionList">
                         <!-- Populated by JavaScript -->
                     </div>
@@ -910,7 +1075,7 @@
 
                 <!-- Trigger Conditions -->
                 <div class="recovery-panel">
-                    <div class="panel-title">Trigger Conditions â€” Watch For These Signals</div>
+                    <div class="panel-title">Trigger Conditions — Watch For These Signals</div>
                     <div class="trigger-list" id="triggerList">
                         <!-- Populated by JavaScript -->
                     </div>
@@ -918,7 +1083,7 @@
 
                 <!-- Sensitivity Analysis -->
                 <div class="recovery-panel" style="grid-column: 1 / -1;">
-                    <div class="panel-title">Sensitivity Analysis â€” What Would Move the Needle?</div>
+                    <div class="panel-title">Sensitivity Analysis — What Would Move the Needle?</div>
                     <div class="sensitivity-list" id="sensitivityList">
                         <!-- Populated by JavaScript -->
                     </div>
@@ -927,8 +1092,27 @@
         </section>
 
         <footer>
-            Data Sources: BLS JOLTS, BLS Employment Situation, Federal Reserve, ZipRecruiter, Indeed Hiring Lab, Conference Board, Challenger Gray<br>
-            Built for job search timing decisions â€¢ <a href="https://www.bls.gov/jlt/">BLS JOLTS</a> â€¢ <a href="https://fred.stlouisfed.org/">FRED</a>
+            <div class="footer-content">
+                <div class="footer-about">
+                    <strong>About this project</strong><br>
+                    Built to help workers make informed decisions about job search timing. 
+                    The composite score synthesizes government data into an actionable signal—no spin, no narratives, just numbers.
+                </div>
+                <div class="footer-links">
+                    <strong>Resources</strong><br>
+                    <a href="docs/methodology.md">Methodology</a> · 
+                    <a href="https://www.bls.gov/jlt/">BLS JOLTS</a> · 
+                    <a href="https://fred.stlouisfed.org/">FRED</a> · 
+                    <a href="https://github.com/jricciardi/labor-market-dashboard">Source Code</a>
+                </div>
+                <div class="footer-data">
+                    <strong>Data Sources</strong><br>
+                    BLS JOLTS, BLS Employment Situation, Federal Reserve
+                </div>
+            </div>
+            <div class="footer-bottom">
+                Updated monthly after BLS data releases. Not financial or career advice.
+            </div>
         </footer>
     </div>
 
