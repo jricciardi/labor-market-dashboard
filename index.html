@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labor Market Dashboard | Job Search Readiness</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --bg-card: #161620;
+            --text-primary: #e8e8ed;
+            --text-secondary: #9898a8;
+            --text-muted: #606070;
+            --accent-green: #00d9a0;
+            --accent-green-dim: rgba(0, 217, 160, 0.12);
+            --accent-yellow: #ffc940;
+            --accent-yellow-dim: rgba(255, 201, 64, 0.12);
+            --accent-orange: #ff8c40;
+            --accent-orange-dim: rgba(255, 140, 64, 0.12);
+            --accent-red: #ff4d6a;
+            --accent-red-dim: rgba(255, 77, 106, 0.12);
+            --accent-blue: #4d9fff;
+            --border-color: #28283a;
+            --chart-grid: rgba(255,255,255,0.04);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        header {
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 24px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2.2rem;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .last-updated {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            background: var(--bg-tertiary);
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+        }
+
+        /* Hero Score Section */
+        .hero-score {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-score::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-red), var(--accent-yellow) 50%, var(--accent-green));
+        }
+
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .score-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .score-display {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .score-value {
+            font-size: 4.5rem;
+            font-weight: 700;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .score-value.favorable { color: var(--accent-green); }
+        .score-value.lean-favorable { color: var(--accent-yellow); }
+        .score-value.lean-unfavorable { color: var(--accent-orange); }
+        .score-value.unfavorable { color: var(--accent-red); }
+
+        .score-max {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        .score-meta {
+            text-align: right;
+        }
+
+        .score-verdict {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .score-verdict.favorable {
+            background: var(--accent-green-dim);
+            color: var(--accent-green);
+            border: 1px solid rgba(0, 217, 160, 0.3);
+        }
+
+        .score-verdict.lean-favorable {
+            background: var(--accent-yellow-dim);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(255, 201, 64, 0.3);
+        }
+
+        .score-verdict.lean-unfavorable {
+            background: var(--accent-orange-dim);
+            color: var(--accent-orange);
+            border: 1px solid rgba(255, 140, 64, 0.3);
+        }
+
+        .score-verdict.unfavorable {
+            background: var(--accent-red-dim);
+            color: var(--accent-red);
+            border: 1px solid rgba(255, 77, 106, 0.3);
+        }
+
+        .verdict-icon {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .verdict-icon.favorable { background: var(--accent-green); }
+        .verdict-icon.lean-favorable { background: var(--accent-yellow); }
+        .verdict-icon.lean-unfavorable { background: var(--accent-orange); }
+        .verdict-icon.unfavorable { background: var(--accent-red); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .score-change {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .interpretation {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            padding: 14px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-red);
+        }
+
+        /* Main Chart */
+        .main-chart {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 16px;
+            font-size: 0.7rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .legend-dot.green { background: var(--accent-green); }
+        .legend-dot.yellow { background: var(--accent-yellow); }
+        .legend-dot.orange { background: var(--accent-orange); }
+        .legend-dot.red { background: var(--accent-red); }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .metric-info h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .metric-info .description {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .metric-value.good { color: var(--accent-green); }
+        .metric-value.neutral { color: var(--accent-yellow); }
+        .metric-value.bad { color: var(--accent-red); }
+
+        .metric-chart {
+            height: 80px;
+            margin-top: 12px;
+        }
+
+        /* Tier Sections */
+        .tier-section {
+            margin-bottom: 32px;
+        }
+
+        .tier-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tier-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .tier-badge.tier1 {
+            background: rgba(77, 159, 255, 0.15);
+            color: var(--accent-blue);
+            border: 1px solid rgba(77, 159, 255, 0.3);
+        }
+
+        .tier-badge.tier2 {
+            background: rgba(136, 136, 160, 0.15);
+            color: var(--text-secondary);
+            border: 1px solid rgba(136, 136, 160, 0.3);
+        }
+
+        .tier-badge.tier3 {
+            background: rgba(96, 96, 112, 0.15);
+            color: var(--text-muted);
+            border: 1px solid rgba(96, 96, 112, 0.3);
+        }
+
+        .tier-title {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* Historical Context */
+        .context-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .context-header {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .context-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .context-item {
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .context-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .context-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .context-value.highlight {
+            color: var(--accent-yellow);
+        }
+
+        /* Path to Recovery Section */
+        .recovery-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .recovery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .recovery-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .distance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: var(--accent-yellow-dim);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(255, 201, 64, 0.3);
+        }
+
+        .recovery-summary {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            padding: 14px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .recovery-summary strong {
+            color: var(--text-primary);
+        }
+
+        .recovery-summary .trend-positive {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .recovery-summary .trend-negative {
+            color: var(--accent-red);
+            font-weight: 600;
+        }
+
+        .recovery-summary .trend-neutral {
+            color: var(--accent-yellow);
+            font-weight: 600;
+        }
+
+        .recovery-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .recovery-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .recovery-panel {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .panel-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        /* Score Decomposition */
+        .decomposition-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .decomposition-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .metric-name {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            width: 140px;
+            flex-shrink: 0;
+        }
+
+        .metric-bar-container {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-primary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .metric-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .metric-bar.good { background: var(--accent-green); }
+        .metric-bar.neutral { background: var(--accent-yellow); }
+        .metric-bar.poor { background: var(--accent-orange); }
+        .metric-bar.bad { background: var(--accent-red); }
+
+        .metric-score {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            width: 32px;
+            text-align: right;
+        }
+
+        /* Trigger Conditions */
+        .trigger-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .trigger-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            border-left: 3px solid var(--text-muted);
+        }
+
+        .trigger-item.watching {
+            border-left-color: var(--accent-yellow);
+        }
+
+        .trigger-item.met {
+            border-left-color: var(--accent-green);
+        }
+
+        .trigger-icon {
+            font-size: 0.8rem;
+            margin-top: 1px;
+        }
+
+        .trigger-content {
+            flex: 1;
+        }
+
+        .trigger-condition {
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .trigger-status {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .trigger-trend {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+            font-size: 0.6rem;
+        }
+
+        .trend-arrow {
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .trend-history {
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .trigger-trend.trend-good .trend-arrow { color: var(--accent-green); }
+        .trigger-trend.trend-bad .trend-arrow { color: var(--accent-red); }
+        .trigger-trend.trend-flat .trend-arrow { color: var(--text-muted); }
+
+        /* Decomposition Footnote */
+        .decomposition-footnote {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .footnote-marker {
+            color: var(--accent-yellow);
+            font-weight: 600;
+        }
+
+        /* Sensitivity Analysis */
+        .sensitivity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sensitivity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+        }
+
+        .sensitivity-scenario {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .sensitivity-result {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .sensitivity-result.positive { color: var(--accent-green); }
+        .sensitivity-result.neutral { color: var(--accent-yellow); }
+        .sensitivity-result.negative { color: var(--accent-orange); }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 24px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+        }
+
+        footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .score-value {
+                font-size: 3rem;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="noise-overlay"></div>
+    
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <h1>Labor Market Dashboard</h1>
+                <span class="last-updated">Updated: Jan 8, 2026 â€¢ Data through Nov 2025</span>
+            </div>
+            <p class="subtitle">Quantitative signals for job search timing decisions. Tracking employee leverage indicators since 2015.</p>
+        </header>
+
+        <!-- Hero Score -->
+        <section class="hero-score">
+            <div class="score-header">
+                <div>
+                    <div class="score-label">Composite Job Search Readiness Score</div>
+                    <div class="score-display">
+                        <span class="score-value" id="currentScore">--</span>
+                        <span class="score-max">/ 100</span>
+                    </div>
+                </div>
+                <div class="score-meta">
+                    <div class="score-verdict" id="scoreVerdict">
+                        <span class="verdict-icon" id="verdictIcon"></span>
+                        <span id="verdictText">Loading...</span>
+                    </div>
+                    <div class="score-change" id="scoreChange">Loading...</div>
+                </div>
+            </div>
+            <div class="interpretation" id="interpretation">
+                Loading interpretation...
+            </div>
+        </section>
+
+        <!-- Main Time Series Chart -->
+        <section class="main-chart">
+            <div class="chart-header">
+                <div class="chart-title">Composite Score: 10-Year History (2015â€“2025)</div>
+                <div class="chart-legend">
+                    <div class="legend-item"><span class="legend-dot green"></span> Favorable (70+)</div>
+                    <div class="legend-item"><span class="legend-dot yellow"></span> Lean Favorable (55â€“69)</div>
+                    <div class="legend-item"><span class="legend-dot orange"></span> Lean Unfavorable (40â€“54)</div>
+                    <div class="legend-item"><span class="legend-dot red"></span> Unfavorable (&lt;40)</div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="mainChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Tier 1: Core Indicators -->
+        <section class="tier-section">
+            <div class="tier-header">
+                <span class="tier-badge tier1">Tier 1</span>
+                <span class="tier-title">Core Indicators â€” Direct measures of employee leverage</span>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-info">
+                            <h3>Quit Rate</h3>
+                            <span class="description">Worker confidence in finding better opportunities</span>
+                        </div>
+                        <span class="metric-value bad">2.0%</span>
+                    </div>
+                    <div class="metric-chart"><canvas id="quitChart"></canvas></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-info">
+                            <h3>Job Openings / Unemployed</h3>
+                            <span class="description">Supply/demand balance (>1 = more jobs than seekers)</span>
+                        </div>
+                        <span class="metric-value bad">0.94</span>
+                    </div>
+                    <div class="metric-chart"><canvas id="openingsChart"></canvas></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-info">
+                            <h3>Hires Rate</h3>
+                            <span class="description">Actual hiring velocity, not just postings</span>
+                        </div>
+                        <span class="metric-value neutral">3.2%</span>
+                    </div>
+                    <div class="metric-chart"><canvas id="hiresChart"></canvas></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-info">
+                            <h3>Layoffs Rate</h3>
+                            <span class="description">Involuntary separations</span>
+                        </div>
+                        <span class="metric-value neutral">1.1%</span>
+                    </div>
+                    <div class="metric-chart"><canvas id="layoffsChart"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tier 2: Macro Context -->
+        <section class="tier-section">
+            <div class="tier-header">
+                <span class="tier-badge tier2">Tier 2</span>
+                <span class="tier-title">Macro Context â€” Economic environment shaping labor dynamics</span>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-info">
+                            <h3>Unemployment Rate</h3>
+                            <span class="description">Headline labor market health</span>
+                        </div>
+                        <span class="metric-value neutral">4.6%</span>
+                    </div>
+                    <div class="metric-chart"><canvas id="unempChart"></canvas></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-info">
+                            <h3>Fed Funds Rate</h3>
+                            <span class="description">Cost of capital driving hiring decisions</span>
+                        </div>
+                        <span class="metric-value neutral">3.63%</span>
+                    </div>
+                    <div class="metric-chart"><canvas id="fedChart"></canvas></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-info">
+                            <h3>Wage Growth (YoY)</h3>
+                            <span class="description">Worker pricing power</span>
+                        </div>
+                        <span class="metric-value neutral">3.9%</span>
+                    </div>
+                    <div class="metric-chart"><canvas id="wageChart"></canvas></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-info">
+                            <h3>Prime-Age LFPR (25-54)</h3>
+                            <span class="description">Labor force engagement</span>
+                        </div>
+                        <span class="metric-value good">83.3%</span>
+                    </div>
+                    <div class="metric-chart"><canvas id="lfprChart"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Historical Context -->
+        <section class="context-section">
+            <div class="context-header">Historical Context & Key Benchmarks</div>
+            <div class="context-grid">
+                <div class="context-item">
+                    <div class="context-label">Current Cycle Position</div>
+                    <div class="context-value highlight" id="cyclePosition">Late-cycle Cooling</div>
+                </div>
+                <div class="context-item">
+                    <div class="context-label">Historical Analog</div>
+                    <div class="context-value" id="historicalAnalog">Loading...</div>
+                </div>
+                <div class="context-item">
+                    <div class="context-label">Peak Score</div>
+                    <div class="context-value" id="peakContext">Loading...</div>
+                </div>
+                <div class="context-item">
+                    <div class="context-label">COVID Trough (Apr 2020)</div>
+                    <div class="context-value" id="covidContext">Loading...</div>
+                </div>
+                <div class="context-item">
+                    <div class="context-label">Pre-Pandemic (Dec 2019)</div>
+                    <div class="context-value" id="prePandemicContext">Loading...</div>
+                </div>
+                <div class="context-item">
+                    <div class="context-label">Key Recovery Signal</div>
+                    <div class="context-value">Quit Rate > 2.3% for 3+ months</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Path to Recovery Section -->
+        <section class="recovery-section">
+            <div class="recovery-header">
+                <div class="recovery-title">Path to Lean Favorable</div>
+                <div class="distance-badge" id="distanceBadge">
+                    <span id="distancePoints">--</span> points needed
+                </div>
+            </div>
+            <div class="recovery-summary" id="recoverySummary">
+                <!-- Populated by JavaScript -->
+            </div>
+            <div class="recovery-grid">
+                <!-- Score Decomposition -->
+                <div class="recovery-panel">
+                    <div class="panel-title">Score Decomposition â€” What's Dragging Us Down?</div>
+                    <div class="decomposition-list" id="decompositionList">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Trigger Conditions -->
+                <div class="recovery-panel">
+                    <div class="panel-title">Trigger Conditions â€” Watch For These Signals</div>
+                    <div class="trigger-list" id="triggerList">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Sensitivity Analysis -->
+                <div class="recovery-panel" style="grid-column: 1 / -1;">
+                    <div class="panel-title">Sensitivity Analysis â€” What Would Move the Needle?</div>
+                    <div class="sensitivity-list" id="sensitivityList">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            Data Sources: BLS JOLTS, BLS Employment Situation, Federal Reserve, ZipRecruiter, Indeed Hiring Lab, Conference Board, Challenger Gray<br>
+            Built for job search timing decisions â€¢ <a href="https://www.bls.gov/jlt/">BLS JOLTS</a> â€¢ <a href="https://fred.stlouisfed.org/">FRED</a>
+        </footer>
+    </div>
+
+    <script>
+        // Complete monthly data from 2015-2025
+        const monthlyData = {
+            labels: [
+                'Jan-15','Feb-15','Mar-15','Apr-15','May-15','Jun-15','Jul-15','Aug-15','Sep-15','Oct-15','Nov-15','Dec-15',
+                'Jan-16','Feb-16','Mar-16','Apr-16','May-16','Jun-16','Jul-16','Aug-16','Sep-16','Oct-16','Nov-16','Dec-16',
+                'Jan-17','Feb-17','Mar-17','Apr-17','May-17','Jun-17','Jul-17','Aug-17','Sep-17','Oct-17','Nov-17','Dec-17',
+                'Jan-18','Feb-18','Mar-18','Apr-18','May-18','Jun-18','Jul-18','Aug-18','Sep-18','Oct-18','Nov-18','Dec-18',
+                'Jan-19','Feb-19','Mar-19','Apr-19','May-19','Jun-19','Jul-19','Aug-19','Sep-19','Oct-19','Nov-19','Dec-19',
+                'Jan-20','Feb-20','Mar-20','Apr-20','May-20','Jun-20','Jul-20','Aug-20','Sep-20','Oct-20','Nov-20','Dec-20',
+                'Jan-21','Feb-21','Mar-21','Apr-21','May-21','Jun-21','Jul-21','Aug-21','Sep-21','Oct-21','Nov-21','Dec-21',
+                'Jan-22','Feb-22','Mar-22','Apr-22','May-22','Jun-22','Jul-22','Aug-22','Sep-22','Oct-22','Nov-22','Dec-22',
+                'Jan-23','Feb-23','Mar-23','Apr-23','May-23','Jun-23','Jul-23','Aug-23','Sep-23','Oct-23','Nov-23','Dec-23',
+                'Jan-24','Feb-24','Mar-24','Apr-24','May-24','Jun-24','Jul-24','Aug-24','Sep-24','Oct-24','Nov-24','Dec-24',
+                'Jan-25','Feb-25','Mar-25','Apr-25','May-25','Jun-25','Jul-25','Aug-25','Sep-25','Oct-25','Nov-25'
+            ],
+            quitRate: [
+                1.9,1.9,1.9,1.9,1.9,2.0,2.0,2.0,2.0,2.0,2.0,2.0,
+                2.1,2.1,2.1,2.1,2.1,2.1,2.1,2.1,2.1,2.1,2.1,2.1,
+                2.2,2.2,2.2,2.2,2.2,2.2,2.2,2.2,2.2,2.2,2.2,2.2,
+                2.2,2.3,2.3,2.3,2.3,2.4,2.4,2.4,2.4,2.3,2.3,2.3,
+                2.3,2.3,2.3,2.3,2.3,2.3,2.4,2.3,2.3,2.3,2.3,2.3,
+                2.3,2.3,2.2,1.4,1.6,1.9,2.1,2.2,2.2,2.3,2.2,2.2,
+                2.3,2.4,2.5,2.6,2.5,2.5,2.6,2.7,2.8,2.8,2.9,2.9,
+                2.8,2.8,2.9,2.8,2.8,2.7,2.7,2.6,2.6,2.6,2.5,2.6,
+                2.5,2.4,2.4,2.4,2.4,2.3,2.3,2.3,2.2,2.2,2.2,2.2,
+                2.1,2.1,2.1,2.1,2.0,2.0,2.0,2.0,2.0,2.0,2.0,2.0,
+                2.1,2.1,2.1,2.0,2.0,2.0,2.0,1.9,2.0,1.8,2.0
+            ],
+            openingsRatio: [
+                1.09,1.12,1.14,1.15,1.18,1.17,1.16,1.15,1.12,1.15,1.17,1.17,
+                1.18,1.20,1.22,1.24,1.22,1.24,1.26,1.28,1.30,1.28,1.26,1.24,
+                1.26,1.28,1.30,1.32,1.34,1.36,1.38,1.40,1.42,1.44,1.42,1.35,
+                1.40,1.42,1.44,1.46,1.48,1.50,1.52,1.54,1.52,1.50,1.48,1.48,
+                1.46,1.48,1.50,1.52,1.50,1.48,1.46,1.44,1.42,1.44,1.46,1.45,
+                1.42,1.40,1.02,0.30,0.36,0.52,0.62,0.74,0.82,0.88,0.92,0.95,
+                1.05,1.18,1.32,1.48,1.58,1.68,1.78,1.85,1.88,1.92,1.98,2.00,
+                1.98,1.95,2.00,1.95,1.92,1.85,1.78,1.72,1.65,1.58,1.52,1.82,
+                1.78,1.72,1.65,1.58,1.52,1.48,1.44,1.42,1.40,1.38,1.36,1.40,
+                1.35,1.32,1.28,1.25,1.22,1.18,1.15,1.12,1.10,1.08,1.08,1.10,
+                1.13,1.10,1.05,1.02,1.00,0.99,0.98,0.96,1.01,0.99,0.94
+            ],
+            hiresRate: [
+                3.5,3.6,3.6,3.5,3.6,3.6,3.5,3.5,3.5,3.5,3.6,3.6,
+                3.6,3.6,3.7,3.7,3.7,3.7,3.7,3.7,3.7,3.7,3.7,3.7,
+                3.7,3.7,3.8,3.8,3.8,3.8,3.8,3.8,3.8,3.9,3.8,3.8,
+                3.8,3.8,3.9,3.9,3.9,3.9,3.9,3.9,4.0,3.9,3.9,3.9,
+                3.8,3.8,3.9,3.9,3.9,3.9,3.9,3.8,3.8,3.8,3.9,3.9,
+                3.9,3.8,3.2,2.0,2.8,3.5,3.8,3.9,3.8,3.8,3.7,3.7,
+                3.8,3.9,4.0,4.1,4.2,4.3,4.4,4.4,4.4,4.5,4.5,4.6,
+                4.5,4.5,4.6,4.4,4.3,4.2,4.1,4.1,4.0,3.9,3.8,4.0,
+                3.9,3.8,3.7,3.7,3.6,3.6,3.6,3.6,3.6,3.6,3.6,3.6,
+                3.5,3.5,3.5,3.5,3.4,3.4,3.4,3.4,3.3,3.3,3.4,3.4,
+                3.4,3.4,3.4,3.3,3.3,3.3,3.3,3.3,3.4,3.2,3.2
+            ],
+            layoffsRate: [
+                1.2,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,
+                1.1,1.1,1.1,1.0,1.1,1.0,1.0,1.0,1.0,1.0,1.1,1.1,
+                1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,1.1,
+                1.1,1.1,1.2,1.1,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,
+                1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,
+                1.2,1.2,1.8,4.8,2.5,1.4,1.2,1.2,1.2,1.2,1.3,1.3,
+                1.2,1.1,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.9,1.0,
+                1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.1,1.0,
+                1.0,1.0,1.1,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,
+                1.0,1.0,1.0,1.0,1.0,1.1,1.1,1.1,1.1,1.1,1.1,1.1,
+                1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.2,1.1
+            ],
+            unempRate: [
+                5.7,5.5,5.5,5.4,5.5,5.3,5.3,5.1,5.1,5.0,5.0,5.0,
+                4.9,4.9,5.0,5.0,4.7,4.9,4.9,4.9,5.0,4.9,4.6,4.7,
+                4.8,4.7,4.5,4.4,4.3,4.4,4.3,4.4,4.2,4.1,4.1,4.1,
+                4.1,4.1,4.1,3.9,3.8,4.0,3.9,3.9,3.7,3.7,3.7,3.9,
+                4.0,3.8,3.8,3.6,3.6,3.7,3.7,3.7,3.5,3.6,3.5,3.5,
+                3.6,3.5,4.4,14.7,13.3,11.1,10.2,8.4,7.8,6.9,6.7,6.7,
+                6.4,6.2,6.0,6.1,5.8,5.9,5.4,5.2,4.8,4.6,4.2,3.9,
+                4.0,3.8,3.6,3.6,3.6,3.6,3.5,3.7,3.5,3.7,3.6,3.5,
+                3.4,3.6,3.5,3.4,3.7,3.6,3.5,3.8,3.8,3.9,3.7,3.7,
+                3.7,3.9,3.8,3.9,4.0,4.1,4.3,4.2,4.1,4.1,4.2,4.1,
+                4.0,4.1,4.2,4.2,4.2,4.1,4.2,4.3,4.4,null,4.6
+            ],
+            fedRate: [
+                0.11,0.11,0.11,0.12,0.12,0.13,0.13,0.14,0.14,0.12,0.12,0.24,
+                0.34,0.38,0.36,0.37,0.37,0.38,0.39,0.40,0.40,0.41,0.41,0.55,
+                0.65,0.66,0.79,0.90,0.91,1.04,1.15,1.16,1.15,1.15,1.16,1.30,
+                1.42,1.42,1.51,1.69,1.70,1.82,1.91,1.91,2.00,2.19,2.20,2.27,
+                2.40,2.40,2.41,2.42,2.39,2.38,2.40,2.13,1.90,1.83,1.55,1.55,
+                1.55,1.58,0.65,0.05,0.05,0.08,0.09,0.10,0.09,0.09,0.09,0.09,
+                0.08,0.08,0.07,0.07,0.06,0.08,0.10,0.09,0.08,0.08,0.08,0.08,
+                0.08,0.08,0.20,0.33,0.77,1.21,1.68,2.33,2.56,3.08,3.78,4.33,
+                4.33,4.57,4.65,4.83,5.06,5.08,5.12,5.33,5.33,5.33,5.33,5.33,
+                5.33,5.33,5.33,5.33,5.33,5.33,5.33,5.33,4.83,4.58,4.58,4.48,
+                4.375,4.375,4.375,4.375,4.375,4.375,4.375,4.375,4.125,3.875,3.625
+            ],
+            wageGrowth: [
+                2.2,2.1,2.3,2.2,2.2,2.1,2.2,2.2,2.3,2.4,2.3,2.3,
+                2.4,2.3,2.2,2.5,2.4,2.5,2.6,2.5,2.5,2.6,2.5,2.5,
+                2.6,2.7,2.6,2.5,2.6,2.5,2.5,2.5,2.6,2.4,2.5,2.6,
+                2.8,2.7,2.7,2.6,2.7,2.7,2.8,2.9,2.8,3.0,3.1,3.0,
+                3.1,3.4,3.2,3.1,3.1,3.1,3.2,3.2,2.9,3.0,3.1,3.0,
+                3.0,3.0,3.1,3.0,6.2,5.0,4.7,4.5,4.4,4.3,4.5,4.8,
+                5.0,5.0,4.8,4.2,3.5,3.5,4.0,4.2,4.5,4.8,4.9,4.7,
+                5.5,5.2,5.5,5.5,5.2,5.0,5.2,5.2,5.0,4.8,4.8,4.6,
+                4.4,4.5,4.2,4.4,4.2,4.3,4.4,4.3,4.2,4.0,4.0,4.1,
+                4.4,4.3,4.1,3.9,4.0,3.9,3.7,3.8,3.8,4.0,4.0,4.0,
+                4.1,4.0,3.9,3.8,3.8,3.7,3.6,3.6,3.6,null,3.9
+            ],
+            lfpr: [
+                80.8,80.9,80.9,81.0,81.0,81.0,81.1,81.1,81.1,81.2,81.3,81.3,
+                81.4,81.4,81.5,81.6,81.6,81.6,81.6,81.7,81.7,81.7,81.7,81.7,
+                81.7,81.8,81.8,81.9,82.0,82.0,82.0,82.0,82.0,82.0,82.0,82.0,
+                82.0,82.1,82.2,82.2,82.2,82.3,82.3,82.3,82.3,82.3,82.3,82.3,
+                82.5,82.6,82.7,82.7,82.8,82.8,82.8,82.9,82.9,82.9,82.9,82.9,
+                83.0,83.0,82.5,79.8,79.6,80.0,80.2,80.4,80.5,80.6,80.6,80.6,
+                80.9,81.0,81.2,81.4,81.5,81.6,81.7,81.8,81.9,82.0,82.0,82.0,
+                82.1,82.2,82.3,82.4,82.4,82.4,82.4,82.4,82.4,82.4,82.4,82.4,
+                82.5,83.0,83.0,83.1,83.2,83.2,83.2,83.0,83.0,83.0,83.1,83.0,
+                83.2,83.3,83.3,83.4,83.4,83.4,83.4,83.4,83.4,83.4,83.4,83.4,
+                83.5,83.5,83.5,83.4,83.4,83.4,83.5,83.3,83.4,null,83.3
+            ]
+        };
+
+        // Calculate composite scores with improved formula
+        function calculateCompositeScore(idx) {
+            const quit = monthlyData.quitRate[idx];
+            const ratio = monthlyData.openingsRatio[idx];
+            const hires = monthlyData.hiresRate[idx];
+            const layoffs = monthlyData.layoffsRate[idx];
+            const unemp = monthlyData.unempRate[idx];
+            const fed = monthlyData.fedRate[idx];
+            const wage = monthlyData.wageGrowth[idx];
+            const lfpr = monthlyData.lfpr[idx];
+            
+            // Skip if missing critical data
+            if (quit == null || ratio == null) return null;
+            
+            // Score each metric (0-1 scale) - adjusted for better historical accuracy
+            // Quit rate: 1.5% = 0, 3.0% = 1.0 (captures Great Resignation peak)
+            const quitScore = Math.min(1, Math.max(0, (quit - 1.5) / 1.5));
+            
+            // Openings ratio: 0.3 = 0, 2.0 = 1.0 (captures COVID crash to Great Resignation)
+            const ratioScore = Math.min(1, Math.max(0, (ratio - 0.3) / 1.7));
+            
+            // Hires rate: 2.0% = 0, 4.5% = 1.0
+            const hiresScore = Math.min(1, Math.max(0, (hires - 2.0) / 2.5));
+            
+            // Layoffs rate: inverted, 2.5% = 0, 0.8% = 1.0
+            const layoffsScore = Math.min(1, Math.max(0, (2.5 - layoffs) / 1.7));
+            
+            // Unemployment: inverted, 7% = 0, 3.5% = 1.0
+            const unempScore = unemp != null ? Math.min(1, Math.max(0, (7.0 - unemp) / 3.5)) : 0.5;
+            
+            // Fed rate: inverted, 5.5% = 0, 0% = 1.0 (low rates = stimulative = good for workers)
+            const fedScore = Math.min(1, Math.max(0, (5.5 - fed) / 5.5));
+            
+            // Wage growth: 2% = 0, 5% = 1.0
+            const wageScore = wage != null ? Math.min(1, Math.max(0, (wage - 2.0) / 3.0)) : 0.5;
+            
+            // Prime-age LFPR: 79% = 0, 83% = 1.0
+            const lfprScore = lfpr != null ? Math.min(1, Math.max(0, (lfpr - 79) / 4.0)) : 0.5;
+            
+            // Weighted average - Tier 1 (direct leverage measures) gets 60% weight
+            const tier1 = (quitScore + ratioScore + hiresScore + layoffsScore) / 4 * 0.6;
+            const tier2 = (unempScore + fedScore + wageScore + lfprScore) / 4 * 0.4;
+            
+            let baseScore = (tier1 + tier2) * 100;
+            
+            // === INTERACTION EFFECTS ===
+            
+            // 1. Sub-1.0 Ratio Penalty
+            // Falling below 1.0 openings/unemployed is a qualitative bright line:
+            // more job seekers than jobs = employers have structural leverage
+            if (ratio < 1.0) {
+                baseScore *= 0.92; // 8% penalty
+            }
+            
+            // 2. Market Churn Multiplier  
+            // When BOTH quit rate AND hires rate are depressed, the market is "frozen"
+            // Low layoffs in a frozen market isn't actually good for job seekers
+            // Penalty scales with how depressed both metrics are
+            const churnPenalty = 0.12 * (1 - Math.min(quitScore, hiresScore));
+            baseScore *= (1 - churnPenalty);
+            
+            // 3. Near-Zero Fed Bonus
+            // Emergency/highly stimulative rates (<0.5%) create tailwinds:
+            // cheap capital = companies more willing to hire, take risks, expand
+            if (fed < 0.5) {
+                baseScore *= 1.08; // 8% bonus
+            }
+            
+            // Cap at 100 to keep scale clean
+            return Math.min(100, Math.round(baseScore));
+        }
+
+        const compositeScores = monthlyData.labels.map((_, idx) => calculateCompositeScore(idx));
+        
+        // Find peak score and its date
+        let peakScore = 0;
+        let peakIdx = 0;
+        compositeScores.forEach((score, idx) => {
+            if (score !== null && score > peakScore) {
+                peakScore = score;
+                peakIdx = idx;
+            }
+        });
+        
+        // Get current score (last non-null)
+        let currentScore = compositeScores[compositeScores.length - 1];
+        let currentIdx = compositeScores.length - 1;
+        while (currentScore === null && currentIdx > 0) {
+            currentIdx--;
+            currentScore = compositeScores[currentIdx];
+        }
+        
+        // Update hero score display
+        document.getElementById('currentScore').textContent = currentScore;
+        const scoreEl = document.getElementById('currentScore');
+        const verdictEl = document.getElementById('scoreVerdict');
+        const verdictIconEl = document.getElementById('verdictIcon');
+        const verdictTextEl = document.getElementById('verdictText');
+        const changeEl = document.getElementById('scoreChange');
+        const interpEl = document.getElementById('interpretation');
+        
+        if (currentScore >= 70) {
+            scoreEl.className = 'score-value favorable';
+            verdictEl.className = 'score-verdict favorable';
+            verdictIconEl.className = 'verdict-icon favorable';
+            verdictTextEl.textContent = 'Favorable';
+            interpEl.innerHTML = '<strong>Employee-favorable market.</strong> Active job searching is rational. High quit rates signal worker confidence. Apply aggressively and accept informational interviews.';
+            interpEl.style.borderLeftColor = 'var(--accent-green)';
+        } else if (currentScore >= 55) {
+            scoreEl.className = 'score-value lean-favorable';
+            verdictEl.className = 'score-verdict lean-favorable';
+            verdictIconEl.className = 'verdict-icon lean-favorable';
+            verdictTextEl.textContent = 'Lean Favorable';
+            interpEl.innerHTML = '<strong>Functional market with opportunities.</strong> Selective job searching is reasonable. Focus on strong-fit opportunities and maintain your network. Patience and targeting will pay off.';
+            interpEl.style.borderLeftColor = 'var(--accent-yellow)';
+        } else if (currentScore >= 40) {
+            scoreEl.className = 'score-value lean-unfavorable';
+            verdictEl.className = 'score-verdict lean-unfavorable';
+            verdictIconEl.className = 'verdict-icon lean-unfavorable';
+            verdictTextEl.textContent = 'Lean Unfavorable';
+            interpEl.innerHTML = '<strong>Headwinds present.</strong> Hold steady unless you have a compelling reason to move. Market is competitive with more seekers than opportunities. Be strategic and don\'t jump at marginal offers.';
+            interpEl.style.borderLeftColor = 'var(--accent-orange)';
+        } else {
+            scoreEl.className = 'score-value unfavorable';
+            verdictEl.className = 'score-verdict unfavorable';
+            verdictIconEl.className = 'verdict-icon unfavorable';
+            verdictTextEl.textContent = 'Unfavorable';
+            interpEl.innerHTML = '<strong>Employer-favorable market.</strong> Hunker down and focus on stability. Significant difficulty finding new positions. Only move if necessary or for exceptional opportunities.';
+            interpEl.style.borderLeftColor = 'var(--accent-red)';
+        }
+        
+        const diff = peakScore - currentScore;
+        changeEl.textContent = `â†“ ${diff} pts from peak (${monthlyData.labels[peakIdx]}: ${peakScore})`;
+        
+        // Update historical context
+        document.getElementById('peakContext').textContent = `${peakScore} â€” ${monthlyData.labels[peakIdx]} (Great Resignation)`;
+        
+        // Find COVID trough (Apr 2020 = index 63)
+        const covidIdx = monthlyData.labels.indexOf('Apr-20');
+        const covidScore = compositeScores[covidIdx];
+        document.getElementById('covidContext').textContent = `${covidScore} â€” Lockdowns`;
+        
+        // Find pre-pandemic (Dec 2019 = index 59)
+        const prePandemicIdx = monthlyData.labels.indexOf('Dec-19');
+        const prePandemicScore = compositeScores[prePandemicIdx];
+        document.getElementById('prePandemicContext').textContent = `${prePandemicScore} â€” Tight Labor Market`;
+        
+        // Update cycle position based on current score
+        const cycleEl = document.getElementById('cyclePosition');
+        if (currentScore >= 70) {
+            cycleEl.textContent = 'Employee-Favorable';
+        } else if (currentScore >= 55) {
+            cycleEl.textContent = 'Balanced / Functional';
+        } else if (currentScore >= 40) {
+            cycleEl.textContent = 'Employer-Tilting';
+        } else {
+            cycleEl.textContent = 'Employer-Favorable';
+        }
+        
+        // Find historical analog - closest score match from pre-2020 period
+        // Excluding COVID crash (Mar-20 through Dec-20) and recent 12 months
+        const analogEl = document.getElementById('historicalAnalog');
+        let bestMatch = { idx: -1, diff: Infinity };
+        const excludeStart = monthlyData.labels.indexOf('Mar-20');
+        const excludeEnd = monthlyData.labels.indexOf('Dec-20');
+        const recentCutoff = compositeScores.length - 12; // Exclude last 12 months
+        
+        compositeScores.forEach((score, idx) => {
+            // Skip nulls, COVID period, and recent months
+            if (score === null) return;
+            if (idx >= excludeStart && idx <= excludeEnd) return;
+            if (idx >= recentCutoff) return;
+            
+            const diff = Math.abs(score - currentScore);
+            if (diff < bestMatch.diff) {
+                bestMatch = { idx, diff, score };
+            }
+        });
+        
+        if (bestMatch.idx >= 0) {
+            const analogLabel = monthlyData.labels[bestMatch.idx];
+            const analogYear = '20' + analogLabel.split('-')[1];
+            
+            // Determine the context description
+            let analogDesc;
+            if (bestMatch.idx < 24) { // 2015-16
+                analogDesc = 'Post-Recession Recovery';
+            } else if (bestMatch.idx < 48) { // 2017-18
+                analogDesc = 'Mid-Cycle Expansion';
+            } else if (bestMatch.idx < 60) { // 2019
+                analogDesc = 'Late-Cycle Tight Market';
+            } else if (bestMatch.idx >= 72 && bestMatch.idx < 96) { // 2021-22
+                analogDesc = 'Great Resignation Era';
+            } else if (bestMatch.idx >= 96 && bestMatch.idx < 120) { // 2023-24
+                analogDesc = 'Post-Peak Normalization';
+            } else {
+                analogDesc = '';
+            }
+            
+            if (bestMatch.diff <= 3) {
+                analogEl.textContent = `${analogLabel} (Score: ${bestMatch.score})`;
+            } else if (bestMatch.diff <= 8) {
+                analogEl.textContent = `~${analogLabel} (Â±${bestMatch.diff} pts)`;
+            } else {
+                analogEl.textContent = `No close analog`;
+            }
+        } else {
+            analogEl.textContent = 'No historical match';
+        }
+
+        // === PATH TO LEAN FAVORABLE ANALYSIS ===
+        
+        // Get current metric values
+        const currentMetrics = {
+            quitRate: monthlyData.quitRate[currentIdx],
+            openingsRatio: monthlyData.openingsRatio[currentIdx],
+            hiresRate: monthlyData.hiresRate[currentIdx],
+            layoffsRate: monthlyData.layoffsRate[currentIdx],
+            unempRate: monthlyData.unempRate[currentIdx],
+            fedRate: monthlyData.fedRate[currentIdx],
+            wageGrowth: monthlyData.wageGrowth[currentIdx],
+            lfpr: monthlyData.lfpr[currentIdx]
+        };
+        
+        // Calculate individual metric scores (same logic as composite)
+        function getMetricScore(metric, value) {
+            switch(metric) {
+                case 'quitRate': return Math.min(1, Math.max(0, (value - 1.5) / 1.5));
+                case 'openingsRatio': return Math.min(1, Math.max(0, (value - 0.3) / 1.7));
+                case 'hiresRate': return Math.min(1, Math.max(0, (value - 2.0) / 2.5));
+                case 'layoffsRate': return Math.min(1, Math.max(0, (2.5 - value) / 1.7));
+                case 'unempRate': return Math.min(1, Math.max(0, (7.0 - value) / 3.5));
+                case 'fedRate': return Math.min(1, Math.max(0, (5.5 - value) / 5.5));
+                case 'wageGrowth': return Math.min(1, Math.max(0, (value - 2.0) / 3.0));
+                case 'lfpr': return Math.min(1, Math.max(0, (value - 79) / 4.0));
+                default: return 0.5;
+            }
+        }
+        
+        // Get score category for coloring
+        function getScoreCategory(score) {
+            if (score >= 0.7) return 'good';
+            if (score >= 0.5) return 'neutral';
+            if (score >= 0.3) return 'poor';
+            return 'bad';
+        }
+        
+        // Metric display names and info
+        const metricInfo = {
+            quitRate: { name: 'Quit Rate', tier: 1, format: v => v.toFixed(1) + '%', target: 2.3 },
+            openingsRatio: { name: 'Openings/Unemployed', tier: 1, format: v => v.toFixed(2), target: 1.1 },
+            hiresRate: { name: 'Hires Rate', tier: 1, format: v => v.toFixed(1) + '%', target: 3.6 },
+            layoffsRate: { name: 'Layoffs Rate', tier: 1, format: v => v.toFixed(1) + '%', target: 1.0, inverted: true },
+            unempRate: { name: 'Unemployment', tier: 2, format: v => v.toFixed(1) + '%', target: 4.2, inverted: true },
+            fedRate: { name: 'Fed Funds Rate', tier: 2, format: v => v.toFixed(2) + '%', target: 3.0, inverted: true },
+            wageGrowth: { name: 'Wage Growth', tier: 2, format: v => v.toFixed(1) + '%', target: 4.0 },
+            lfpr: { name: 'Prime-Age LFPR', tier: 2, format: v => v.toFixed(1) + '%', target: 83.0 }
+        };
+        
+        // Calculate scores and sort by contribution (lowest first = biggest drag)
+        const metricScores = Object.entries(currentMetrics)
+            .filter(([k, v]) => v != null)
+            .map(([metric, value]) => ({
+                metric,
+                value,
+                score: getMetricScore(metric, value),
+                info: metricInfo[metric]
+            }))
+            .sort((a, b) => a.score - b.score);
+        
+        // 1. Distance to Lean Favorable
+        const distanceToTarget = Math.max(0, 55 - currentScore);
+        document.getElementById('distancePoints').textContent = distanceToTarget;
+        
+        // 2. Score Decomposition with Layoffs Paradox footnote
+        // Check if we're in a "frozen market" (both quit and hires depressed)
+        const quitScoreVal = getMetricScore('quitRate', currentMetrics.quitRate);
+        const hiresScoreVal = getMetricScore('hiresRate', currentMetrics.hiresRate);
+        const isFrozenMarket = quitScoreVal < 0.5 && hiresScoreVal < 0.6;
+        
+        const decompositionEl = document.getElementById('decompositionList');
+        decompositionEl.innerHTML = metricScores.map(m => {
+            const isLayoffs = m.metric === 'layoffsRate';
+            const showFootnote = isLayoffs && isFrozenMarket && m.score > 0.7;
+            return `
+                <div class="decomposition-item">
+                    <span class="metric-name">${m.info.name}${showFootnote ? ' <span class="footnote-marker">â€ </span>' : ''}</span>
+                    <div class="metric-bar-container">
+                        <div class="metric-bar ${getScoreCategory(m.score)}" style="width: ${m.score * 100}%"></div>
+                    </div>
+                    <span class="metric-score">${Math.round(m.score * 100)}</span>
+                </div>
+            `;
+        }).join('');
+        
+        // Add footnote if in frozen market
+        if (isFrozenMarket) {
+            decompositionEl.innerHTML += `
+                <div class="decomposition-footnote">
+                    <span class="footnote-marker">â€ </span> Low layoffs in a frozen market (low quits + low hires) provides less benefit than the score suggests. 
+                    Employers aren't cutting, but they're also not hiring â€” limited opportunities for job seekers.
+                </div>
+            `;
+        }
+        
+        // 3. Trigger Conditions with Trend Analysis
+        // Get last 3 months of data for trends
+        const getRecentValues = (dataArray, count = 3) => {
+            const validIdx = currentIdx;
+            const values = [];
+            for (let i = 0; i < count && (validIdx - i) >= 0; i++) {
+                const val = dataArray[validIdx - i];
+                if (val != null) values.push(val);
+            }
+            return values;
+        };
+        
+        const getTrend = (values) => {
+            if (values.length < 2) return { arrow: 'â€“', direction: 'flat' };
+            const recent = values[0];
+            const older = values[values.length - 1];
+            const diff = recent - older;
+            const threshold = Math.abs(older) * 0.05; // 5% change threshold
+            
+            if (diff > threshold) return { arrow: 'â†‘', direction: 'up' };
+            if (diff < -threshold) return { arrow: 'â†“', direction: 'down' };
+            return { arrow: 'â†’', direction: 'flat' };
+        };
+        
+        const formatTrendHistory = (values, decimals = 2) => {
+            return values.slice(0, 3).reverse().map(v => v.toFixed(decimals)).join(' â†’ ');
+        };
+        
+        const triggers = [
+            {
+                condition: 'Quit Rate > 2.3% for 3+ months',
+                current: currentMetrics.quitRate,
+                target: 2.3,
+                recentValues: getRecentValues(monthlyData.quitRate),
+                decimals: 1,
+                goodDirection: 'up', // higher is better for this metric
+                status: currentMetrics.quitRate > 2.3 ? 'met' : 
+                        currentMetrics.quitRate > 2.1 ? 'watching' : ''
+            },
+            {
+                condition: 'Openings/Unemployed > 1.1',
+                current: currentMetrics.openingsRatio,
+                target: 1.1,
+                recentValues: getRecentValues(monthlyData.openingsRatio),
+                decimals: 2,
+                goodDirection: 'up',
+                status: currentMetrics.openingsRatio > 1.1 ? 'met' :
+                        currentMetrics.openingsRatio > 1.0 ? 'watching' : ''
+            },
+            {
+                condition: 'Hires Rate > 3.5%',
+                current: currentMetrics.hiresRate,
+                target: 3.5,
+                recentValues: getRecentValues(monthlyData.hiresRate),
+                decimals: 1,
+                goodDirection: 'up',
+                status: currentMetrics.hiresRate > 3.5 ? 'met' :
+                        currentMetrics.hiresRate > 3.3 ? 'watching' : ''
+            },
+            {
+                condition: 'Fed Funds Rate < 3.0%',
+                current: currentMetrics.fedRate,
+                target: 3.0,
+                recentValues: getRecentValues(monthlyData.fedRate),
+                decimals: 2,
+                goodDirection: 'down', // lower is better for this metric
+                status: currentMetrics.fedRate < 3.0 ? 'met' :
+                        currentMetrics.fedRate < 3.5 ? 'watching' : ''
+            }
+        ];
+        
+        const triggerEl = document.getElementById('triggerList');
+        triggerEl.innerHTML = triggers.map(t => {
+            const icon = t.status === 'met' ? 'âœ“' : t.status === 'watching' ? 'â—' : 'â—‹';
+            const trend = getTrend(t.recentValues);
+            const trendIsGood = (trend.direction === t.goodDirection) || 
+                               (trend.direction === 'flat' && t.status === 'met');
+            const trendClass = trendIsGood ? 'trend-good' : 
+                              trend.direction === 'flat' ? 'trend-flat' : 'trend-bad';
+            const trendHistory = formatTrendHistory(t.recentValues, t.decimals);
+            
+            const statusText = t.status === 'met' ? 'Condition met' :
+                              t.status === 'watching' ? 'Approaching threshold' :
+                              `Current: ${t.current.toFixed(t.decimals)}`;
+            return `
+                <div class="trigger-item ${t.status}">
+                    <span class="trigger-icon">${icon}</span>
+                    <div class="trigger-content">
+                        <div class="trigger-condition">${t.condition}</div>
+                        <div class="trigger-status">${statusText}</div>
+                        <div class="trigger-trend ${trendClass}">
+                            <span class="trend-arrow">${trend.arrow}</span>
+                            <span class="trend-history">Last 3mo: ${trendHistory}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        // Generate plain English summary based on trigger conditions and trends
+        const triggerAnalysis = triggers.map(t => {
+            const trend = getTrend(t.recentValues);
+            const trendIsGood = trend.direction === t.goodDirection;
+            const trendIsBad = trend.direction !== 'flat' && !trendIsGood;
+            return { ...t, trend, trendIsGood, trendIsBad };
+        });
+        
+        const metConditions = triggerAnalysis.filter(t => t.status === 'met');
+        const watchingConditions = triggerAnalysis.filter(t => t.status === 'watching');
+        const improvingConditions = triggerAnalysis.filter(t => t.trendIsGood);
+        const worseningConditions = triggerAnalysis.filter(t => t.trendIsBad);
+        
+        // Build the summary
+        let summaryParts = [];
+        
+        // Overall assessment
+        if (metConditions.length >= 3) {
+            summaryParts.push(`<strong>Recovery signals strengthening.</strong> ${metConditions.length} of 4 trigger conditions are now met.`);
+        } else if (metConditions.length >= 2) {
+            summaryParts.push(`<strong>Early recovery signals emerging.</strong> ${metConditions.length} of 4 conditions met â€” watch for sustained improvement.`);
+        } else if (watchingConditions.length >= 2 || improvingConditions.length >= 2) {
+            summaryParts.push(`<strong>Mixed signals, but some positive movement.</strong> No conditions met yet, but trends bear watching.`);
+        } else if (worseningConditions.length >= 3) {
+            summaryParts.push(`<strong>Conditions deteriorating.</strong> Most indicators moving in the wrong direction â€” hunker down.`);
+        } else {
+            summaryParts.push(`<strong>Holding pattern.</strong> No trigger conditions met, limited positive momentum.`);
+        }
+        
+        // Specific trends
+        if (improvingConditions.length > 0) {
+            const improvingNames = improvingConditions.map(t => {
+                if (t.condition.includes('Quit')) return 'quit rate';
+                if (t.condition.includes('Openings')) return 'openings ratio';
+                if (t.condition.includes('Hires')) return 'hires rate';
+                if (t.condition.includes('Fed')) return 'Fed rate';
+                return t.condition;
+            });
+            summaryParts.push(`<span class="trend-positive">â†‘ Improving:</span> ${improvingNames.join(', ')}.`);
+        }
+        
+        if (worseningConditions.length > 0) {
+            const worseningNames = worseningConditions.map(t => {
+                if (t.condition.includes('Quit')) return 'quit rate';
+                if (t.condition.includes('Openings')) return 'openings ratio';
+                if (t.condition.includes('Hires')) return 'hires rate';
+                if (t.condition.includes('Fed')) return 'Fed rate';
+                return t.condition;
+            });
+            summaryParts.push(`<span class="trend-negative">â†“ Worsening:</span> ${worseningNames.join(', ')}.`);
+        }
+        
+        // Bottom line recommendation
+        if (metConditions.length >= 2 && improvingConditions.length >= 1) {
+            summaryParts.push(`<span class="trend-positive">Consider increasing job search activity.</span>`);
+        } else if (improvingConditions.length >= 2 && worseningConditions.length === 0) {
+            summaryParts.push(`<span class="trend-neutral">Watch closely â€” conditions may be turning.</span>`);
+        } else if (worseningConditions.length > improvingConditions.length) {
+            summaryParts.push(`<span class="trend-negative">Not yet time to actively search.</span>`);
+        } else {
+            summaryParts.push(`<span class="trend-neutral">Continue monitoring monthly data releases.</span>`);
+        }
+        
+        document.getElementById('recoverySummary').innerHTML = summaryParts.join(' ');
+        
+        // 4. Sensitivity Analysis - Calculate hypothetical scores
+        function calculateHypotheticalScore(overrides) {
+            const metrics = { ...currentMetrics, ...overrides };
+            
+            const quitScore = Math.min(1, Math.max(0, (metrics.quitRate - 1.5) / 1.5));
+            const ratioScore = Math.min(1, Math.max(0, (metrics.openingsRatio - 0.3) / 1.7));
+            const hiresScore = Math.min(1, Math.max(0, (metrics.hiresRate - 2.0) / 2.5));
+            const layoffsScore = Math.min(1, Math.max(0, (2.5 - metrics.layoffsRate) / 1.7));
+            const unempScore = Math.min(1, Math.max(0, (7.0 - metrics.unempRate) / 3.5));
+            const fedScore = Math.min(1, Math.max(0, (5.5 - metrics.fedRate) / 5.5));
+            const wageScore = Math.min(1, Math.max(0, (metrics.wageGrowth - 2.0) / 3.0));
+            const lfprScore = Math.min(1, Math.max(0, (metrics.lfpr - 79) / 4.0));
+            
+            const tier1 = (quitScore + ratioScore + hiresScore + layoffsScore) / 4 * 0.6;
+            const tier2 = (unempScore + fedScore + wageScore + lfprScore) / 4 * 0.4;
+            
+            let baseScore = (tier1 + tier2) * 100;
+            
+            // Apply interaction effects
+            if (metrics.openingsRatio < 1.0) baseScore *= 0.92;
+            const churnPenalty = 0.12 * (1 - Math.min(quitScore, hiresScore));
+            baseScore *= (1 - churnPenalty);
+            if (metrics.fedRate < 0.5) baseScore *= 1.08;
+            
+            return Math.min(100, Math.round(baseScore));
+        }
+        
+        const scenarios = [
+            {
+                name: 'Quit rate improves to 2.3%',
+                overrides: { quitRate: 2.3 },
+                score: calculateHypotheticalScore({ quitRate: 2.3 })
+            },
+            {
+                name: 'Openings/Unemployed returns to 1.1',
+                overrides: { openingsRatio: 1.1 },
+                score: calculateHypotheticalScore({ openingsRatio: 1.1 })
+            },
+            {
+                name: 'Fed cuts to 2.5%',
+                overrides: { fedRate: 2.5 },
+                score: calculateHypotheticalScore({ fedRate: 2.5 })
+            },
+            {
+                name: 'Hires rate recovers to 3.6%',
+                overrides: { hiresRate: 3.6 },
+                score: calculateHypotheticalScore({ hiresRate: 3.6 })
+            },
+            {
+                name: 'Combined: Quit 2.3% + Ratio 1.1',
+                overrides: { quitRate: 2.3, openingsRatio: 1.1 },
+                score: calculateHypotheticalScore({ quitRate: 2.3, openingsRatio: 1.1 })
+            }
+        ];
+        
+        const sensitivityEl = document.getElementById('sensitivityList');
+        sensitivityEl.innerHTML = scenarios.map(s => {
+            const delta = s.score - currentScore;
+            const deltaStr = delta >= 0 ? `+${delta}` : `${delta}`;
+            const category = s.score >= 55 ? 'positive' : s.score >= 48 ? 'neutral' : 'negative';
+            const reachesTarget = s.score >= 55 ? ' â†’ Lean Favorable' : '';
+            return `
+                <div class="sensitivity-item">
+                    <span class="sensitivity-scenario">${s.name}</span>
+                    <span class="sensitivity-result ${category}">Score: ${s.score} (${deltaStr})${reachesTarget}</span>
+                </div>
+            `;
+        }).join('');
+
+        // Get colors based on score (four-tier system)
+        function getScoreColor(score) {
+            if (score >= 70) return 'rgba(0, 217, 160, 1)';      // Green - Favorable
+            if (score >= 55) return 'rgba(255, 201, 64, 1)';     // Yellow - Lean Favorable
+            if (score >= 40) return 'rgba(255, 140, 64, 1)';     // Orange - Lean Unfavorable
+            return 'rgba(255, 77, 106, 1)';                       // Red - Unfavorable
+        }
+
+        function getScoreColorDim(score) {
+            if (score >= 70) return 'rgba(0, 217, 160, 0.2)';
+            if (score >= 55) return 'rgba(255, 201, 64, 0.2)';
+            if (score >= 40) return 'rgba(255, 140, 64, 0.2)';
+            return 'rgba(255, 77, 106, 0.2)';
+        }
+
+        // Create gradient for main chart (four zones)
+        function createGradient(ctx, chartArea) {
+            const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+            gradient.addColorStop(0, 'rgba(255, 77, 106, 0.3)');     // Red at bottom (<40)
+            gradient.addColorStop(0.4, 'rgba(255, 140, 64, 0.3)');   // Orange (40-54)
+            gradient.addColorStop(0.55, 'rgba(255, 201, 64, 0.3)');  // Yellow (55-69)
+            gradient.addColorStop(0.7, 'rgba(0, 217, 160, 0.3)');    // Green at top (70+)
+            return gradient;
+        }
+
+        // Chart defaults
+        Chart.defaults.color = '#9898a8';
+        Chart.defaults.font.family = "'JetBrains Mono', monospace";
+        Chart.defaults.font.size = 10;
+
+        // Main composite score chart
+        const mainCtx = document.getElementById('mainChart').getContext('2d');
+        new Chart(mainCtx, {
+            type: 'line',
+            data: {
+                labels: monthlyData.labels,
+                datasets: [{
+                    label: 'Composite Score',
+                    data: compositeScores,
+                    borderColor: 'rgba(255, 201, 64, 1)',
+                    segment: {
+                        borderColor: ctx => {
+                            const val = ctx.p0.parsed.y;
+                            if (val >= 70) return 'rgba(0, 217, 160, 1)';    // Green - Favorable
+                            if (val >= 55) return 'rgba(255, 201, 64, 1)';   // Yellow - Lean Favorable
+                            if (val >= 40) return 'rgba(255, 140, 64, 1)';   // Orange - Lean Unfavorable
+                            return 'rgba(255, 77, 106, 1)';                   // Red - Unfavorable
+                        }
+                    },
+                    backgroundColor: function(context) {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+                        if (!chartArea) return 'rgba(255, 201, 64, 0.1)';
+                        return createGradient(ctx, chartArea);
+                    },
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(22, 22, 32, 0.95)',
+                        titleColor: '#e8e8ed',
+                        bodyColor: '#9898a8',
+                        borderColor: '#28283a',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            title: (items) => items[0].label,
+                            label: (item) => {
+                                const score = item.raw;
+                                let status = 'Unfavorable';
+                                if (score >= 70) status = 'Favorable';
+                                else if (score >= 55) status = 'Lean Favorable';
+                                else if (score >= 40) status = 'Lean Unfavorable';
+                                return [`Score: ${score}/100`, `Status: ${status}`];
+                            }
+                        }
+                    },
+                    annotation: {
+                        annotations: {
+                            line70: {
+                                type: 'line',
+                                yMin: 70,
+                                yMax: 70,
+                                borderColor: 'rgba(0, 217, 160, 0.4)',
+                                borderWidth: 1,
+                                borderDash: [5, 5]
+                            },
+                            line55: {
+                                type: 'line',
+                                yMin: 55,
+                                yMax: 55,
+                                borderColor: 'rgba(255, 201, 64, 0.4)',
+                                borderWidth: 1,
+                                borderDash: [5, 5]
+                            },
+                            line40: {
+                                type: 'line',
+                                yMin: 40,
+                                yMax: 40,
+                                borderColor: 'rgba(255, 140, 64, 0.4)',
+                                borderWidth: 1,
+                                borderDash: [5, 5]
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+                        ticks: { 
+                            maxTicksLimit: 12,
+                            maxRotation: 0
+                        }
+                    },
+                    y: {
+                        min: 0,
+                        max: 100,
+                        grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+                        ticks: {
+                            stepSize: 20,
+                            callback: (val) => val + ''
+                        }
+                    }
+                }
+            }
+        });
+
+        // Color constants
+        const COLOR_GOOD = 'rgba(0, 217, 160, 1)';
+        const COLOR_NEUTRAL = 'rgba(255, 201, 64, 1)';
+        const COLOR_BAD = 'rgba(255, 77, 106, 1)';
+        
+        // Threshold definitions for each metric
+        const thresholds = {
+            quitRate: { good: 2.5, neutral: 2.0 }, // Higher is better
+            openingsRatio: { good: 1.5, neutral: 1.0 }, // Higher is better
+            hiresRate: { good: 4.0, neutral: 3.5 }, // Higher is better
+            layoffsRate: { good: 1.0, neutral: 1.3 }, // Lower is better (inverted color logic)
+            unempRate: { good: 4.0, neutral: 5.0 }, // Lower is better (inverted color logic)
+            fedRate: { good: 2.0, neutral: 4.0 }, // Lower is better (inverted color logic)
+            wageGrowth: { good: 4.0, neutral: 3.0 }, // Higher is better
+            lfpr: { good: 82.5, neutral: 81.0 } // Higher is better
+        };
+        
+        // Get color based on value and thresholds
+        function getMetricColor(value, metric) {
+            const t = thresholds[metric];
+            const inverted = ['layoffsRate', 'unempRate', 'fedRate'].includes(metric);
+            
+            if (inverted) {
+                // Lower is better
+                if (value <= t.good) return COLOR_GOOD;
+                if (value <= t.neutral) return COLOR_NEUTRAL;
+                return COLOR_BAD;
+            } else {
+                // Higher is better
+                if (value >= t.good) return COLOR_GOOD;
+                if (value >= t.neutral) return COLOR_NEUTRAL;
+                return COLOR_BAD;
+            }
+        }
+
+        // Mini sparkline charts with dynamic segment coloring
+        // Note: Y-axis is NOT inverted - spikes show as spikes for intuitive reading
+        // Color logic handles "good" vs "bad" interpretation
+        function createSparkline(canvasId, data, metric) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: monthlyData.labels,
+                    datasets: [{
+                        data: data,
+                        borderColor: COLOR_NEUTRAL,
+                        segment: {
+                            borderColor: ctx => {
+                                const val = ctx.p0.parsed.y;
+                                return getMetricColor(val, metric);
+                            }
+                        },
+                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        borderWidth: 1.5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Create all sparklines with metric-specific thresholds
+        createSparkline('quitChart', monthlyData.quitRate, 'quitRate');
+        createSparkline('openingsChart', monthlyData.openingsRatio, 'openingsRatio');
+        createSparkline('hiresChart', monthlyData.hiresRate, 'hiresRate');
+        createSparkline('layoffsChart', monthlyData.layoffsRate, 'layoffsRate');
+        createSparkline('unempChart', monthlyData.unempRate.map(v => v || 0), 'unempRate');
+        createSparkline('fedChart', monthlyData.fedRate, 'fedRate');
+        createSparkline('wageChart', monthlyData.wageGrowth.map(v => v || 0), 'wageGrowth');
+        createSparkline('lfprChart', monthlyData.lfpr.map(v => v || 0), 'lfpr');
+    </script>
+</body>
+</html>
