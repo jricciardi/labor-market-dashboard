@@ -435,6 +435,12 @@
             font-style: normal;
         }
 
+        .about-note {
+            font-size: 0.7rem !important;
+            color: var(--text-muted) !important;
+            margin-top: 12px !important;
+        }
+
         .about-how {
             background: var(--bg-tertiary);
             border-radius: 8px;
@@ -659,6 +665,98 @@
         .action-section.tough-market .action-list li::before {
             content: '→';
             color: var(--text-muted);
+        }
+
+        /* Score Guide (expandable) */
+        .score-guide {
+            padding-top: 16px;
+            margin-top: 20px;
+            border-top: 1px solid var(--border-color);
+            transition: border-color var(--theme-transition);
+        }
+
+        .score-guide-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            background: none;
+            border: none;
+            width: 100%;
+            font-family: 'JetBrains Mono', monospace;
+            transition: color var(--theme-transition);
+        }
+
+        .score-guide-trigger:hover {
+            color: var(--text-secondary);
+        }
+
+        .score-guide-trigger:focus {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 2px;
+        }
+
+        .score-guide-trigger:focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        .score-guide-content {
+            display: none;
+            margin-top: 12px;
+        }
+
+        .score-guide-content.show {
+            display: block;
+        }
+
+        .score-guide-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .score-guide-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .score-guide-item {
+            text-align: center;
+            padding: 12px 10px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            border-top: 2px solid;
+            transition: background var(--theme-transition);
+        }
+
+        .score-guide-item.green { border-top-color: var(--accent-green); }
+        .score-guide-item.yellow { border-top-color: var(--accent-yellow); }
+        .score-guide-item.orange { border-top-color: var(--accent-orange); }
+        .score-guide-item.red { border-top-color: var(--accent-red); }
+
+        .score-guide-item.current {
+            background: var(--bg-primary);
+            box-shadow: inset 0 0 0 1px var(--border-color);
+        }
+
+        .score-guide-range {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            transition: color var(--theme-transition);
+        }
+
+        .score-guide-feel {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            transition: color var(--theme-transition);
         }
 
         /* Main Chart */
@@ -1840,14 +1938,15 @@
                 <div class="about-main">
                     <p>This page tracks whether the job market currently favors <strong>people looking for work</strong> or <strong>employers doing the hiring</strong>. It combines eight economic indicators into a single score to help answer: <em>is now a good time to look for a new job?</em></p>
                     <p>The score runs from 0 to 100. Higher means better for job seekers. The data comes from the Bureau of Labor Statistics and Federal Reserve, updated monthly.</p>
+                    <p class="about-note">This tracks the US labor market overall — tech, healthcare, and finance each behave differently.</p>
                 </div>
                 <div class="about-how">
-                    <h3>How to read this</h3>
+                    <h3>What the score means</h3>
                     <ul>
-                        <li><strong>The score</strong> — A quick read on conditions. Higher = better for job seekers.</li>
-                        <li><strong>Core metrics</strong> — Direct measures like quit rate and hiring velocity.</li>
-                        <li><strong>Bigger picture</strong> — Economic forces like unemployment and Fed policy.</li>
-                        <li><strong>What would it take</strong> — What needs to change for conditions to improve.</li>
+                        <li><strong>70+</strong> — Recruiters reaching out. Negotiation pays off.</li>
+                        <li><strong>55–69</strong> — Opportunities if you look. Some room to negotiate.</li>
+                        <li><strong>40–54</strong> — Competitive. Employers have options.</li>
+                        <li><strong>&lt;40</strong> — Hiring freezes. Little leverage.</li>
                     </ul>
                 </div>
             </div>
@@ -1882,6 +1981,38 @@
                 <div class="action-content" id="actionContent">
                     <span class="skeleton skeleton-text" style="width: 100%;"></span>
                     <span class="skeleton skeleton-text" style="width: 90%; margin-top: 8px;"></span>
+                </div>
+            </div>
+
+            <!-- Expandable Score Guide -->
+            <div class="score-guide">
+                <button class="score-guide-trigger" 
+                        onclick="toggleScoreGuide()"
+                        aria-expanded="false"
+                        aria-controls="scoreGuideContent"
+                        id="scoreGuideTrigger">
+                    <span id="scoreGuideText">What do these scores mean?</span>
+                    <span id="scoreGuideChevron">▾</span>
+                </button>
+                <div class="score-guide-content" id="scoreGuideContent">
+                    <div class="score-guide-grid">
+                        <div class="score-guide-item red" id="guideRed">
+                            <div class="score-guide-range">&lt;40</div>
+                            <div class="score-guide-feel">Hiring freezes. Little leverage.</div>
+                        </div>
+                        <div class="score-guide-item orange" id="guideOrange">
+                            <div class="score-guide-range">40–54</div>
+                            <div class="score-guide-feel">Competitive. Employers have options.</div>
+                        </div>
+                        <div class="score-guide-item yellow" id="guideYellow">
+                            <div class="score-guide-range">55–69</div>
+                            <div class="score-guide-feel">Opportunities if you look. Some room to negotiate.</div>
+                        </div>
+                        <div class="score-guide-item green" id="guideGreen">
+                            <div class="score-guide-range">70+</div>
+                            <div class="score-guide-feel">Recruiters reaching out. Negotiation pays off.</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -2300,6 +2431,22 @@
             trigger.setAttribute('aria-expanded', isOpen);
         }
 
+        function toggleScoreGuide() {
+            const content = document.getElementById('scoreGuideContent');
+            const trigger = document.getElementById('scoreGuideTrigger');
+            const text = document.getElementById('scoreGuideText');
+            const chevron = document.getElementById('scoreGuideChevron');
+            const isOpen = content.classList.contains('show');
+            
+            content.classList.toggle('show');
+            trigger.setAttribute('aria-expanded', !isOpen);
+            text.textContent = isOpen ? 'What do these scores mean?' : 'Hide score guide';
+            chevron.textContent = isOpen ? '▾' : '▴';
+            
+            // Remember preference
+            localStorage.setItem('scoreGuideOpen', !isOpen);
+        }
+
         // Check if about section should be collapsed on load
         document.addEventListener('DOMContentLoaded', function() {
             const aboutCollapsed = localStorage.getItem('aboutCollapsed');
@@ -2307,6 +2454,15 @@
                 document.getElementById('aboutSection').classList.add('collapsed');
                 document.getElementById('aboutToggleText').textContent = 'Show';
                 document.getElementById('aboutHeader').setAttribute('aria-expanded', 'false');
+            }
+            
+            // Restore score guide state
+            const scoreGuideOpen = localStorage.getItem('scoreGuideOpen');
+            if (scoreGuideOpen === 'true') {
+                document.getElementById('scoreGuideContent').classList.add('show');
+                document.getElementById('scoreGuideTrigger').setAttribute('aria-expanded', 'true');
+                document.getElementById('scoreGuideText').textContent = 'Hide score guide';
+                document.getElementById('scoreGuideChevron').textContent = '▴';
             }
         });
 
@@ -2521,6 +2677,33 @@
                 'tough-market': 'var(--accent-red)'
             };
             document.getElementById('actionSection').style.borderLeft = '3px solid ' + accentColors[tierKey];
+            
+            // Highlight current tier in score guide
+            const guideMapping = {
+                'good-time': 'guideGreen',
+                'worth-exploring': 'guideYellow',
+                'build-your-position': 'guideOrange',
+                'tough-market': 'guideRed'
+            };
+            ['guideGreen', 'guideYellow', 'guideOrange', 'guideRed'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.remove('current');
+                    // Add arrow to current tier's range
+                    const rangeEl = el.querySelector('.score-guide-range');
+                    if (rangeEl) {
+                        rangeEl.textContent = rangeEl.textContent.replace(' ←', '');
+                    }
+                }
+            });
+            const currentGuideEl = document.getElementById(guideMapping[tierKey]);
+            if (currentGuideEl) {
+                currentGuideEl.classList.add('current');
+                const rangeEl = currentGuideEl.querySelector('.score-guide-range');
+                if (rangeEl && !rangeEl.textContent.includes('←')) {
+                    rangeEl.textContent += ' ←';
+                }
+            }
             
             const diff = peakScore - currentScore;
             document.getElementById('scoreChange').textContent = `↓ ${diff} pts from peak (${monthlyData.labels[peakIdx]})`;
