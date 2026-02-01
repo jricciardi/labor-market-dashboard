@@ -98,7 +98,8 @@
         .js-loading .recovery-summary,
         .js-loading #decompositionList,
         .js-loading #triggerList,
-        .js-loading #sensitivityList {
+        .js-loading #sensitivityList,
+        .js-loading .data-freshness {
             visibility: hidden;
         }
 
@@ -179,6 +180,43 @@
             font-size: 0.6rem;
             color: var(--text-muted);
         }
+
+        .data-freshness {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.6rem;
+            margin-top: 4px;
+        }
+
+        .freshness-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .freshness-dot.fresh {
+            background: var(--accent-green);
+            box-shadow: 0 0 4px var(--accent-green);
+        }
+
+        .freshness-dot.stale {
+            background: var(--accent-yellow);
+            box-shadow: 0 0 4px var(--accent-yellow);
+        }
+
+        .freshness-dot.old {
+            background: var(--accent-orange);
+            box-shadow: 0 0 4px var(--accent-orange);
+        }
+
+        .freshness-text {
+            color: var(--text-muted);
+        }
+
+        .freshness-text.fresh { color: var(--accent-green); }
+        .freshness-text.stale { color: var(--accent-yellow); }
+        .freshness-text.old { color: var(--accent-orange); }
 
         .subtitle {
             font-size: 0.85rem;
@@ -1383,6 +1421,217 @@
                 padding: 16px;
             }
         }
+
+        /* Print styles */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            body {
+                background: white !important;
+                color: #1a1a1a !important;
+                font-size: 11pt;
+            }
+
+            .noise-overlay {
+                display: none !important;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            /* Hide interactive elements */
+            .about-section,
+            .accordion-section,
+            .chevron,
+            .about-toggle,
+            footer {
+                display: none !important;
+            }
+
+            /* Header adjustments */
+            header {
+                border-bottom: 2px solid #333;
+                padding-bottom: 12px;
+                margin-bottom: 16px;
+            }
+
+            h1 {
+                color: #1a1a1a !important;
+                font-size: 24pt;
+            }
+
+            .subtitle {
+                color: #444 !important;
+            }
+
+            .header-meta {
+                text-align: left;
+                margin-top: 8px;
+            }
+
+            .last-updated {
+                background: none !important;
+                padding: 0;
+                color: #666 !important;
+                display: inline;
+            }
+
+            .next-update,
+            .data-freshness {
+                display: none;
+            }
+
+            /* Hero score */
+            .hero-score {
+                background: #f5f5f5 !important;
+                border: 1px solid #ccc !important;
+                page-break-inside: avoid;
+            }
+
+            .hero-score::before {
+                display: none;
+            }
+
+            .score-value {
+                color: #1a1a1a !important;
+            }
+
+            .score-verdict {
+                background: none !important;
+                border: 1px solid currentColor !important;
+            }
+
+            .action-section {
+                background: #f9f9f9 !important;
+                border-color: #999 !important;
+            }
+
+            /* Charts - hide sparklines, keep main chart */
+            .metric-chart-wrapper,
+            .sparkline-time,
+            .sparkline-range {
+                display: none !important;
+            }
+
+            /* Metric cards as compact list */
+            .metrics-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+
+            .metric-card {
+                background: #f5f5f5 !important;
+                border: 1px solid #ddd !important;
+                padding: 8px !important;
+                page-break-inside: avoid;
+            }
+
+            .metric-header {
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .metric-info h3 {
+                font-size: 9pt;
+                color: #333 !important;
+            }
+
+            .metric-info .description {
+                display: none;
+            }
+
+            .metric-value {
+                font-size: 14pt !important;
+            }
+
+            .metric-delta {
+                display: none;
+            }
+
+            /* Main chart */
+            .main-chart {
+                background: white !important;
+                border: 1px solid #ccc !important;
+                page-break-inside: avoid;
+            }
+
+            .chart-title {
+                color: #1a1a1a !important;
+            }
+
+            .chart-legend {
+                font-size: 8pt;
+            }
+
+            .legend-dot {
+                border: 1px solid #999;
+            }
+
+            /* Context section */
+            .context-section {
+                background: #f5f5f5 !important;
+                border: 1px solid #ccc !important;
+                page-break-inside: avoid;
+            }
+
+            .context-header {
+                color: #1a1a1a !important;
+            }
+
+            .context-item {
+                background: white !important;
+            }
+
+            .context-label {
+                color: #666 !important;
+            }
+
+            .context-value {
+                color: #1a1a1a !important;
+            }
+
+            /* Recovery section */
+            .recovery-section {
+                background: #f5f5f5 !important;
+                border: 1px solid #ccc !important;
+                page-break-before: always;
+            }
+
+            .recovery-panel {
+                background: white !important;
+            }
+
+            .trigger-item,
+            .sensitivity-item {
+                background: #f9f9f9 !important;
+            }
+
+            /* Tier sections */
+            .tier-badge {
+                background: none !important;
+                border: 1px solid currentColor !important;
+            }
+
+            .tier-title,
+            .tier-subtitle {
+                color: #333 !important;
+            }
+
+            /* Page breaks */
+            .tier-section {
+                page-break-inside: avoid;
+            }
+
+            .context-section {
+                page-break-before: always;
+            }
+        }
     </style>
 </head>
 <body class="js-loading">
@@ -1395,6 +1644,10 @@
                 <div class="header-meta">
                     <span class="last-updated" id="lastUpdated"><span class="skeleton skeleton-text" style="width: 180px;"></span></span>
                     <span class="next-update" id="nextUpdate">Next update expected: ~Feb 7</span>
+                    <div class="data-freshness" id="dataFreshness">
+                        <span class="freshness-dot"></span>
+                        <span class="freshness-text"></span>
+                    </div>
                 </div>
             </div>
             <p class="subtitle">Data to help you decide when to look for a new job.</p>
@@ -1928,6 +2181,32 @@
             
             const nextUpdateText = `Next update: ~${monthNames[nextReleaseMonth.getMonth()]} ${nextReleaseMonth.getDate()}`;
             document.getElementById('nextUpdate').textContent = nextUpdateText;
+            
+            // Calculate data freshness
+            // Data is considered "fresh" if the most recent available data is less than 6 weeks old
+            // "stale" if 6-10 weeks old, "old" if more than 10 weeks
+            const dataEndDate = new Date(parseInt(dataMonth[0]), parseInt(dataMonth[1]), 0); // Last day of data month
+            const daysSinceData = Math.floor((today - dataEndDate) / (1000 * 60 * 60 * 24));
+            
+            const freshnessEl = document.getElementById('dataFreshness');
+            const freshnessDot = freshnessEl.querySelector('.freshness-dot');
+            const freshnessText = freshnessEl.querySelector('.freshness-text');
+            
+            let freshnessClass, freshnessLabel;
+            if (daysSinceData <= 42) { // 6 weeks
+                freshnessClass = 'fresh';
+                freshnessLabel = 'Current';
+            } else if (daysSinceData <= 70) { // 10 weeks
+                freshnessClass = 'stale';
+                freshnessLabel = `${Math.floor(daysSinceData / 7)} weeks old`;
+            } else {
+                freshnessClass = 'old';
+                freshnessLabel = `${Math.floor(daysSinceData / 7)} weeks old`;
+            }
+            
+            freshnessDot.className = `freshness-dot ${freshnessClass}`;
+            freshnessText.className = `freshness-text ${freshnessClass}`;
+            freshnessText.textContent = freshnessLabel;
             
             // Update chart title with actual data range
             const firstLabel = monthlyData.labels[0];
