@@ -623,6 +623,16 @@
             font-variant-numeric: tabular-nums;
         }
 
+        .sparkline-time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.5rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            padding: 0 2px;
+            opacity: 0.7;
+        }
+
         /* How Does This Compare Section */
         .context-section {
             background: var(--bg-secondary);
@@ -776,8 +786,16 @@
         .metric-name {
             font-size: 0.7rem;
             color: var(--text-secondary);
-            width: 130px;
+            width: 100px;
             flex-shrink: 0;
+        }
+
+        .metric-current {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            width: 45px;
+            flex-shrink: 0;
+            font-variant-numeric: tabular-nums;
         }
 
         .metric-bar-container {
@@ -846,8 +864,30 @@
         }
 
         .trigger-icon {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            flex-shrink: 0;
             margin-top: 1px;
+        }
+
+        .trigger-item .trigger-icon {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+        }
+
+        .trigger-item.watching .trigger-icon {
+            background: var(--accent-yellow-dim);
+            color: var(--accent-yellow);
+        }
+
+        .trigger-item.met .trigger-icon {
+            background: var(--accent-green-dim);
+            color: var(--accent-green);
         }
 
         .trigger-content {
@@ -972,6 +1012,29 @@
         .accordion-trigger .icon {
             color: var(--text-muted);
             transition: transform 0.2s ease;
+            font-size: 0.6rem;
+        }
+
+        /* CSS Chevron */
+        .chevron {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid var(--text-muted);
+            border-bottom: 2px solid var(--text-muted);
+            transform: rotate(45deg);
+            transition: transform 0.2s ease;
+            margin-bottom: 2px;
+        }
+
+        .accordion-item.open .chevron,
+        .about-section.collapsed .chevron {
+            transform: rotate(-135deg);
+            margin-bottom: -2px;
+        }
+
+        .about-section:not(.collapsed) .chevron {
+            transform: rotate(45deg);
         }
 
         .accordion-item.open .accordion-trigger .icon {
@@ -1021,6 +1084,41 @@
 
         .accordion-panel a:hover {
             text-decoration: underline;
+        }
+
+        .formula-block {
+            margin-top: 16px;
+            padding: 14px 16px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        .formula-block strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.7rem;
+        }
+
+        .formula-block code {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent-yellow);
+            background: var(--bg-tertiary);
+            padding: 10px 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            overflow-x: auto;
+        }
+
+        .formula-block p {
+            font-size: 0.65rem;
+            margin-bottom: 8px;
+        }
+
+        .formula-block a {
+            font-size: 0.65rem;
         }
 
         /* Footer */
@@ -1248,7 +1346,7 @@
                 <h2>What is this?</h2>
                 <span class="about-toggle">
                     <span id="aboutToggleText">Hide</span>
-                    <span class="icon">▼</span>
+                    <span class="chevron"></span>
                 </span>
             </div>
             <div class="about-content">
@@ -1309,7 +1407,7 @@
                     <div class="legend-item"><span class="legend-dot green"></span> Good Time to Move (70+)</div>
                     <div class="legend-item"><span class="legend-dot yellow"></span> Worth Exploring (55–69)</div>
                     <div class="legend-item"><span class="legend-dot orange"></span> Build Your Position (40–54)</div>
-                    <div class="legend-item"><span class="legend-dot red"></span> Tough Market (&lt;40)</div>
+                    <div class="legend-item"><span class="legend-dot red"></span> Challenging (&lt;40)</div>
                 </div>
             </div>
             <div class="chart-container">
@@ -1340,6 +1438,7 @@
                             <span class="min">--</span>
                         </div>
                     </div>
+                    <div class="sparkline-time"><span>'15</span><span>Now</span></div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1356,6 +1455,7 @@
                             <span class="min">--</span>
                         </div>
                     </div>
+                    <div class="sparkline-time"><span>'15</span><span>Now</span></div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1372,6 +1472,7 @@
                             <span class="min">--</span>
                         </div>
                     </div>
+                    <div class="sparkline-time"><span>'15</span><span>Now</span></div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1388,6 +1489,7 @@
                             <span class="min">--</span>
                         </div>
                     </div>
+                    <div class="sparkline-time"><span>'15</span><span>Now</span></div>
                 </div>
             </div>
         </section>
@@ -1415,6 +1517,7 @@
                             <span class="min">--</span>
                         </div>
                     </div>
+                    <div class="sparkline-time"><span>'15</span><span>Now</span></div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1431,6 +1534,7 @@
                             <span class="min">--</span>
                         </div>
                     </div>
+                    <div class="sparkline-time"><span>'15</span><span>Now</span></div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1447,6 +1551,7 @@
                             <span class="min">--</span>
                         </div>
                     </div>
+                    <div class="sparkline-time"><span>'15</span><span>Now</span></div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1463,6 +1568,7 @@
                             <span class="min">--</span>
                         </div>
                     </div>
+                    <div class="sparkline-time"><span>'15</span><span>Now</span></div>
                 </div>
             </div>
         </section>
@@ -1545,7 +1651,7 @@
             <div class="accordion-item" id="accordion-calc">
                 <button class="accordion-trigger" onclick="toggleAccordion('accordion-calc')">
                     <span>How is this calculated?</span>
-                    <span class="icon">▼</span>
+                    <span class="chevron"></span>
                 </button>
                 <div class="accordion-panel">
                     <p>The score combines eight labor market indicators, weighted by how directly they measure worker leverage:</p>
@@ -1554,13 +1660,19 @@
                         <li><strong>Context metrics (40% of score):</strong> Unemployment rate, Fed interest rate, wage growth, and workforce participation. These shape the environment but are less direct.</li>
                     </ul>
                     <p>The score also applies adjustments for unusual conditions: when the job openings ratio falls below 1.0 (more seekers than jobs), when the market is "frozen" (low hiring AND low quitting), and when Fed rates are near zero (historically stimulative).</p>
+                    <div class="formula-block">
+                        <strong>The formula:</strong>
+                        <code>Score = (0.6 × CoreAvg + 0.4 × ContextAvg) × 100 × adjustments</code>
+                        <p>Each metric is normalized to 0–1 based on historical ranges (e.g., quit rate: 1.5% = 0, 3.0% = 1). Adjustments: ×0.92 if jobs/seeker &lt; 1.0; up to ×0.88 for frozen market; ×1.08 if Fed rate &lt; 0.5%.</p>
+                        <a href="https://github.com/jricciardi/labor-market-dashboard/blob/main/index.html#L1850" target="_blank">View source code →</a>
+                    </div>
                 </div>
             </div>
             
             <div class="accordion-item" id="accordion-limits">
                 <button class="accordion-trigger" onclick="toggleAccordion('accordion-limits')">
                     <span>What are the limitations?</span>
-                    <span class="icon">▼</span>
+                    <span class="chevron"></span>
                 </button>
                 <div class="accordion-panel">
                     <p><strong>This is national data.</strong> Your industry, region, and role may differ significantly. Tech hiring can freeze while healthcare booms. San Francisco and rural Ohio are different markets.</p>
@@ -1573,7 +1685,7 @@
             <div class="accordion-item" id="accordion-data">
                 <button class="accordion-trigger" onclick="toggleAccordion('accordion-data')">
                     <span>Where does the data come from?</span>
-                    <span class="icon">▼</span>
+                    <span class="chevron"></span>
                 </button>
                 <div class="accordion-panel">
                     <p>All data comes from official government sources, retrieved via the <a href="https://fred.stlouisfed.org/" target="_blank">Federal Reserve Economic Data (FRED)</a> API:</p>
@@ -1642,7 +1754,7 @@
             'good-time': 'Good Time to Move',
             'worth-exploring': 'Worth Exploring', 
             'build-your-position': 'Build Your Position',
-            'tough-market': 'Tough Market'
+            'tough-market': 'Challenging'
         };
 
         // Action advice for each tier
@@ -1675,7 +1787,7 @@
                 ]
             },
             'tough-market': {
-                intro: 'This is a difficult market for job seekers. Prioritize stability unless you have no choice.',
+                intro: 'Conditions favor employers right now. Focus on stability unless you have a compelling reason to move.',
                 actions: [
                     'Protect your current position',
                     'Build skills that will matter when conditions improve',
@@ -1965,6 +2077,16 @@
                 wageGrowth: 'Wage Growth',
                 lfpr: 'Participation'
             };
+
+            // Format metric values for display
+            const formatMetricValue = (metric, value) => {
+                switch(metric) {
+                    case 'openingsRatio': return value.toFixed(2);
+                    case 'fedRate': return value.toFixed(2) + '%';
+                    case 'lfpr': return value.toFixed(1) + '%';
+                    default: return value.toFixed(1) + '%';
+                }
+            };
             
             const metricScores = Object.entries(currentMetrics)
                 .filter(([k, v]) => v != null)
@@ -1984,9 +2106,11 @@
             decompositionEl.innerHTML = metricScores.map(m => {
                 const isLayoffs = m.metric === 'layoffsRate';
                 const showFootnote = isLayoffs && isFrozenMarket && m.score > 0.7;
+                const formattedValue = formatMetricValue(m.metric, m.value);
                 return `
                     <div class="decomposition-item">
                         <span class="metric-name">${m.name}${showFootnote ? ' <span class="footnote-marker">†</span>' : ''}</span>
+                        <span class="metric-current">${formattedValue}</span>
                         <div class="metric-bar-container">
                             <div class="metric-bar ${getScoreCategory(m.score)}" style="width: ${m.score * 100}%"></div>
                         </div>
@@ -2075,7 +2199,8 @@
             
             const triggerEl = document.getElementById('triggerList');
             triggerEl.innerHTML = triggers.map(t => {
-                const icon = t.status === 'met' ? '✓' : t.status === 'watching' ? '◐' : '○';
+                // Use clearer icons: ✓ for met, ● for watching, ○ for not met
+                const icon = t.status === 'met' ? '✓' : t.status === 'watching' ? '●' : '○';
                 const trend = getTrend(t.recentValues);
                 const trendIsGood = (trend.direction === t.goodDirection) || 
                                    (trend.direction === 'flat' && t.status === 'met');
@@ -2278,7 +2403,7 @@
                                 title: (items) => items[0].label,
                                 label: (item) => {
                                     const score = item.raw;
-                                    let status = 'Tough Market';
+                                    let status = 'Challenging';
                                     if (score >= 70) status = 'Good Time to Move';
                                     else if (score >= 55) status = 'Worth Exploring';
                                     else if (score >= 40) status = 'Build Your Position';
