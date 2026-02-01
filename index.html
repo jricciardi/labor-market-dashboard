@@ -1469,7 +1469,7 @@
         <!-- Main Time Series Chart -->
         <section class="main-chart">
             <div class="chart-header">
-                <div class="chart-title">The Score Over Time (2015–2025)</div>
+                <div class="chart-title" id="chartTitle">The Score Over Time</div>
                 <div class="chart-legend">
                     <div class="legend-item"><span class="legend-dot green"></span> Good Time to Move (70+)</div>
                     <div class="legend-item"><span class="legend-dot yellow"></span> Worth Exploring (55–69)</div>
@@ -1909,12 +1909,30 @@
             const dataThrough = monthNames[parseInt(dataMonth[1]) - 1] + ' ' + dataMonth[0];
             document.getElementById('lastUpdated').textContent = `Updated ${formattedDate} • Data through ${dataThrough}`;
             
-            // Calculate next update (roughly 7th of next month)
-            const nextMonth = new Date(lastUpdated);
-            nextMonth.setMonth(nextMonth.getMonth() + 1);
-            nextMonth.setDate(7);
-            const nextUpdateText = `Next update: ~${monthNames[nextMonth.getMonth()]} ${nextMonth.getDate()}`;
+            // Calculate next update based on dataThrough
+            // JOLTS data for month X is released ~5-6 weeks after month X ends
+            // If we have data through month X, next release (month X+1 data) comes ~X+2 months
+            // But if today is past that date, we should show X+3 months
+            const dataThroughDate = new Date(parseInt(dataMonth[0]), parseInt(dataMonth[1]) - 1, 1);
+            const today = new Date();
+            
+            // Calculate when the next data release should be
+            let nextReleaseMonth = new Date(dataThroughDate);
+            nextReleaseMonth.setMonth(nextReleaseMonth.getMonth() + 2);
+            nextReleaseMonth.setDate(7);
+            
+            // If that date has passed, show the following month
+            if (nextReleaseMonth < today) {
+                nextReleaseMonth.setMonth(nextReleaseMonth.getMonth() + 1);
+            }
+            
+            const nextUpdateText = `Next update: ~${monthNames[nextReleaseMonth.getMonth()]} ${nextReleaseMonth.getDate()}`;
             document.getElementById('nextUpdate').textContent = nextUpdateText;
+            
+            // Update chart title with actual data range
+            const firstLabel = monthlyData.labels[0];
+            const lastLabel = monthlyData.labels[monthlyData.labels.length - 1];
+            document.getElementById('chartTitle').textContent = `The Score Over Time (${firstLabel} – ${lastLabel})`;
 
             // Calculate composite scores
             function calculateCompositeScore(idx) {
