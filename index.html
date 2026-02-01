@@ -29,6 +29,58 @@
             --chart-grid: rgba(255,255,255,0.04);
         }
 
+        /* Skeleton loading animation */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, 
+                var(--bg-tertiary) 25%, 
+                rgba(255,255,255,0.08) 50%, 
+                var(--bg-tertiary) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        .skeleton-text {
+            height: 1em;
+            display: inline-block;
+            min-width: 60px;
+        }
+
+        .skeleton-score {
+            width: 80px;
+            height: 4.5rem;
+            display: inline-block;
+        }
+
+        .skeleton-badge {
+            width: 120px;
+            height: 32px;
+            border-radius: 20px;
+        }
+
+        /* Hide dynamic content until JS loads - prevents FOUC */
+        .js-loading .metric-value,
+        .js-loading .score-value,
+        .js-loading .score-verdict,
+        .js-loading .score-change,
+        .js-loading .action-content,
+        .js-loading .context-value:not(:last-child),
+        .js-loading .recovery-summary,
+        .js-loading #decompositionList,
+        .js-loading #triggerList,
+        .js-loading #sensitivityList {
+            visibility: hidden;
+        }
+
+        .js-loading .skeleton {
+            visibility: visible;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -277,7 +329,7 @@
 
         .score-value.good-time { color: var(--accent-green); }
         .score-value.worth-exploring { color: var(--accent-yellow); }
-        .score-value.wait-if-you-can { color: var(--accent-orange); }
+        .score-value.build-your-position { color: var(--accent-orange); }
         .score-value.tough-market { color: var(--accent-red); }
 
         .score-max {
@@ -314,7 +366,7 @@
             border: 1px solid rgba(255, 201, 64, 0.3);
         }
 
-        .score-verdict.wait-if-you-can {
+        .score-verdict.build-your-position {
             background: var(--accent-orange-dim);
             color: var(--accent-orange);
             border: 1px solid rgba(255, 140, 64, 0.3);
@@ -335,7 +387,7 @@
 
         .verdict-icon.good-time { background: var(--accent-green); }
         .verdict-icon.worth-exploring { background: var(--accent-yellow); }
-        .verdict-icon.wait-if-you-can { background: var(--accent-orange); }
+        .verdict-icon.build-your-position { background: var(--accent-orange); }
         .verdict-icon.tough-market { background: var(--accent-red); }
 
         @keyframes pulse {
@@ -395,7 +447,7 @@
             font-size: 0.7rem;
         }
 
-        .action-section.wait-if-you-can .action-list li::before,
+        .action-section.build-your-position .action-list li::before,
         .action-section.tough-market .action-list li::before {
             content: '→';
             color: var(--text-muted);
@@ -505,6 +557,7 @@
             border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 20px;
+            overflow: hidden; /* Prevent chart overflow */
         }
 
         .metric-header {
@@ -530,15 +583,44 @@
             font-size: 1.8rem;
             font-weight: 700;
             font-variant-numeric: tabular-nums;
+            flex-shrink: 0;
         }
 
         .metric-value.good { color: var(--accent-green); }
         .metric-value.neutral { color: var(--accent-yellow); }
         .metric-value.bad { color: var(--accent-red); }
 
+        .metric-chart-wrapper {
+            display: flex;
+            align-items: stretch;
+            gap: 6px;
+            margin-top: 8px;
+            width: 100%;
+            max-width: 100%;
+        }
+
         .metric-chart {
             height: 80px;
-            margin-top: 8px;
+            flex: 1;
+            min-width: 0;
+            max-width: calc(100% - 38px); /* Account for sparkline-range width + gap */
+            position: relative;
+        }
+
+        .sparkline-range {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            text-align: right;
+            padding: 2px 0;
+            min-width: 32px;
+        }
+
+        .sparkline-range .max,
+        .sparkline-range .min {
+            font-variant-numeric: tabular-nums;
         }
 
         /* How Does This Compare Section */
@@ -1003,6 +1085,10 @@
             .chart-legend {
                 justify-content: flex-start;
             }
+
+            .recovery-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 768px) {
@@ -1016,6 +1102,10 @@
             
             .score-value {
                 font-size: 3rem;
+            }
+            
+            .score-approx {
+                font-size: 1.2rem;
             }
             
             .metrics-grid {
@@ -1034,10 +1124,110 @@
             .context-grid {
                 grid-template-columns: 1fr 1fr;
             }
+
+            .chart-legend {
+                gap: 8px;
+                font-size: 0.55rem;
+            }
+
+            .legend-item {
+                gap: 4px;
+            }
+
+            .legend-dot {
+                width: 8px;
+                height: 8px;
+            }
+
+            .score-header {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .score-meta {
+                text-align: left;
+            }
+
+            .tier-header {
+                flex-wrap: wrap;
+            }
+
+            .tier-subtitle {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 4px;
+            }
+
+            .accordion-trigger {
+                padding: 14px 16px;
+                font-size: 0.75rem;
+            }
+
+            .accordion-panel {
+                padding: 0 16px 16px 16px;
+            }
+
+            .recovery-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .sensitivity-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+
+            .trigger-trend {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .context-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-legend {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+
+            .about-how ul {
+                font-size: 0.7rem;
+            }
+
+            .action-list li {
+                font-size: 0.75rem;
+            }
+
+            .metric-header {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .metric-value {
+                font-size: 1.5rem;
+            }
+
+            .sparkline-range {
+                font-size: 0.5rem;
+                min-width: 28px;
+            }
+
+            .metric-chart {
+                max-width: calc(100% - 34px); /* Smaller range column on mobile */
+            }
+
+            .metric-card {
+                padding: 16px;
+            }
         }
     </style>
 </head>
-<body>
+<body class="js-loading">
     <div class="noise-overlay"></div>
     
     <div class="container">
@@ -1045,7 +1235,7 @@
             <div class="header-top">
                 <h1>Is Now a Good Time?</h1>
                 <div class="header-meta">
-                    <span class="last-updated" id="lastUpdated">Loading...</span>
+                    <span class="last-updated" id="lastUpdated"><span class="skeleton skeleton-text" style="width: 180px;"></span></span>
                     <span class="next-update" id="nextUpdate">Next update expected: ~Feb 7</span>
                 </div>
             </div>
@@ -1085,16 +1275,16 @@
                     <div class="score-label">The Score</div>
                     <div class="score-display">
                         <span class="score-approx">~</span>
-                        <span class="score-value" id="currentScore">--</span>
+                        <span class="score-value" id="currentScore"><span class="skeleton skeleton-score"></span></span>
                         <span class="score-max">/ 100</span>
                     </div>
                 </div>
                 <div class="score-meta">
                     <div class="score-verdict" id="scoreVerdict">
                         <span class="verdict-icon" id="verdictIcon"></span>
-                        <span id="verdictText">Loading...</span>
+                        <span id="verdictText"><span class="skeleton skeleton-text" style="width: 100px;"></span></span>
                     </div>
-                    <div class="score-change" id="scoreChange">Loading...</div>
+                    <div class="score-change" id="scoreChange"><span class="skeleton skeleton-text" style="width: 140px;"></span></div>
                 </div>
             </div>
             
@@ -1105,7 +1295,8 @@
                     <span>What should I do?</span>
                 </div>
                 <div class="action-content" id="actionContent">
-                    Loading...
+                    <span class="skeleton skeleton-text" style="width: 100%;"></span>
+                    <span class="skeleton skeleton-text" style="width: 90%; margin-top: 8px;"></span>
                 </div>
             </div>
         </section>
@@ -1117,7 +1308,7 @@
                 <div class="chart-legend">
                     <div class="legend-item"><span class="legend-dot green"></span> Good Time to Move (70+)</div>
                     <div class="legend-item"><span class="legend-dot yellow"></span> Worth Exploring (55–69)</div>
-                    <div class="legend-item"><span class="legend-dot orange"></span> Wait If You Can (40–54)</div>
+                    <div class="legend-item"><span class="legend-dot orange"></span> Build Your Position (40–54)</div>
                     <div class="legend-item"><span class="legend-dot red"></span> Tough Market (&lt;40)</div>
                 </div>
             </div>
@@ -1140,9 +1331,15 @@
                             <h3>Quit Rate</h3>
                             <span class="description">Workers confident enough to leave voluntarily</span>
                         </div>
-                        <span class="metric-value" id="quitValue">--%</span>
+                        <span class="metric-value" id="quitValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
-                    <div class="metric-chart"><canvas id="quitChart"></canvas></div>
+                    <div class="metric-chart-wrapper">
+                        <div class="metric-chart"><canvas id="quitChart"></canvas></div>
+                        <div class="sparkline-range" id="quitRange">
+                            <span class="max">--</span>
+                            <span class="min">--</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1150,9 +1347,15 @@
                             <h3>Jobs per Job Seeker</h3>
                             <span class="description">Open positions ÷ unemployed workers</span>
                         </div>
-                        <span class="metric-value" id="ratioValue">--</span>
+                        <span class="metric-value" id="ratioValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
-                    <div class="metric-chart"><canvas id="openingsChart"></canvas></div>
+                    <div class="metric-chart-wrapper">
+                        <div class="metric-chart"><canvas id="openingsChart"></canvas></div>
+                        <div class="sparkline-range" id="ratioRange">
+                            <span class="max">--</span>
+                            <span class="min">--</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1160,9 +1363,15 @@
                             <h3>Hiring Rate</h3>
                             <span class="description">Actual hires happening, not just postings</span>
                         </div>
-                        <span class="metric-value" id="hiresValue">--%</span>
+                        <span class="metric-value" id="hiresValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
-                    <div class="metric-chart"><canvas id="hiresChart"></canvas></div>
+                    <div class="metric-chart-wrapper">
+                        <div class="metric-chart"><canvas id="hiresChart"></canvas></div>
+                        <div class="sparkline-range" id="hiresRange">
+                            <span class="max">--</span>
+                            <span class="min">--</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1170,9 +1379,15 @@
                             <h3>Layoff Rate</h3>
                             <span class="description">Involuntary job losses</span>
                         </div>
-                        <span class="metric-value" id="layoffsValue">--%</span>
+                        <span class="metric-value" id="layoffsValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
-                    <div class="metric-chart"><canvas id="layoffsChart"></canvas></div>
+                    <div class="metric-chart-wrapper">
+                        <div class="metric-chart"><canvas id="layoffsChart"></canvas></div>
+                        <div class="sparkline-range" id="layoffsRange">
+                            <span class="max">--</span>
+                            <span class="min">--</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1191,9 +1406,15 @@
                             <h3>Unemployment Rate</h3>
                             <span class="description">Share of workforce without jobs</span>
                         </div>
-                        <span class="metric-value" id="unempValue">--%</span>
+                        <span class="metric-value" id="unempValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
-                    <div class="metric-chart"><canvas id="unempChart"></canvas></div>
+                    <div class="metric-chart-wrapper">
+                        <div class="metric-chart"><canvas id="unempChart"></canvas></div>
+                        <div class="sparkline-range" id="unempRange">
+                            <span class="max">--</span>
+                            <span class="min">--</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1201,9 +1422,15 @@
                             <h3>Fed Interest Rate</h3>
                             <span class="description">Cost of borrowing that affects hiring budgets</span>
                         </div>
-                        <span class="metric-value" id="fedValue">--%</span>
+                        <span class="metric-value" id="fedValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
-                    <div class="metric-chart"><canvas id="fedChart"></canvas></div>
+                    <div class="metric-chart-wrapper">
+                        <div class="metric-chart"><canvas id="fedChart"></canvas></div>
+                        <div class="sparkline-range" id="fedRange">
+                            <span class="max">--</span>
+                            <span class="min">--</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1211,9 +1438,15 @@
                             <h3>Wage Growth</h3>
                             <span class="description">Year-over-year change in average pay</span>
                         </div>
-                        <span class="metric-value" id="wageValue">--%</span>
+                        <span class="metric-value" id="wageValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
-                    <div class="metric-chart"><canvas id="wageChart"></canvas></div>
+                    <div class="metric-chart-wrapper">
+                        <div class="metric-chart"><canvas id="wageChart"></canvas></div>
+                        <div class="sparkline-range" id="wageRange">
+                            <span class="max">--</span>
+                            <span class="min">--</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1221,9 +1454,15 @@
                             <h3>Workforce Participation</h3>
                             <span class="description">Share of 25-54 year olds working or looking</span>
                         </div>
-                        <span class="metric-value" id="lfprValue">--%</span>
+                        <span class="metric-value" id="lfprValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
-                    <div class="metric-chart"><canvas id="lfprChart"></canvas></div>
+                    <div class="metric-chart-wrapper">
+                        <div class="metric-chart"><canvas id="lfprChart"></canvas></div>
+                        <div class="sparkline-range" id="lfprRange">
+                            <span class="max">--</span>
+                            <span class="min">--</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1234,23 +1473,23 @@
             <div class="context-grid">
                 <div class="context-item">
                     <div class="context-label">Current Conditions</div>
-                    <div class="context-value highlight" id="cyclePosition">Loading...</div>
+                    <div class="context-value highlight" id="cyclePosition"><span class="skeleton skeleton-text"></span></div>
                 </div>
                 <div class="context-item">
                     <div class="context-label">Similar to</div>
-                    <div class="context-value" id="historicalAnalog">Loading...</div>
+                    <div class="context-value" id="historicalAnalog"><span class="skeleton skeleton-text"></span></div>
                 </div>
                 <div class="context-item">
                     <div class="context-label">Best on Record</div>
-                    <div class="context-value" id="peakContext">Loading...</div>
+                    <div class="context-value" id="peakContext"><span class="skeleton skeleton-text"></span></div>
                 </div>
                 <div class="context-item">
                     <div class="context-label">COVID Crash</div>
-                    <div class="context-value" id="covidContext">Loading...</div>
+                    <div class="context-value" id="covidContext"><span class="skeleton skeleton-text"></span></div>
                 </div>
                 <div class="context-item">
                     <div class="context-label">Before Pandemic</div>
-                    <div class="context-value" id="prePandemicContext">Loading...</div>
+                    <div class="context-value" id="prePandemicContext"><span class="skeleton skeleton-text"></span></div>
                 </div>
                 <div class="context-item">
                     <div class="context-label">Key Signal to Watch</div>
@@ -1268,7 +1507,8 @@
                 </div>
             </div>
             <div class="recovery-summary" id="recoverySummary">
-                Loading...
+                <span class="skeleton skeleton-text" style="width: 100%;"></span>
+                <span class="skeleton skeleton-text" style="width: 80%; margin-top: 8px;"></span>
             </div>
             <div class="recovery-grid">
                 <!-- What's Holding the Score Down -->
@@ -1401,7 +1641,7 @@
         const tierNames = {
             'good-time': 'Good Time to Move',
             'worth-exploring': 'Worth Exploring', 
-            'wait-if-you-can': 'Wait If You Can',
+            'build-your-position': 'Build Your Position',
             'tough-market': 'Tough Market'
         };
 
@@ -1425,7 +1665,7 @@
                     'Don\'t feel rushed—wait for good opportunities'
                 ]
             },
-            'wait-if-you-can': {
+            'build-your-position': {
                 intro: 'The market currently favors employers. If you can stay put, this may not be the best time to search actively.',
                 actions: [
                     'Focus on building skills in your current role',
@@ -1541,8 +1781,8 @@
                 tierClass = 'worth-exploring';
                 tierKey = 'worth-exploring';
             } else if (currentScore >= 40) {
-                tierClass = 'wait-if-you-can';
-                tierKey = 'wait-if-you-can';
+                tierClass = 'build-your-position';
+                tierKey = 'build-your-position';
             } else {
                 tierClass = 'tough-market';
                 tierKey = 'tough-market';
@@ -1560,7 +1800,7 @@
             const accentColors = {
                 'good-time': 'var(--accent-green)',
                 'worth-exploring': 'var(--accent-yellow)',
-                'wait-if-you-can': 'var(--accent-orange)',
+                'build-your-position': 'var(--accent-orange)',
                 'tough-market': 'var(--accent-red)'
             };
             document.getElementById('actionSection').style.borderLeft = '3px solid ' + accentColors[tierKey];
@@ -2001,12 +2241,12 @@
                         backgroundColor: function(context) {
                             const chart = context.chart;
                             const {ctx, chartArea} = chart;
-                            if (!chartArea) return 'rgba(255, 201, 64, 0.1)';
+                            if (!chartArea) return 'rgba(255, 201, 64, 0.05)';
                             const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-                            gradient.addColorStop(0, 'rgba(255, 77, 106, 0.15)');
-                            gradient.addColorStop(0.4, 'rgba(255, 140, 64, 0.15)');
-                            gradient.addColorStop(0.55, 'rgba(255, 201, 64, 0.15)');
-                            gradient.addColorStop(0.7, 'rgba(0, 217, 160, 0.15)');
+                            gradient.addColorStop(0, 'rgba(255, 77, 106, 0.08)');
+                            gradient.addColorStop(0.4, 'rgba(255, 140, 64, 0.08)');
+                            gradient.addColorStop(0.55, 'rgba(255, 201, 64, 0.08)');
+                            gradient.addColorStop(0.7, 'rgba(0, 217, 160, 0.08)');
                             return gradient;
                         },
                         fill: true,
@@ -2041,7 +2281,7 @@
                                     let status = 'Tough Market';
                                     if (score >= 70) status = 'Good Time to Move';
                                     else if (score >= 55) status = 'Worth Exploring';
-                                    else if (score >= 40) status = 'Wait If You Can';
+                                    else if (score >= 40) status = 'Build Your Position';
                                     return [`Score: ~${score}`, `${status}`];
                                 }
                             }
@@ -2069,8 +2309,8 @@
                 }
             });
 
-            // Sparklines
-            function createSparkline(canvasId, dataArray, metric) {
+            // Sparklines with min/max range labels
+            function createSparkline(canvasId, dataArray, metric, rangeId) {
                 const ctx = document.getElementById(canvasId).getContext('2d');
                 const thresholds = {
                     quitRate: { good: 2.5, neutral: 2.0 },
@@ -2082,6 +2322,27 @@
                     wageGrowth: { good: 4.0, neutral: 3.0 },
                     lfpr: { good: 83.0, neutral: 82.0 }
                 };
+                
+                // Calculate and display min/max range
+                const validData = dataArray.filter(v => v != null && !isNaN(v));
+                const minVal = Math.min(...validData);
+                const maxVal = Math.max(...validData);
+                
+                // Format based on metric type
+                const formatValue = (val) => {
+                    if (metric === 'openingsRatio') return val.toFixed(1);
+                    if (metric === 'lfpr') return val.toFixed(0);
+                    return val.toFixed(1);
+                };
+                
+                // Populate range labels
+                if (rangeId) {
+                    const rangeEl = document.getElementById(rangeId);
+                    if (rangeEl) {
+                        rangeEl.querySelector('.max').textContent = formatValue(maxVal);
+                        rangeEl.querySelector('.min').textContent = formatValue(minVal);
+                    }
+                }
                 
                 const getColor = (val) => {
                     const t = thresholds[metric];
@@ -2123,14 +2384,17 @@
                 });
             }
 
-            createSparkline('quitChart', monthlyData.quitRate, 'quitRate');
-            createSparkline('openingsChart', monthlyData.openingsRatio, 'openingsRatio');
-            createSparkline('hiresChart', monthlyData.hiresRate, 'hiresRate');
-            createSparkline('layoffsChart', monthlyData.layoffsRate, 'layoffsRate');
-            createSparkline('unempChart', monthlyData.unempRate.map(v => v || 0), 'unempRate');
-            createSparkline('fedChart', monthlyData.fedRate, 'fedRate');
-            createSparkline('wageChart', monthlyData.wageGrowth.map(v => v || 0), 'wageGrowth');
-            createSparkline('lfprChart', monthlyData.lfpr.map(v => v || 0), 'lfpr');
+            createSparkline('quitChart', monthlyData.quitRate, 'quitRate', 'quitRange');
+            createSparkline('openingsChart', monthlyData.openingsRatio, 'openingsRatio', 'ratioRange');
+            createSparkline('hiresChart', monthlyData.hiresRate, 'hiresRate', 'hiresRange');
+            createSparkline('layoffsChart', monthlyData.layoffsRate, 'layoffsRate', 'layoffsRange');
+            createSparkline('unempChart', monthlyData.unempRate.map(v => v || 0), 'unempRate', 'unempRange');
+            createSparkline('fedChart', monthlyData.fedRate, 'fedRate', 'fedRange');
+            createSparkline('wageChart', monthlyData.wageGrowth.map(v => v || 0), 'wageGrowth', 'wageRange');
+            createSparkline('lfprChart', monthlyData.lfpr.map(v => v || 0), 'lfpr', 'lfprRange');
+
+            // Remove loading state - reveal all content
+            document.body.classList.remove('js-loading');
         }
 
         // Initialize
