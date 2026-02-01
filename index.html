@@ -4,10 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Is Now a Good Time? | Job Search Timing</title>
+    
+    <!-- FOIT Prevention: Apply theme BEFORE body renders -->
+    <script>
+        (function() {
+            const saved = localStorage.getItem('dashboard-theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <style>
+        /* ========================================
+           CSS CUSTOM PROPERTIES - DARK (DEFAULT)
+           ======================================== */
         :root {
             --bg-primary: #0a0a0f;
             --bg-secondary: #12121a;
@@ -16,6 +30,8 @@
             --text-primary: #e8e8ed;
             --text-secondary: #9898a8;
             --text-muted: #606070;
+            
+            /* Base accent colors */
             --accent-green: #00d9a0;
             --accent-green-dim: rgba(0, 217, 160, 0.12);
             --accent-yellow: #ffc940;
@@ -26,7 +42,69 @@
             --accent-red-dim: rgba(255, 77, 106, 0.12);
             --accent-blue: #4d9fff;
             --border-color: #28283a;
-            --chart-grid: rgba(255,255,255,0.04);
+            
+            /* Text-on-background accent variants */
+            --accent-green-text: #00d9a0;
+            --accent-yellow-text: #ffc940;
+            --accent-orange-text: #ff8c40;
+            --accent-red-text: #ff4d6a;
+            
+            /* Chart-specific */
+            --chart-grid: rgba(255, 255, 255, 0.04);
+            --chart-tooltip-bg: rgba(22, 22, 32, 0.95);
+            --chart-tooltip-border: #28283a;
+            
+            /* Sparkline colors */
+            --sparkline-good: #00d9a0;
+            --sparkline-neutral: #ffc940;
+            --sparkline-bad: #ff4d6a;
+            
+            /* Noise overlay */
+            --noise-opacity: 0.025;
+            
+            /* Theme transition */
+            --theme-transition: 200ms ease;
+        }
+
+        /* ========================================
+           LIGHT MODE OVERRIDES
+           ======================================== */
+        [data-theme="light"] {
+            --bg-primary: #f5f6f8;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #ecedf0;
+            --bg-card: #ffffff;
+            
+            --text-primary: #1a1a2e;
+            --text-secondary: #5a5a6e;
+            --text-muted: #8888a0;
+            
+            --border-color: #d8dae0;
+            
+            /* Adjusted dim colors for light backgrounds */
+            --accent-green-dim: rgba(0, 160, 112, 0.12);
+            --accent-yellow-dim: rgba(180, 140, 0, 0.15);
+            --accent-orange-dim: rgba(220, 120, 40, 0.12);
+            --accent-red-dim: rgba(220, 60, 80, 0.12);
+            
+            /* Darker text variants for readability on white */
+            --accent-green-text: #00a070;
+            --accent-yellow-text: #c99700;
+            --accent-orange-text: #d2691e;
+            --accent-red-text: #dc3545;
+            
+            /* Chart-specific */
+            --chart-grid: rgba(0, 0, 0, 0.06);
+            --chart-tooltip-bg: rgba(255, 255, 255, 0.95);
+            --chart-tooltip-border: #d8dae0;
+            
+            /* Sparkline colors - adjusted for light bg */
+            --sparkline-good: #00a070;
+            --sparkline-neutral: #b48c00;
+            --sparkline-bad: #dc3545;
+            
+            /* Hide noise in light mode */
+            --noise-opacity: 0;
         }
 
         /* Skeleton loading animation */
@@ -119,6 +197,7 @@
             color: var(--text-primary);
             min-height: 100vh;
             line-height: 1.6;
+            transition: background var(--theme-transition), color var(--theme-transition);
         }
 
         .noise-overlay {
@@ -128,9 +207,10 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            opacity: 0.025;
+            opacity: var(--noise-opacity);
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
             z-index: 1000;
+            transition: opacity var(--theme-transition);
         }
 
         .container {
@@ -143,6 +223,7 @@
             margin-bottom: 32px;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 24px;
+            transition: border-color var(--theme-transition);
         }
 
         .header-top {
@@ -174,11 +255,13 @@
             border-radius: 4px;
             display: block;
             margin-bottom: 6px;
+            transition: background var(--theme-transition), color var(--theme-transition);
         }
 
         .next-update {
             font-size: 0.6rem;
             color: var(--text-muted);
+            transition: color var(--theme-transition);
         }
 
         .data-freshness {
@@ -214,9 +297,53 @@
             color: var(--text-muted);
         }
 
-        .freshness-text.fresh { color: var(--accent-green); }
-        .freshness-text.stale { color: var(--accent-yellow); }
-        .freshness-text.old { color: var(--accent-orange); }
+        .freshness-text.fresh { color: var(--accent-green-text); }
+        .freshness-text.stale { color: var(--accent-yellow-text); }
+        .freshness-text.old { color: var(--accent-orange-text); }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 8px;
+            transition: all var(--theme-transition);
+        }
+
+        .theme-toggle:hover {
+            background: var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .theme-toggle svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .theme-toggle .icon-sun {
+            display: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        .theme-toggle .icon-moon {
+            display: block;
+            fill: currentColor;
+        }
+        
+        [data-theme="light"] .theme-toggle .icon-sun { display: block; }
+        [data-theme="light"] .theme-toggle .icon-moon { display: none; }
 
         .subtitle {
             font-size: 0.85rem;
@@ -231,6 +358,7 @@
             border-radius: 12px;
             margin-bottom: 24px;
             overflow: hidden;
+            transition: background var(--theme-transition), border-color var(--theme-transition);
         }
 
         .about-header {
@@ -240,6 +368,7 @@
             padding: 16px 24px;
             cursor: pointer;
             user-select: none;
+            transition: background var(--theme-transition);
         }
 
         .about-header:hover {
@@ -254,6 +383,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            transition: color var(--theme-transition);
         }
 
         .about-toggle {
@@ -262,6 +392,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            transition: color var(--theme-transition);
         }
 
         .about-toggle .icon {
@@ -288,6 +419,7 @@
             color: var(--text-secondary);
             line-height: 1.7;
             margin-bottom: 10px;
+            transition: color var(--theme-transition);
         }
 
         .about-main p:last-child {
@@ -299,7 +431,7 @@
         }
 
         .about-main em {
-            color: var(--accent-yellow);
+            color: var(--accent-yellow-text);
             font-style: normal;
         }
 
@@ -307,6 +439,7 @@
             background: var(--bg-tertiary);
             border-radius: 8px;
             padding: 16px 20px;
+            transition: background var(--theme-transition);
         }
 
         .about-how h3 {
@@ -315,6 +448,7 @@
             letter-spacing: 0.1em;
             color: var(--text-muted);
             margin-bottom: 12px;
+            transition: color var(--theme-transition);
         }
 
         .about-how ul {
@@ -328,6 +462,7 @@
             color: var(--text-secondary);
             margin-bottom: 8px;
             padding-left: 0;
+            transition: color var(--theme-transition);
         }
 
         .about-how li strong {
@@ -343,6 +478,7 @@
             margin-bottom: 24px;
             position: relative;
             overflow: hidden;
+            transition: background var(--theme-transition), border-color var(--theme-transition);
         }
 
         .hero-score::before {
@@ -368,6 +504,7 @@
             letter-spacing: 0.15em;
             color: var(--text-muted);
             margin-bottom: 8px;
+            transition: color var(--theme-transition);
         }
 
         .score-display {
@@ -381,6 +518,7 @@
             font-weight: 700;
             line-height: 1;
             font-variant-numeric: tabular-nums;
+            transition: color var(--theme-transition);
         }
 
         .score-approx {
@@ -388,16 +526,18 @@
             font-weight: 400;
             color: var(--text-muted);
             margin-right: -4px;
+            transition: color var(--theme-transition);
         }
 
-        .score-value.good-time { color: var(--accent-green); }
-        .score-value.worth-exploring { color: var(--accent-yellow); }
-        .score-value.build-your-position { color: var(--accent-orange); }
-        .score-value.tough-market { color: var(--accent-red); }
+        .score-value.good-time { color: var(--accent-green-text); }
+        .score-value.worth-exploring { color: var(--accent-yellow-text); }
+        .score-value.build-your-position { color: var(--accent-orange-text); }
+        .score-value.tough-market { color: var(--accent-red-text); }
 
         .score-max {
             font-size: 1.2rem;
             color: var(--text-muted);
+            transition: color var(--theme-transition);
         }
 
         .score-meta {
@@ -415,30 +555,31 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 8px;
+            transition: background var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition);
         }
 
         .score-verdict.good-time {
             background: var(--accent-green-dim);
-            color: var(--accent-green);
-            border: 1px solid rgba(0, 217, 160, 0.3);
+            color: var(--accent-green-text);
+            border: 1px solid var(--accent-green);
         }
 
         .score-verdict.worth-exploring {
             background: var(--accent-yellow-dim);
-            color: var(--accent-yellow);
-            border: 1px solid rgba(255, 201, 64, 0.3);
+            color: var(--accent-yellow-text);
+            border: 1px solid var(--accent-yellow);
         }
 
         .score-verdict.build-your-position {
             background: var(--accent-orange-dim);
-            color: var(--accent-orange);
-            border: 1px solid rgba(255, 140, 64, 0.3);
+            color: var(--accent-orange-text);
+            border: 1px solid var(--accent-orange);
         }
 
         .score-verdict.tough-market {
             background: var(--accent-red-dim);
-            color: var(--accent-red);
-            border: 1px solid rgba(255, 77, 106, 0.3);
+            color: var(--accent-red-text);
+            border: 1px solid var(--accent-red);
         }
 
         .verdict-icon {
@@ -461,6 +602,7 @@
         .score-change {
             font-size: 0.75rem;
             color: var(--text-muted);
+            transition: color var(--theme-transition);
         }
 
         /* What Should I Do Section */
@@ -468,6 +610,7 @@
             background: var(--bg-tertiary);
             border-radius: 8px;
             padding: 20px 24px;
+            transition: background var(--theme-transition);
         }
 
         .action-header {
@@ -478,12 +621,14 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: color var(--theme-transition);
         }
 
         .action-content {
             font-size: 0.8rem;
             color: var(--text-secondary);
             line-height: 1.7;
+            transition: color var(--theme-transition);
         }
 
         .action-content strong {
@@ -506,7 +651,7 @@
             content: '✓';
             position: absolute;
             left: 0;
-            color: var(--accent-green);
+            color: var(--accent-green-text);
             font-size: 0.7rem;
         }
 
@@ -523,6 +668,7 @@
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 24px;
+            transition: background var(--theme-transition), border-color var(--theme-transition);
         }
 
         .chart-header {
@@ -538,6 +684,7 @@
             font-size: 0.9rem;
             font-weight: 600;
             color: var(--text-primary);
+            transition: color var(--theme-transition);
         }
 
         .chart-legend {
@@ -621,6 +768,7 @@
             border-radius: 10px;
             padding: 20px;
             overflow: hidden; /* Prevent chart overflow */
+            transition: background var(--theme-transition), border-color var(--theme-transition);
         }
 
         .metric-header {
@@ -635,11 +783,13 @@
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 4px;
+            transition: color var(--theme-transition);
         }
 
         .metric-info .description {
             font-size: 0.65rem;
             color: var(--text-muted);
+            transition: color var(--theme-transition);
         }
 
         .metric-value {
@@ -647,11 +797,12 @@
             font-weight: 700;
             font-variant-numeric: tabular-nums;
             flex-shrink: 0;
+            transition: color var(--theme-transition);
         }
 
-        .metric-value.good { color: var(--accent-green); }
-        .metric-value.neutral { color: var(--accent-yellow); }
-        .metric-value.bad { color: var(--accent-red); }
+        .metric-value.good { color: var(--accent-green-text); }
+        .metric-value.neutral { color: var(--accent-yellow-text); }
+        .metric-value.bad { color: var(--accent-red-text); }
 
         .metric-delta {
             font-size: 0.65rem;
@@ -660,15 +811,16 @@
             padding: 2px 5px;
             border-radius: 3px;
             font-variant-numeric: tabular-nums;
+            transition: color var(--theme-transition), background var(--theme-transition);
         }
 
         .metric-delta.up {
-            color: var(--accent-green);
+            color: var(--accent-green-text);
             background: var(--accent-green-dim);
         }
 
         .metric-delta.down {
-            color: var(--accent-red);
+            color: var(--accent-red-text);
             background: var(--accent-red-dim);
         }
 
@@ -679,12 +831,12 @@
 
         /* For inverted metrics where down is good */
         .metric-delta.up.inverted {
-            color: var(--accent-red);
+            color: var(--accent-red-text);
             background: var(--accent-red-dim);
         }
 
         .metric-delta.down.inverted {
-            color: var(--accent-green);
+            color: var(--accent-green-text);
             background: var(--accent-green-dim);
         }
 
@@ -738,6 +890,7 @@
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 24px;
+            transition: background var(--theme-transition), border-color var(--theme-transition);
         }
 
         .context-header {
@@ -745,6 +898,7 @@
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 16px;
+            transition: color var(--theme-transition);
         }
 
         .context-grid {
@@ -757,6 +911,7 @@
             padding: 12px;
             background: var(--bg-tertiary);
             border-radius: 8px;
+            transition: background var(--theme-transition);
         }
 
         .context-label {
@@ -765,16 +920,18 @@
             letter-spacing: 0.1em;
             color: var(--text-muted);
             margin-bottom: 4px;
+            transition: color var(--theme-transition);
         }
 
         .context-value {
             font-size: 0.85rem;
             font-weight: 600;
             color: var(--text-primary);
+            transition: color var(--theme-transition);
         }
 
         .context-value.highlight {
-            color: var(--accent-yellow);
+            color: var(--accent-yellow-text);
         }
 
         /* Path to Better Section */
@@ -784,6 +941,7 @@
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 24px;
+            transition: background var(--theme-transition), border-color var(--theme-transition);
         }
 
         .recovery-header {
@@ -793,12 +951,14 @@
             margin-bottom: 20px;
             padding-bottom: 12px;
             border-bottom: 1px solid var(--border-color);
+            transition: border-color var(--theme-transition);
         }
 
         .recovery-title {
             font-size: 0.9rem;
             font-weight: 600;
             color: var(--text-primary);
+            transition: color var(--theme-transition);
         }
 
         .distance-badge {
@@ -1227,6 +1387,7 @@
             color: var(--text-muted);
             border-top: 1px solid var(--border-color);
             margin-top: 20px;
+            transition: color var(--theme-transition), border-color var(--theme-transition);
         }
 
         .footer-content {
@@ -1243,6 +1404,7 @@
             font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
+            transition: color var(--theme-transition);
         }
 
         .footer-about {
@@ -1648,6 +1810,11 @@
                         <span class="freshness-dot"></span>
                         <span class="freshness-text"></span>
                     </div>
+                    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark theme">
+                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                        <span>Theme</span>
+                    </button>
                 </div>
             </div>
             <p class="subtitle">Data to help you decide when to look for a new job.</p>
@@ -2054,6 +2221,61 @@
     </div>
 
     <script>
+        // Theme toggle function
+        let mainChartInstance = null;
+        let sparklineInstances = {};
+        
+        function toggleTheme() {
+            const html = document.documentElement;
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('dashboard-theme', next);
+            
+            // Update charts with new theme colors
+            updateChartsForTheme();
+        }
+        
+        function getThemeColors() {
+            const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+            return {
+                grid: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.06)',
+                tooltipBg: isDark ? 'rgba(22, 22, 32, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                tooltipBorder: isDark ? '#28283a' : '#d8dae0',
+                tooltipText: isDark ? '#e8e8ed' : '#1a1a2e',
+                tooltipSecondary: isDark ? '#9898a8' : '#5a5a6e',
+                textMuted: isDark ? '#606070' : '#8888a0',
+                sparklineGood: isDark ? '#00d9a0' : '#00a070',
+                sparklineNeutral: isDark ? '#ffc940' : '#b48c00',
+                sparklineBad: isDark ? '#ff4d6a' : '#dc3545',
+            };
+        }
+        
+        function updateChartsForTheme() {
+            const colors = getThemeColors();
+            
+            // Update main chart
+            if (mainChartInstance) {
+                mainChartInstance.options.scales.x.grid.color = colors.grid;
+                mainChartInstance.options.scales.y.grid.color = colors.grid;
+                mainChartInstance.options.scales.x.ticks.color = colors.textMuted;
+                mainChartInstance.options.scales.y.ticks.color = colors.textMuted;
+                mainChartInstance.options.plugins.tooltip.backgroundColor = colors.tooltipBg;
+                mainChartInstance.options.plugins.tooltip.borderColor = colors.tooltipBorder;
+                mainChartInstance.options.plugins.tooltip.titleColor = colors.tooltipText;
+                mainChartInstance.options.plugins.tooltip.bodyColor = colors.tooltipSecondary;
+                mainChartInstance.update('none');
+            }
+            
+            // Update sparklines
+            Object.values(sparklineInstances).forEach(chart => {
+                if (chart && chart.data && chart.data.datasets[0]) {
+                    // Update colors based on current theme
+                    chart.update('none');
+                }
+            });
+        }
+        
         // Toggle functions for collapsible sections
         function toggleAbout() {
             const section = document.getElementById('aboutSection');
@@ -2755,7 +2977,8 @@
 
             // Main chart
             const mainCtx = document.getElementById('mainChart').getContext('2d');
-            new Chart(mainCtx, {
+            const themeColors = getThemeColors();
+            mainChartInstance = new Chart(mainCtx, {
                 type: 'line',
                 data: {
                     labels: monthlyData.labels,
@@ -2803,10 +3026,10 @@
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(22, 22, 32, 0.95)',
-                            titleColor: '#e8e8ed',
-                            bodyColor: '#9898a8',
-                            borderColor: '#28283a',
+                            backgroundColor: themeColors.tooltipBg,
+                            titleColor: themeColors.tooltipText,
+                            bodyColor: themeColors.tooltipSecondary,
+                            borderColor: themeColors.tooltipBorder,
                             borderWidth: 1,
                             padding: 12,
                             displayColors: false,
@@ -2832,18 +3055,19 @@
                     },
                     scales: {
                         x: {
-                            grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
+                            grid: { color: themeColors.grid, drawBorder: false },
                             ticks: { 
                                 maxTicksLimit: window.innerWidth < 480 ? 5 : window.innerWidth < 768 ? 8 : 12, 
                                 maxRotation: 0,
-                                font: { size: window.innerWidth < 480 ? 8 : 10 }
+                                font: { size: window.innerWidth < 480 ? 8 : 10 },
+                                color: themeColors.textMuted
                             }
                         },
                         y: {
                             min: 0,
                             max: 100,
-                            grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
-                            ticks: { stepSize: 20 }
+                            grid: { color: themeColors.grid, drawBorder: false },
+                            ticks: { stepSize: 20, color: themeColors.textMuted }
                         }
                     }
                 }
@@ -2886,29 +3110,33 @@
                 
                 const getColor = (val) => {
                     const t = thresholds[metric];
-                    if (!t) return 'rgba(255, 201, 64, 1)';
+                    const colors = getThemeColors();
+                    if (!t) return colors.sparklineNeutral;
                     if (t.inverted) {
-                        if (val <= t.good) return 'rgba(0, 217, 160, 1)';
-                        if (val <= t.neutral) return 'rgba(255, 201, 64, 1)';
-                        return 'rgba(255, 77, 106, 1)';
+                        if (val <= t.good) return colors.sparklineGood;
+                        if (val <= t.neutral) return colors.sparklineNeutral;
+                        return colors.sparklineBad;
                     } else {
-                        if (val >= t.good) return 'rgba(0, 217, 160, 1)';
-                        if (val >= t.neutral) return 'rgba(255, 201, 64, 1)';
-                        return 'rgba(255, 77, 106, 1)';
+                        if (val >= t.good) return colors.sparklineGood;
+                        if (val >= t.neutral) return colors.sparklineNeutral;
+                        return colors.sparklineBad;
                     }
                 };
                 
-                new Chart(ctx, {
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const fillColor = isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.03)';
+                
+                sparklineInstances[canvasId] = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: monthlyData.labels,
                         datasets: [{
                             data: dataArray,
-                            borderColor: 'rgba(255, 201, 64, 1)',
+                            borderColor: getThemeColors().sparklineNeutral,
                             segment: {
                                 borderColor: ctx => getColor(ctx.p0.parsed.y)
                             },
-                            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                            backgroundColor: fillColor,
                             fill: true,
                             tension: 0.4,
                             pointRadius: 0,
