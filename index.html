@@ -2484,9 +2484,11 @@
                         label: 'Score',
                         data: compositeScores,
                         borderColor: 'rgba(255, 201, 64, 1)',
+                        spanGaps: true,
                         segment: {
                             borderColor: ctx => {
                                 const val = ctx.p0.parsed.y;
+                                if (val == null) return 'rgba(255, 140, 64, 1)';
                                 if (val >= 70) return 'rgba(0, 217, 160, 1)';
                                 if (val >= 55) return 'rgba(255, 201, 64, 1)';
                                 if (val >= 40) return 'rgba(255, 140, 64, 1)';
