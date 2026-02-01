@@ -35,6 +35,31 @@
             100% { background-position: 200% 0; }
         }
 
+        /* Screen reader only - visually hidden but accessible */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus styles for keyboard navigation */
+        .accordion-trigger:focus,
+        .about-header:focus {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 2px;
+        }
+
+        .accordion-trigger:focus:not(:focus-visible),
+        .about-header:focus:not(:focus-visible) {
+            outline: none;
+        }
+
         .skeleton {
             background: linear-gradient(90deg, 
                 var(--bg-tertiary) 25%, 
@@ -589,6 +614,41 @@
         .metric-value.good { color: var(--accent-green); }
         .metric-value.neutral { color: var(--accent-yellow); }
         .metric-value.bad { color: var(--accent-red); }
+
+        .metric-delta {
+            font-size: 0.65rem;
+            font-weight: 500;
+            margin-left: 6px;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .metric-delta.up {
+            color: var(--accent-green);
+            background: var(--accent-green-dim);
+        }
+
+        .metric-delta.down {
+            color: var(--accent-red);
+            background: var(--accent-red-dim);
+        }
+
+        .metric-delta.flat {
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+        }
+
+        /* For inverted metrics where down is good */
+        .metric-delta.up.inverted {
+            color: var(--accent-red);
+            background: var(--accent-red-dim);
+        }
+
+        .metric-delta.down.inverted {
+            color: var(--accent-green);
+            background: var(--accent-green-dim);
+        }
 
         .metric-chart-wrapper {
             display: flex;
@@ -1342,14 +1402,21 @@
 
         <!-- Collapsible About Section -->
         <section class="about-section" id="aboutSection">
-            <div class="about-header" onclick="toggleAbout()">
+            <div class="about-header" 
+                 onclick="toggleAbout()" 
+                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAbout();}"
+                 role="button" 
+                 tabindex="0" 
+                 aria-expanded="true" 
+                 aria-controls="aboutContent"
+                 id="aboutHeader">
                 <h2>What is this?</h2>
                 <span class="about-toggle">
                     <span id="aboutToggleText">Hide</span>
                     <span class="chevron"></span>
                 </span>
             </div>
-            <div class="about-content">
+            <div class="about-content" id="aboutContent">
                 <div class="about-main">
                     <p>This page tracks whether the job market currently favors <strong>people looking for work</strong> or <strong>employers doing the hiring</strong>. It combines eight economic indicators into a single score to help answer: <em>is now a good time to look for a new job?</em></p>
                     <p>The score runs from 0 to 100. Higher means better for job seekers. The data comes from the Bureau of Labor Statistics and Federal Reserve, updated monthly.</p>
@@ -1411,7 +1478,8 @@
                 </div>
             </div>
             <div class="chart-container">
-                <canvas id="mainChart"></canvas>
+                <canvas id="mainChart" role="img" aria-label="Line chart showing job search readiness composite score from 2015 to present, with scores ranging from 0 to 100"></canvas>
+                <p class="sr-only" id="mainChartDesc">Historical composite score tracking labor market conditions for job seekers. Higher scores indicate better conditions for finding new employment.</p>
             </div>
         </section>
 
@@ -1432,7 +1500,7 @@
                         <span class="metric-value" id="quitValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
                     <div class="metric-chart-wrapper">
-                        <div class="metric-chart"><canvas id="quitChart"></canvas></div>
+                        <div class="metric-chart"><canvas id="quitChart" role="img" aria-label="Quit rate trend from 2015 to present"></canvas></div>
                         <div class="sparkline-range" id="quitRange">
                             <span class="max">--</span>
                             <span class="min">--</span>
@@ -1449,7 +1517,7 @@
                         <span class="metric-value" id="ratioValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
                     <div class="metric-chart-wrapper">
-                        <div class="metric-chart"><canvas id="openingsChart"></canvas></div>
+                        <div class="metric-chart"><canvas id="openingsChart" role="img" aria-label="Jobs per job seeker trend from 2015 to present"></canvas></div>
                         <div class="sparkline-range" id="ratioRange">
                             <span class="max">--</span>
                             <span class="min">--</span>
@@ -1466,7 +1534,7 @@
                         <span class="metric-value" id="hiresValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
                     <div class="metric-chart-wrapper">
-                        <div class="metric-chart"><canvas id="hiresChart"></canvas></div>
+                        <div class="metric-chart"><canvas id="hiresChart" role="img" aria-label="Hiring rate trend from 2015 to present"></canvas></div>
                         <div class="sparkline-range" id="hiresRange">
                             <span class="max">--</span>
                             <span class="min">--</span>
@@ -1483,7 +1551,7 @@
                         <span class="metric-value" id="layoffsValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
                     <div class="metric-chart-wrapper">
-                        <div class="metric-chart"><canvas id="layoffsChart"></canvas></div>
+                        <div class="metric-chart"><canvas id="layoffsChart" role="img" aria-label="Layoff rate trend from 2015 to present"></canvas></div>
                         <div class="sparkline-range" id="layoffsRange">
                             <span class="max">--</span>
                             <span class="min">--</span>
@@ -1511,7 +1579,7 @@
                         <span class="metric-value" id="unempValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
                     <div class="metric-chart-wrapper">
-                        <div class="metric-chart"><canvas id="unempChart"></canvas></div>
+                        <div class="metric-chart"><canvas id="unempChart" role="img" aria-label="Unemployment rate trend from 2015 to present"></canvas></div>
                         <div class="sparkline-range" id="unempRange">
                             <span class="max">--</span>
                             <span class="min">--</span>
@@ -1528,7 +1596,7 @@
                         <span class="metric-value" id="fedValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
                     <div class="metric-chart-wrapper">
-                        <div class="metric-chart"><canvas id="fedChart"></canvas></div>
+                        <div class="metric-chart"><canvas id="fedChart" role="img" aria-label="Federal interest rate trend from 2015 to present"></canvas></div>
                         <div class="sparkline-range" id="fedRange">
                             <span class="max">--</span>
                             <span class="min">--</span>
@@ -1545,7 +1613,7 @@
                         <span class="metric-value" id="wageValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
                     <div class="metric-chart-wrapper">
-                        <div class="metric-chart"><canvas id="wageChart"></canvas></div>
+                        <div class="metric-chart"><canvas id="wageChart" role="img" aria-label="Wage growth trend from 2015 to present"></canvas></div>
                         <div class="sparkline-range" id="wageRange">
                             <span class="max">--</span>
                             <span class="min">--</span>
@@ -1562,7 +1630,7 @@
                         <span class="metric-value" id="lfprValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
                     <div class="metric-chart-wrapper">
-                        <div class="metric-chart"><canvas id="lfprChart"></canvas></div>
+                        <div class="metric-chart"><canvas id="lfprChart" role="img" aria-label="Workforce participation trend from 2015 to present"></canvas></div>
                         <div class="sparkline-range" id="lfprRange">
                             <span class="max">--</span>
                             <span class="min">--</span>
@@ -1649,11 +1717,14 @@
             <div class="accordion-header">Understanding the Score</div>
             
             <div class="accordion-item" id="accordion-calc">
-                <button class="accordion-trigger" onclick="toggleAccordion('accordion-calc')">
+                <button class="accordion-trigger" 
+                        onclick="toggleAccordion('accordion-calc')"
+                        aria-expanded="false"
+                        aria-controls="panel-calc">
                     <span>How is this calculated?</span>
                     <span class="chevron"></span>
                 </button>
-                <div class="accordion-panel">
+                <div class="accordion-panel" id="panel-calc" role="region" aria-labelledby="accordion-calc">
                     <p>The score combines eight labor market indicators, weighted by how directly they measure worker leverage:</p>
                     <ul>
                         <li><strong>Core metrics (60% of score):</strong> Quit rate, job openings per unemployed worker, hiring rate, and layoff rate. These directly measure whether workers or employers have the upper hand.</li>
@@ -1670,11 +1741,14 @@
             </div>
             
             <div class="accordion-item" id="accordion-limits">
-                <button class="accordion-trigger" onclick="toggleAccordion('accordion-limits')">
+                <button class="accordion-trigger" 
+                        onclick="toggleAccordion('accordion-limits')"
+                        aria-expanded="false"
+                        aria-controls="panel-limits">
                     <span>What are the limitations?</span>
                     <span class="chevron"></span>
                 </button>
-                <div class="accordion-panel">
+                <div class="accordion-panel" id="panel-limits" role="region">
                     <p><strong>This is national data.</strong> Your industry, region, and role may differ significantly. Tech hiring can freeze while healthcare booms. San Francisco and rural Ohio are different markets.</p>
                     <p><strong>The data lags reality.</strong> BLS releases come 4-6 weeks after the reference month. By the time you see it here, conditions may have shifted.</p>
                     <p><strong>The thresholds are calibrated to recent history.</strong> A "bad" quit rate today might have been normal in 2010. The score tells you how now compares to 2015-2025, not to all of history.</p>
@@ -1683,11 +1757,14 @@
             </div>
             
             <div class="accordion-item" id="accordion-data">
-                <button class="accordion-trigger" onclick="toggleAccordion('accordion-data')">
+                <button class="accordion-trigger" 
+                        onclick="toggleAccordion('accordion-data')"
+                        aria-expanded="false"
+                        aria-controls="panel-data">
                     <span>Where does the data come from?</span>
                     <span class="chevron"></span>
                 </button>
-                <div class="accordion-panel">
+                <div class="accordion-panel" id="panel-data" role="region">
                     <p>All data comes from official government sources, retrieved via the <a href="https://fred.stlouisfed.org/" target="_blank">Federal Reserve Economic Data (FRED)</a> API:</p>
                     <ul>
                         <li><strong>Quit rate, hiring rate, layoff rate, job openings:</strong> Bureau of Labor Statistics <a href="https://www.bls.gov/jlt/" target="_blank">Job Openings and Labor Turnover Survey (JOLTS)</a></li>
@@ -1728,16 +1805,24 @@
         function toggleAbout() {
             const section = document.getElementById('aboutSection');
             const toggleText = document.getElementById('aboutToggleText');
+            const header = document.getElementById('aboutHeader');
+            const isCollapsed = !section.classList.contains('collapsed');
+            
             section.classList.toggle('collapsed');
-            toggleText.textContent = section.classList.contains('collapsed') ? 'Show' : 'Hide';
+            toggleText.textContent = isCollapsed ? 'Show' : 'Hide';
+            header.setAttribute('aria-expanded', !isCollapsed);
             
             // Remember preference
-            localStorage.setItem('aboutCollapsed', section.classList.contains('collapsed'));
+            localStorage.setItem('aboutCollapsed', isCollapsed);
         }
 
         function toggleAccordion(id) {
             const item = document.getElementById(id);
+            const trigger = item.querySelector('.accordion-trigger');
+            const isOpen = !item.classList.contains('open');
+            
             item.classList.toggle('open');
+            trigger.setAttribute('aria-expanded', isOpen);
         }
 
         // Check if about section should be collapsed on load
@@ -1746,6 +1831,7 @@
             if (aboutCollapsed === 'true') {
                 document.getElementById('aboutSection').classList.add('collapsed');
                 document.getElementById('aboutToggleText').textContent = 'Show';
+                document.getElementById('aboutHeader').setAttribute('aria-expanded', 'false');
             }
         });
 
@@ -1966,28 +2052,54 @@
                 }
             }
             
-            document.getElementById('quitValue').textContent = currentMetrics.quitRate.toFixed(1) + '%';
+            // Get previous month's value for delta calculation
+            const prevIdx = currentIdx > 0 ? currentIdx - 1 : currentIdx;
+            const prevMetrics = {
+                quitRate: monthlyData.quitRate[prevIdx],
+                openingsRatio: monthlyData.openingsRatio[prevIdx],
+                hiresRate: monthlyData.hiresRate[prevIdx],
+                layoffsRate: monthlyData.layoffsRate[prevIdx],
+                unempRate: monthlyData.unempRate[prevIdx],
+                fedRate: monthlyData.fedRate[prevIdx],
+                wageGrowth: monthlyData.wageGrowth[prevIdx],
+                lfpr: monthlyData.lfpr[prevIdx]
+            };
+            
+            // Helper to create delta HTML
+            function getDeltaHTML(current, previous, decimals, isInverted = false) {
+                if (previous == null || current == null) return '';
+                const diff = current - previous;
+                if (Math.abs(diff) < 0.01) return '<span class="metric-delta flat">—</span>';
+                
+                const sign = diff > 0 ? '+' : '';
+                const direction = diff > 0 ? 'up' : 'down';
+                const invertedClass = isInverted ? ' inverted' : '';
+                return `<span class="metric-delta ${direction}${invertedClass}">${sign}${diff.toFixed(decimals)}</span>`;
+            }
+            
+            // Update metric displays with deltas
+            document.getElementById('quitValue').innerHTML = currentMetrics.quitRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.quitRate, prevMetrics.quitRate, 1);
             document.getElementById('quitValue').className = 'metric-value ' + getMetricClass(currentMetrics.quitRate, 'quitRate');
             
-            document.getElementById('ratioValue').textContent = currentMetrics.openingsRatio.toFixed(2);
+            document.getElementById('ratioValue').innerHTML = currentMetrics.openingsRatio.toFixed(2) + getDeltaHTML(currentMetrics.openingsRatio, prevMetrics.openingsRatio, 2);
             document.getElementById('ratioValue').className = 'metric-value ' + getMetricClass(currentMetrics.openingsRatio, 'openingsRatio');
             
-            document.getElementById('hiresValue').textContent = currentMetrics.hiresRate.toFixed(1) + '%';
+            document.getElementById('hiresValue').innerHTML = currentMetrics.hiresRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.hiresRate, prevMetrics.hiresRate, 1);
             document.getElementById('hiresValue').className = 'metric-value ' + getMetricClass(currentMetrics.hiresRate, 'hiresRate');
             
-            document.getElementById('layoffsValue').textContent = currentMetrics.layoffsRate.toFixed(1) + '%';
+            document.getElementById('layoffsValue').innerHTML = currentMetrics.layoffsRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.layoffsRate, prevMetrics.layoffsRate, 1, true);
             document.getElementById('layoffsValue').className = 'metric-value ' + getMetricClass(currentMetrics.layoffsRate, 'layoffsRate');
             
-            document.getElementById('unempValue').textContent = (currentMetrics.unempRate || 0).toFixed(1) + '%';
+            document.getElementById('unempValue').innerHTML = (currentMetrics.unempRate || 0).toFixed(1) + '%' + getDeltaHTML(currentMetrics.unempRate, prevMetrics.unempRate, 1, true);
             document.getElementById('unempValue').className = 'metric-value ' + getMetricClass(currentMetrics.unempRate || 5, 'unempRate');
             
-            document.getElementById('fedValue').textContent = currentMetrics.fedRate.toFixed(2) + '%';
+            document.getElementById('fedValue').innerHTML = currentMetrics.fedRate.toFixed(2) + '%' + getDeltaHTML(currentMetrics.fedRate, prevMetrics.fedRate, 2, true);
             document.getElementById('fedValue').className = 'metric-value ' + getMetricClass(currentMetrics.fedRate, 'fedRate');
             
-            document.getElementById('wageValue').textContent = (currentMetrics.wageGrowth || 0).toFixed(1) + '%';
+            document.getElementById('wageValue').innerHTML = (currentMetrics.wageGrowth || 0).toFixed(1) + '%' + getDeltaHTML(currentMetrics.wageGrowth, prevMetrics.wageGrowth, 1);
             document.getElementById('wageValue').className = 'metric-value ' + getMetricClass(currentMetrics.wageGrowth || 3, 'wageGrowth');
             
-            document.getElementById('lfprValue').textContent = (currentMetrics.lfpr || 0).toFixed(1) + '%';
+            document.getElementById('lfprValue').innerHTML = (currentMetrics.lfpr || 0).toFixed(1) + '%' + getDeltaHTML(currentMetrics.lfpr, prevMetrics.lfpr, 1);
             document.getElementById('lfprValue').className = 'metric-value ' + getMetricClass(currentMetrics.lfpr || 82, 'lfpr');
 
             // Historical context
@@ -2422,7 +2534,11 @@
                     scales: {
                         x: {
                             grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
-                            ticks: { maxTicksLimit: 12, maxRotation: 0 }
+                            ticks: { 
+                                maxTicksLimit: window.innerWidth < 480 ? 5 : window.innerWidth < 768 ? 8 : 12, 
+                                maxRotation: 0,
+                                font: { size: window.innerWidth < 480 ? 8 : 10 }
+                            }
                         },
                         y: {
                             min: 0,
