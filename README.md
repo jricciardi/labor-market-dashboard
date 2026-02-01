@@ -1,44 +1,54 @@
-# Labor Market Dashboard
+# Is Now a Good Time?
 
-A quantitative dashboard for tracking labor market conditions and job search timing decisions.
+A data-driven tool to help you decide when to look for a new job.
 
-## What This Tracks
+**Live site:** [jricciardi.github.io/labor-market-dashboard](https://jricciardi.github.io/labor-market-dashboard)
 
-The dashboard synthesizes Bureau of Labor Statistics data into a composite score (0-100) that indicates whether current conditions favor job seekers or employers.
+## What is this?
 
-**Core indicators (Tier 1):**
-- Quit Rate — worker confidence in finding better opportunities
-- Job Openings per Unemployed — supply/demand balance
-- Hires Rate — actual hiring velocity
-- Layoffs Rate — involuntary separations
+This dashboard combines eight labor market indicators into a single score to answer a simple question: **does the job market currently favor people looking for work, or employers doing the hiring?**
 
-**Macro context (Tier 2):**
-- Unemployment Rate
-- Federal Funds Rate
-- Wage Growth (YoY)
-- Prime-Age Labor Force Participation
+The score runs from 0 to 100. Higher means better for job seekers.
 
-## Score Interpretation
+- **70+** — Good Time to Move
+- **55–69** — Worth Exploring  
+- **40–54** — Wait If You Can
+- **<40** — Tough Market
 
-| Score | Verdict | Meaning |
-|-------|---------|---------|
-| 70+ | Favorable | Employee-favorable market. Active job searching is rational. |
-| 55-69 | Lean Favorable | Functional market. Selective searching reasonable. |
-| 40-54 | Lean Unfavorable | Headwinds present. Hold steady unless compelling reason to move. |
-| <40 | Unfavorable | Employer-favorable. Focus on stability. |
+## Data sources
 
-## Data Sources
+All data comes from official government sources via the [FRED API](https://fred.stlouisfed.org/):
 
-- [BLS JOLTS](https://www.bls.gov/jlt/) — quit rate, hires, openings, layoffs
-- [BLS Employment Situation](https://www.bls.gov/news.release/empsit.toc.htm) — unemployment, wages, LFPR
-- [Federal Reserve](https://www.federalreserve.gov/monetarypolicy/openmarket.htm) — fed funds rate
+- **Bureau of Labor Statistics JOLTS** — Quit rate, hiring rate, layoff rate, job openings
+- **BLS Employment Situation** — Unemployment rate, workforce participation, wage growth
+- **Federal Reserve** — Fed funds interest rate
 
-## Update Schedule
+Data updates automatically each month after BLS releases.
 
-Data is updated monthly following BLS releases:
-- Employment Situation: First Friday of each month
-- JOLTS: ~35 days after reference month
+## Local development
 
----
+```bash
+# Clone the repo
+git clone https://github.com/jricciardi/labor-market-dashboard.git
+cd labor-market-dashboard
 
-*Built for personal job search timing decisions. Not financial or career advice.*
+# Open in browser
+open index.html
+```
+
+For data updates, you'll need a [FRED API key](https://fred.stlouisfed.org/docs/api/api_key.html):
+
+```bash
+export FRED_API_KEY=your_key_here
+python scripts/update_data.py
+```
+
+## License
+
+MIT — fork it, adapt it for your industry, use it however you want.
+
+## Why this exists
+
+This project is an experiment in pro-worker tooling: taking institutional data that's technically public but practically inaccessible and making it legible to regular people.
+
+Built with AI assistance.
