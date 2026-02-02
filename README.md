@@ -1,6 +1,6 @@
 # Is Now a Good Time?
 
-A data-driven tool to help you decide when to look for a new job.
+A data-driven tool to help you understand when job seekers have more or less leverage than employers.
 
 **Live site:** [jricciardi.github.io/labor-market-dashboard](https://jricciardi.github.io/labor-market-dashboard)
 
