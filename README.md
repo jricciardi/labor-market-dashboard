@@ -2,6 +2,8 @@
 
 A data-driven tool to help you understand when job seekers have more or less leverage than employers.
 
+Built with love for friends currently navigating the tough labor market.
+
 **Live site:** [jricciardi.github.io/labor-market-dashboard](https://jricciardi.github.io/labor-market-dashboard)
 
 ## What is this?
