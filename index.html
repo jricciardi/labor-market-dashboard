@@ -373,6 +373,7 @@
 
         .about-header:hover {
             background: var(--bg-tertiary);
+            border-radius: 8px;
         }
 
         .about-header h2 {
@@ -1068,8 +1069,8 @@
             font-size: 0.7rem;
             font-weight: 600;
             background: var(--accent-yellow-dim);
-            color: var(--accent-yellow);
-            border: 1px solid rgba(255, 201, 64, 0.3);
+            color: var(--accent-yellow-text);
+            border: 1px solid var(--accent-yellow);
         }
 
         .recovery-summary {
@@ -1087,17 +1088,17 @@
         }
 
         .recovery-summary .trend-positive {
-            color: var(--accent-green);
+            color: var(--accent-green-text);
             font-weight: 600;
         }
 
         .recovery-summary .trend-negative {
-            color: var(--accent-red);
+            color: var(--accent-red-text);
             font-weight: 600;
         }
 
         .recovery-summary .trend-neutral {
-            color: var(--accent-yellow);
+            color: var(--accent-yellow-text);
             font-weight: 600;
         }
 
@@ -1190,7 +1191,7 @@
         }
 
         .footnote-marker {
-            color: var(--accent-yellow);
+            color: var(--accent-yellow-text);
             font-weight: 600;
         }
 
@@ -1238,12 +1239,12 @@
 
         .trigger-item.watching .trigger-icon {
             background: var(--accent-yellow-dim);
-            color: var(--accent-yellow);
+            color: var(--accent-yellow-text);
         }
 
         .trigger-item.met .trigger-icon {
             background: var(--accent-green-dim);
-            color: var(--accent-green);
+            color: var(--accent-green-text);
         }
 
         .trigger-content {
@@ -1279,7 +1280,7 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        .trigger-trend.trend-good .trend-arrow { color: var(--accent-green); }
+        .trigger-trend.trend-good .trend-arrow { color: var(--accent-green-text); }
         .trigger-trend.trend-bad .trend-arrow { color: var(--accent-red); }
         .trigger-trend.trend-flat .trend-arrow { color: var(--text-muted); }
 
@@ -1316,9 +1317,9 @@
             font-weight: 600;
         }
 
-        .sensitivity-result.positive { color: var(--accent-green); }
-        .sensitivity-result.neutral { color: var(--accent-yellow); }
-        .sensitivity-result.negative { color: var(--accent-orange); }
+        .sensitivity-result.positive { color: var(--accent-green-text); }
+        .sensitivity-result.neutral { color: var(--accent-yellow-text); }
+        .sensitivity-result.negative { color: var(--accent-orange-text); }
 
         /* Understanding the Score Accordion */
         .accordion-section {
@@ -1460,7 +1461,7 @@
             display: block;
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.7rem;
-            color: var(--accent-yellow);
+            color: var(--accent-yellow-text);
             background: var(--bg-tertiary);
             padding: 10px 12px;
             border-radius: 4px;
