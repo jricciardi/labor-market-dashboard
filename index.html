@@ -1936,9 +1936,10 @@
             </div>
             <div class="about-content" id="aboutContent">
                 <div class="about-main">
-                    <p>This page tracks whether the job market currently favors <strong>people looking for work</strong> or <strong>employers doing the hiring</strong>. It combines eight economic indicators into a single score to help answer: <em>is now a good time to look for a new job?</em></p>
-                    <p>The score runs from 0 to 100. Higher means better for job seekers. The data comes from the Bureau of Labor Statistics and Federal Reserve, updated monthly.</p>
-                    <p class="about-note">This tracks the US labor market overall — tech, healthcare, and finance each behave differently.</p>
+                    <p>Job market conditions shift before the narrative catches up. By the time "it's a great market" or "hiring is frozen" becomes conventional wisdom, the data has usually been pointing that direction for months.</p>
+                    <p>This dashboard uses eight economic indicators to cut through the noise and give job seekers a clearer, earlier read on conditions. The score runs from 0 to 100 — higher means better for workers. Data comes from the Bureau of Labor Statistics and Federal Reserve, updated monthly.</p>
+                    <p>Start with the score, then explore what's driving it, then see what would need to change.</p>
+                    <p class="about-note">This tracks the US labor market overall — tech, healthcare, and finance each have their own dynamics. Your mileage will vary by industry, role, and location.</p>
                 </div>
                 <div class="about-how">
                     <h3>What the score means</h3>
@@ -1976,7 +1977,7 @@
             <div class="action-section" id="actionSection">
                 <div class="action-header">
                     <span>💡</span>
-                    <span>What should I do?</span>
+                    <span>What does this mean?</span>
                 </div>
                 <div class="action-content" id="actionContent">
                     <span class="skeleton skeleton-text" style="width: 100%;"></span>
@@ -1991,7 +1992,7 @@
                         aria-expanded="false"
                         aria-controls="scoreGuideContent"
                         id="scoreGuideTrigger">
-                    <span id="scoreGuideText">What do these scores mean?</span>
+                    <span id="scoreGuideText">What does a different score feel like?</span>
                     <span id="scoreGuideChevron">▾</span>
                 </button>
                 <div class="score-guide-content" id="scoreGuideContent">
@@ -2020,12 +2021,12 @@
         <!-- Main Time Series Chart -->
         <section class="main-chart">
             <div class="chart-header">
-                <div class="chart-title" id="chartTitle">The Score Over Time</div>
+                <div class="chart-title" id="chartTitle">How has the market shifted?</div>
                 <div class="chart-legend">
                     <div class="legend-item"><span class="legend-dot green"></span> Good Time to Move (70+)</div>
                     <div class="legend-item"><span class="legend-dot yellow"></span> Worth Exploring (55–69)</div>
                     <div class="legend-item"><span class="legend-dot orange"></span> Build Your Position (40–54)</div>
-                    <div class="legend-item"><span class="legend-dot red"></span> Challenging (&lt;40)</div>
+                    <div class="legend-item"><span class="legend-dot red"></span> Get Creative (&lt;40)</div>
                 </div>
             </div>
             <div class="chart-container">
@@ -2440,7 +2441,7 @@
             
             content.classList.toggle('show');
             trigger.setAttribute('aria-expanded', !isOpen);
-            text.textContent = isOpen ? 'What do these scores mean?' : 'Hide score guide';
+            text.textContent = isOpen ? 'What does a different score feel like?' : 'Hide score guide';
             chevron.textContent = isOpen ? '▾' : '▴';
             
             // Remember preference
@@ -2471,45 +2472,45 @@
             'good-time': 'Good Time to Move',
             'worth-exploring': 'Worth Exploring', 
             'build-your-position': 'Build Your Position',
-            'tough-market': 'Challenging'
+            'tough-market': 'Get Creative'
         };
 
         // Action advice for each tier
         const actionAdvice = {
             'good-time': {
-                intro: 'The market favors job seekers right now. If you\'ve been considering a move, this is a rational time to act.',
+                intro: 'The market favors job seekers right now. People are moving, employers are competing for talent, and there\'s room to negotiate.',
                 actions: [
-                    'Apply actively to roles that interest you',
-                    'Respond positively to recruiter outreach',
-                    'Negotiate confidently—you have leverage',
-                    'Take informational interviews to expand options'
+                    'Active job searching is well-rewarded in this market',
+                    'Recruiter outreach is worth engaging with',
+                    'Negotiation leverage is real—employers expect it',
+                    'Informational interviews often lead somewhere'
                 ]
             },
             'worth-exploring': {
-                intro: 'Conditions are decent for job seekers. Selective searching makes sense, but be thoughtful about what you pursue.',
+                intro: 'Conditions are decent for job seekers. Opportunities are out there for those who look, though the market isn\'t handing them to you.',
                 actions: [
-                    'Apply to roles that are strong fits',
-                    'Maintain and expand your network',
-                    'Take informational interviews when offered',
-                    'Don\'t feel rushed—wait for good opportunities'
+                    'Strong-fit roles are worth pursuing',
+                    'Networking tends to pay off in this environment',
+                    'There\'s no rush—good opportunities reward patience',
+                    'A thoughtful search beats a broad one right now'
                 ]
             },
             'build-your-position': {
-                intro: 'The market currently favors employers. If you can stay put, this may not be the best time to search actively.',
+                intro: 'The market currently tilts toward employers. Competition for open roles is stiffer and timelines are longer.',
                 actions: [
-                    'Focus on building skills in your current role',
-                    'Network quietly without urgency',
-                    'Save aggressively for runway',
-                    'Only pursue exceptional opportunities'
+                    'Current roles are worth investing in—skill-building pays off later',
+                    'Quiet networking keeps doors open without pressure',
+                    'Financial runway matters more in a slow market',
+                    'Exceptional opportunities still exist, but are rarer'
                 ]
             },
             'tough-market': {
-                intro: 'Conditions favor employers right now. Focus on stability unless you have a compelling reason to move.',
+                intro: 'Conditions favor employers. Hiring is slow, competition is high, and stability has real value.',
                 actions: [
-                    'Protect your current position',
-                    'Build skills that will matter when conditions improve',
-                    'Keep your network warm but don\'t push',
-                    'Only move for truly compelling opportunities or necessity'
+                    'Stability is an asset worth protecting right now',
+                    'Skills built now will compound when conditions turn',
+                    'Keeping your network warm matters—pushing it doesn\'t',
+                    'Moves driven by necessity or truly exceptional fit still make sense'
                 ]
             }
         };
@@ -2589,7 +2590,7 @@
             // Update chart title with actual data range
             const firstLabel = monthlyData.labels[0];
             const lastLabel = monthlyData.labels[monthlyData.labels.length - 1];
-            document.getElementById('chartTitle').textContent = `The Score Over Time (${firstLabel} – ${lastLabel})`;
+            document.getElementById('chartTitle').textContent = `How has the market shifted? (${firstLabel} – ${lastLabel})`;
 
             // Calculate composite scores
             function calculateCompositeScore(idx) {
@@ -3220,7 +3221,7 @@
                                 title: (items) => items[0].label,
                                 label: (item) => {
                                     const score = item.raw;
-                                    let status = 'Challenging';
+                                    let status = 'Get Creative';
                                     if (score >= 70) status = 'Good Time to Move';
                                     else if (score >= 55) status = 'Worth Exploring';
                                     else if (score >= 40) status = 'Build Your Position';
