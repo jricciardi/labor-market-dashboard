@@ -2232,11 +2232,12 @@
             var SC_TOTAL = SC_ALL_LABELS.length;
             var SCENARIO_DS = { frozen: 1, thaw: 2, worse: 3, boom: 4, custom: 5 };
             var PRESET_LINES = ['frozen', 'thaw', 'worse', 'boom'];
-            var SC_OVERLAP = 3;
+            var SC_OVERLAP = 1;
 
             function buildPath(target) {
                 var arr = new Array(SC_TOTAL).fill(null);
-                for (var j = SC_OVERLAP; j >= 0; j--) { var idx = SC_LAST_HIST - j; if (idx >= 0 && scHistScores[idx] != null) arr[idx] = scHistScores[idx]; }
+                // Start scenario lines from the last historical point
+                arr[SC_LAST_HIST] = scHistScores[SC_LAST_HIST];
                 for (var i = 1; i <= SC_PROJ_MONTHS; i++) { var t = i / SC_PROJ_MONTHS; arr[SC_LAST_HIST + i] = scHistScores[SC_LAST_HIST] + (target - scHistScores[SC_LAST_HIST]) * (1 - Math.pow(1 - t, 2)); }
                 return arr;
             }
@@ -2245,7 +2246,7 @@
 
             function makeScenarioDataset(label, target, color, order) {
                 var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-                return { label: label, data: buildPath(target), borderColor: color, borderDash: [8, 4], tension: 0.3, pointRadius: endpointRadius(5), pointBackgroundColor: color, pointBorderColor: isDark ? '#12121a' : '#ffffff', pointBorderWidth: 2, borderWidth: 2, order: order };
+                return { label: label, data: buildPath(target), borderColor: color, borderDash: [8, 4], tension: 0.3, pointRadius: endpointRadius(5), pointBackgroundColor: color, pointBorderColor: isDark ? '#12121a' : '#ffffff', pointBorderWidth: 2, borderWidth: 2, order: order, spanGaps: false };
             }
 
             function initScenarioChart() {
@@ -2264,7 +2265,7 @@
                             makeScenarioDataset('\ud83c\udf24\ufe0f Gradual Thaw', SCENARIO_SCORES.thaw, getScenarioRawColor(SCENARIO_SCORES.thaw), 5),
                             makeScenarioDataset('\u26c8\ufe0f Gets Worse', SCENARIO_SCORES.worse, getScenarioRawColor(SCENARIO_SCORES.worse), 7),
                             makeScenarioDataset('\ud83d\ude80 Bets Pay Off', SCENARIO_SCORES.boom, getScenarioRawColor(SCENARIO_SCORES.boom), 4),
-                            { label: '\u2726 Your Scenario', data: new Array(SC_TOTAL).fill(null), borderColor: '#4d9fff', borderDash: [5, 3], tension: 0.3, pointRadius: endpointRadius(7), pointBackgroundColor: '#4d9fff', pointBorderColor: isDark ? '#12121a' : '#ffffff', pointBorderWidth: 2, borderWidth: 2.5, hidden: true, order: 1 }
+                            { label: '\u2726 Your Scenario', data: new Array(SC_TOTAL).fill(null), borderColor: '#4d9fff', borderDash: [5, 3], tension: 0.3, pointRadius: endpointRadius(7), pointBackgroundColor: '#4d9fff', pointBorderColor: isDark ? '#12121a' : '#ffffff', pointBorderWidth: 2, borderWidth: 2.5, hidden: true, order: 1, spanGaps: false }
                         ]
                     },
                     options: {
