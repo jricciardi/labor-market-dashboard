@@ -42,6 +42,8 @@
             --accent-red-dim: rgba(255, 77, 106, 0.12);
             --accent-blue: #4d9fff;
             --border-color: #28283a;
+            --bg-hover: #1e1e2a;
+            --accent-blue-dim: rgba(77, 159, 255, 0.12);
             
             /* Text-on-background accent variants */
             --accent-green-text: #00d9a0;
@@ -80,6 +82,8 @@
             --text-muted: #8888a0;
             
             --border-color: #d8dae0;
+            --bg-hover: #e8e9ec;
+            --accent-blue-dim: rgba(30, 100, 200, 0.12);
             
             /* Adjusted dim colors for light backgrounds */
             --accent-green-dim: rgba(0, 160, 112, 0.12);
@@ -173,10 +177,9 @@
         .js-loading .score-change,
         .js-loading .action-content,
         .js-loading .context-value:not(:last-child),
-        .js-loading .recovery-summary,
-        .js-loading #decompositionList,
-        .js-loading #triggerList,
-        .js-loading #sensitivityList,
+        .js-loading .scenarios-section .narrative-assessment,
+        .js-loading .scenarios-section .narrative-interpretation,
+        .js-loading .scenarios-section .controls-row,
         .js-loading .data-freshness {
             visibility: hidden;
         }
@@ -1033,8 +1036,8 @@
             color: var(--accent-yellow-text);
         }
 
-        /* Path to Better Section */
-        .recovery-section {
+        /* Scenarios Section */
+        .scenarios-section {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 12px;
@@ -1043,7 +1046,7 @@
             transition: background var(--theme-transition), border-color var(--theme-transition);
         }
 
-        .recovery-header {
+        .scenarios-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -1053,273 +1056,221 @@
             transition: border-color var(--theme-transition);
         }
 
-        .recovery-title {
-            font-size: 0.9rem;
+        .scenarios-title {
+            font-size: 0.85rem;
             font-weight: 600;
             color: var(--text-primary);
-            transition: color var(--theme-transition);
         }
 
-        .distance-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 16px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            background: var(--accent-yellow-dim);
-            color: var(--accent-yellow-text);
-            border: 1px solid var(--accent-yellow);
-        }
-
-        .recovery-summary {
+        /* Narrative blocks */
+        .narrative-assessment {
             font-size: 0.8rem;
             color: var(--text-secondary);
-            line-height: 1.6;
+            line-height: 1.75;
             padding: 14px 16px;
             background: var(--bg-tertiary);
             border-radius: 8px;
-            margin-bottom: 20px;
+            border-left: 3px solid var(--text-muted);
+            margin-bottom: 16px;
+            transition: background var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition);
         }
+        .narrative-assessment strong { color: var(--text-primary); }
 
-        .recovery-summary strong {
-            color: var(--text-primary);
-        }
-
-        .recovery-summary .trend-positive {
-            color: var(--accent-green-text);
-            font-weight: 600;
-        }
-
-        .recovery-summary .trend-negative {
-            color: var(--accent-red-text);
-            font-weight: 600;
-        }
-
-        .recovery-summary .trend-neutral {
-            color: var(--accent-yellow-text);
-            font-weight: 600;
-        }
-
-        .recovery-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        @media (max-width: 900px) {
-            .recovery-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .recovery-panel {
+        .narrative-interpretation {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.75;
+            padding: 14px 16px;
             background: var(--bg-tertiary);
             border-radius: 8px;
-            padding: 16px;
+            border-left: 3px solid var(--accent-blue);
+            transition: border-color 0.3s ease, background var(--theme-transition), color var(--theme-transition);
+        }
+        .narrative-interpretation strong { color: var(--text-primary); }
+
+        .score-inline {
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+        .category-inline { font-style: italic; }
+
+        /* Narrative fade transition */
+        .narrative-interpretation.fading { opacity: 0; transition: opacity 0.2s ease; }
+        .narrative-interpretation:not(.fading) { opacity: 1; transition: opacity 0.25s ease 0.05s; }
+
+        /* Mobile truncation */
+        .interp-more {
+            display: none;
+            font-family: inherit;
+            font-size: 0.65rem;
+            color: var(--accent-blue);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 0 0;
+            margin: 0;
+        }
+        .interp-more:hover { text-decoration: underline; }
+
+        @media (max-width: 640px) {
+            .interp-text:not(.expanded) {
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+            .interp-more.visible { display: inline-block; }
         }
 
-        .panel-title {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 12px;
+        /* Scenario chart */
+        .scenario-chart-area {
+            position: relative;
+            height: 320px;
+            margin-bottom: 16px;
         }
 
-        /* Score Decomposition */
-        .decomposition-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .decomposition-item {
+        /* Scenario controls */
+        .controls-row {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
-        .metric-name {
-            font-size: 0.7rem;
+        .preset-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
             color: var(--text-secondary);
-            width: 100px;
-            flex-shrink: 0;
+            font-family: inherit;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
         }
-
-        .metric-current {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            width: 45px;
-            flex-shrink: 0;
+        .preset-pill:hover {
+            border-color: var(--text-muted);
+            background: var(--bg-hover);
+        }
+        .preset-pill.active {
+            border-color: var(--accent-blue);
+            background: var(--accent-blue-dim);
+            color: var(--text-primary);
+        }
+        .pill-score {
+            font-weight: 700;
             font-variant-numeric: tabular-nums;
         }
 
-        .metric-bar-container {
-            flex: 1;
-            height: 8px;
-            background: var(--bg-primary);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .metric-bar {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        .metric-bar.good { background: var(--accent-green); }
-        .metric-bar.neutral { background: var(--accent-yellow); }
-        .metric-bar.poor { background: var(--accent-orange); }
-        .metric-bar.bad { background: var(--accent-red); }
-
-        .metric-score {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            width: 28px;
-            text-align: right;
-        }
-
-        .decomposition-footnote {
-            margin-top: 12px;
-            padding-top: 10px;
-            border-top: 1px solid var(--border-color);
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            line-height: 1.5;
-        }
-
-        .footnote-marker {
-            color: var(--accent-yellow-text);
-            font-weight: 600;
-        }
-
-        /* Trigger Conditions */
-        .trigger-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .trigger-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 10px 12px;
-            background: var(--bg-primary);
-            border-radius: 6px;
-            border-left: 3px solid var(--text-muted);
-        }
-
-        .trigger-item.watching {
-            border-left-color: var(--accent-yellow);
-        }
-
-        .trigger-item.met {
-            border-left-color: var(--accent-green);
-        }
-
-        .trigger-icon {
-            font-size: 0.7rem;
-            width: 20px;
+        .controls-sep {
+            width: 1px;
             height: 20px;
-            display: flex;
+            background: var(--border-color);
+            margin: 0 2px;
+        }
+
+        .slider-toggle {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        .trigger-item .trigger-icon {
-            background: var(--bg-tertiary);
+            gap: 5px;
+            padding: 7px 12px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
             color: var(--text-muted);
+            font-family: inherit;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
         }
-
-        .trigger-item.watching .trigger-icon {
-            background: var(--accent-yellow-dim);
-            color: var(--accent-yellow-text);
-        }
-
-        .trigger-item.met .trigger-icon {
-            background: var(--accent-green-dim);
-            color: var(--accent-green-text);
-        }
-
-        .trigger-content {
-            flex: 1;
-        }
-
-        .trigger-condition {
-            font-size: 0.75rem;
+        .slider-toggle:hover { color: var(--text-secondary); border-color: var(--text-muted); }
+        .slider-toggle.open {
             color: var(--text-primary);
-            margin-bottom: 2px;
+            border-color: var(--accent-blue);
+            background: var(--accent-blue-dim);
         }
-
-        .trigger-status {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-        }
-
-        .trigger-trend {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 4px;
+        .toggle-arrow {
+            transition: transform 0.3s;
+            display: inline-block;
             font-size: 0.6rem;
         }
+        .slider-toggle.open .toggle-arrow { transform: rotate(180deg); }
 
-        .trend-arrow {
-            font-weight: 700;
-            font-size: 0.75rem;
+        /* Slider panel */
+        .slider-panel {
+            max-height: 500px;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+            opacity: 1;
+            margin-top: 16px;
         }
+        .slider-panel.collapsed { max-height: 0; opacity: 0; margin-top: 0; }
 
-        .trend-history {
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
+        .slider-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
+        .slider-grid .slider-group:last-child:nth-child(odd) { grid-column: 1 / -1; }
 
-        .trigger-trend.trend-good .trend-arrow { color: var(--accent-green-text); }
-        .trigger-trend.trend-bad .trend-arrow { color: var(--accent-red); }
-        .trigger-trend.trend-flat .trend-arrow { color: var(--text-muted); }
-
-        /* Sensitivity / What Would It Take */
-        .sensitivity-intro {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            font-style: italic;
+        .slider-group {
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            transition: background var(--theme-transition);
         }
-
-        .sensitivity-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .sensitivity-item {
+        .slider-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 12px;
+            margin-bottom: 6px;
+        }
+        .slider-name { font-size: 0.7rem; color: var(--text-primary); font-weight: 500; }
+        .slider-vals { display: flex; align-items: center; gap: 5px; font-size: 0.68rem; }
+        .slider-cur { color: var(--text-muted); }
+        .slider-arrow { color: var(--text-muted); font-size: 0.6rem; }
+        .slider-proj { font-weight: 600; }
+        .slider-proj.same { color: var(--text-secondary); }
+        .slider-proj.better { color: var(--accent-green-text); }
+        .slider-proj.worse { color: var(--accent-red-text); }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
             background: var(--bg-primary);
-            border-radius: 6px;
+            border-radius: 2px;
+            outline: none;
+            margin-top: 4px;
+            transition: background var(--theme-transition);
         }
-
-        .sensitivity-scenario {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            cursor: pointer;
+            border: 2px solid var(--bg-secondary);
+            transition: background 0.15s;
         }
-
-        .sensitivity-result {
-            font-size: 0.75rem;
-            font-weight: 600;
+        input[type="range"]:focus::-webkit-slider-thumb {
+            background: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(77, 159, 255, 0.2);
         }
-
-        .sensitivity-result.positive { color: var(--accent-green-text); }
-        .sensitivity-result.neutral { color: var(--accent-yellow-text); }
-        .sensitivity-result.negative { color: var(--accent-orange-text); }
+        input[type="range"]::-moz-range-thumb {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            cursor: pointer;
+            border: 2px solid var(--bg-secondary);
+        }
+        input[type="range"]:focus::-moz-range-thumb { background: var(--accent-blue); }
 
         /* Understanding the Score Accordion */
         .accordion-section {
@@ -1543,7 +1494,7 @@
                 justify-content: flex-start;
             }
 
-            .recovery-grid {
+            .slider-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -1624,21 +1575,11 @@
                 padding: 0 16px 16px 16px;
             }
 
-            .recovery-header {
-                flex-direction: column;
-                gap: 12px;
-                align-items: flex-start;
-            }
-
-            .sensitivity-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 6px;
-            }
-
-            .trigger-trend {
-                flex-wrap: wrap;
-            }
+            .scenarios-section { padding: 16px; }
+            .scenario-chart-area { height: 260px; }
+            .controls-sep { display: none; }
+            .controls-row { gap: 6px; }
+            .preset-pill, .slider-toggle { padding: 6px 10px; font-size: 0.65rem; }
         }
 
         @media (max-width: 480px) {
@@ -1857,20 +1798,22 @@
                 color: #1a1a1a !important;
             }
 
-            /* Recovery section */
-            .recovery-section {
+            /* Scenarios section */
+            .scenarios-section {
                 background: #f5f5f5 !important;
                 border: 1px solid #ccc !important;
                 page-break-before: always;
             }
 
-            .recovery-panel {
-                background: white !important;
+            .narrative-assessment,
+            .narrative-interpretation {
+                background: #f9f9f9 !important;
+                border-left-color: #999 !important;
             }
 
-            .trigger-item,
-            .sensitivity-item {
-                background: #f9f9f9 !important;
+            .slider-panel,
+            .interp-more {
+                display: none !important;
             }
 
             /* Tier sections */
@@ -2225,43 +2168,58 @@
             </div>
         </section>
 
-        <!-- Path to Better Section -->
-        <section class="recovery-section">
-            <div class="recovery-header">
-                <div class="recovery-title" id="recoveryTitle">Path to "Worth Exploring"</div>
-                <div class="distance-badge" id="distanceBadge">
-                    <span id="distancePoints">--</span> points to go
-                </div>
+        <!-- Scenarios Section -->
+        <section class="scenarios-section">
+            <div class="scenarios-header">
+                <span class="scenarios-title">Where Things Could Go</span>
             </div>
-            <div class="recovery-summary" id="recoverySummary">
-                <span class="skeleton skeleton-text" style="width: 100%;"></span>
-                <span class="skeleton skeleton-text" style="width: 80%; margin-top: 8px;"></span>
+
+            <!-- Fixed Assessment -->
+            <div class="narrative-assessment">
+                <strong>The market has been frozen since mid-2024.</strong> Employers aren’t cutting — layoffs at 1.1% remain historically low — but they’re not hiring either. Quit rates stuck near 2.0%, more job seekers than openings for the first time since 2021. Fed cuts are underway but haven’t thawed hiring. The score has drifted from the mid-50s to the upper 40s.
             </div>
-            <div class="recovery-grid">
-                <!-- What's Holding the Score Down -->
-                <div class="recovery-panel">
-                    <div class="panel-title">What's Holding the Score Down?</div>
-                    <div class="decomposition-list" id="decompositionList">
-                        <!-- Populated by JavaScript -->
-                    </div>
-                </div>
 
-                <!-- Signs of Improvement -->
-                <div class="recovery-panel">
-                    <div class="panel-title">Signs of Improvement to Watch</div>
-                    <div class="trigger-list" id="triggerList">
-                        <!-- Populated by JavaScript -->
-                    </div>
-                </div>
+            <!-- Scenario Chart -->
+            <div class="scenario-chart-area">
+                <canvas id="scenarioChart"></canvas>
+            </div>
 
-                <!-- What Would It Take -->
-                <div class="recovery-panel" style="grid-column: 1 / -1;">
-                    <div class="panel-title">What Would It Take?</div>
-                    <div class="sensitivity-intro">These scenarios show individual changes. In practice, multiple metrics often move together.</div>
-                    <div class="sensitivity-list" id="sensitivityList">
-                        <!-- Populated by JavaScript -->
-                    </div>
+            <!-- Dynamic Interpretation -->
+            <div class="narrative-interpretation" id="recoveryInterpretation" aria-live="polite">
+                <div class="interp-text" id="interp-text">
+                    <strong>Four scenarios show the range of plausible futures</strong> — from continued stasis to genuine recovery. The most likely path is more of the same. Pick one to explore what it means, or build your own.
                 </div>
+                <button class="interp-more" id="interp-more" aria-label="Read full interpretation">more ▾</button>
+            </div>
+
+            <!-- Scenario Controls -->
+            <div class="controls-row" style="margin-top: 16px;">
+                <button class="preset-pill" data-key="worse" aria-pressed="false">
+                    <span>⛈️</span> <span>Gets Worse</span> <span class="pill-score" data-pill="worse"></span>
+                </button>
+                <button class="preset-pill" data-key="frozen" aria-pressed="false">
+                    <span>🥶</span> <span>Stays Frozen</span> <span class="pill-score" data-pill="frozen"></span>
+                </button>
+                <button class="preset-pill" data-key="now" aria-pressed="false">
+                    <span>📍</span> <span>Now</span> <span class="pill-score" data-pill="now"></span>
+                </button>
+                <button class="preset-pill" data-key="thaw" aria-pressed="false">
+                    <span>🌤️</span> <span>Gradual Thaw</span> <span class="pill-score" data-pill="thaw"></span>
+                </button>
+                <button class="preset-pill" data-key="boom" aria-pressed="false">
+                    <span>🚀</span> <span>Bets Pay Off</span> <span class="pill-score" data-pill="boom"></span>
+                </button>
+
+                <span class="controls-sep"></span>
+
+                <button class="slider-toggle" id="slider-toggle" aria-expanded="false" aria-controls="slider-panel">
+                    Build your own <span class="toggle-arrow">▾</span>
+                </button>
+            </div>
+
+            <!-- Slider Panel -->
+            <div class="slider-panel collapsed" id="slider-panel" role="region" aria-label="Custom scenario sliders">
+                <div class="slider-grid" id="slider-grid"></div>
             </div>
         </section>
 
@@ -2357,6 +2315,7 @@
         // Theme toggle function
         let mainChartInstance = null;
         let sparklineInstances = {};
+        let scenarioChart = null;
         
         function toggleTheme() {
             const html = document.documentElement;
@@ -2407,6 +2366,25 @@
                     chart.update('none');
                 }
             });
+            
+            // Update scenario chart
+            if (typeof scenarioChart !== 'undefined' && scenarioChart) {
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                scenarioChart.options.scales.x.grid.color = colors.grid;
+                scenarioChart.options.scales.y.grid.color = colors.grid;
+                scenarioChart.options.scales.x.ticks.color = colors.textMuted;
+                scenarioChart.options.scales.y.ticks.color = colors.textMuted;
+                scenarioChart.options.plugins.tooltip.backgroundColor = colors.tooltipBg;
+                scenarioChart.options.plugins.tooltip.titleColor = colors.tooltipText;
+                scenarioChart.options.plugins.tooltip.bodyColor = colors.tooltipSecondary;
+                scenarioChart.options.plugins.tooltip.borderColor = colors.tooltipBorder;
+                const ann = scenarioChart.options.plugins.annotation.annotations;
+                if (ann.branchLine) ann.branchLine.borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+                if (ann.projZone) ann.projZone.backgroundColor = isDark ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.02)';
+                if (ann.projLabel) ann.projLabel.color = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.15)';
+                scenarioChart.data.datasets[0].pointHoverBackgroundColor = isDark ? '#fff' : '#1a1a2e';
+                scenarioChart.update('none');
+            }
         }
         
         // Toggle functions for collapsible sections
@@ -2853,307 +2831,626 @@
                 analogEl.textContent = 'No close match';
             }
 
-            // Recovery section
-            const nextTierThreshold = currentScore >= 55 ? 70 : 55;
-            const nextTierName = currentScore >= 55 ? 'Good Time to Move' : 'Worth Exploring';
-            const distanceToTarget = Math.max(0, nextTierThreshold - currentScore);
-            
-            document.getElementById('recoveryTitle').textContent = `Path to "${nextTierName}"`;
-            document.getElementById('distancePoints').textContent = distanceToTarget;
+            // ========================================
+            // SCENARIOS SECTION
+            // ========================================
 
-            // Score decomposition
-            function getMetricScore(metric, value) {
-                switch(metric) {
-                    case 'quitRate': return Math.min(1, Math.max(0, (value - 1.5) / 1.5));
-                    case 'openingsRatio': return Math.min(1, Math.max(0, (value - 0.3) / 1.7));
-                    case 'hiresRate': return Math.min(1, Math.max(0, (value - 2.0) / 2.5));
-                    case 'layoffsRate': return Math.min(1, Math.max(0, (2.5 - value) / 1.7));
-                    case 'unempRate': return Math.min(1, Math.max(0, (7.0 - value) / 3.5));
-                    case 'fedRate': return Math.min(1, Math.max(0, (5.5 - value) / 5.5));
-                    case 'wageGrowth': return Math.min(1, Math.max(0, (value - 2.0) / 3.0));
-                    case 'lfpr': return Math.min(1, Math.max(0, (value - 79) / 4.0));
-                    default: return 0.5;
-                }
-            }
-            
-            function getScoreCategory(score) {
-                if (score >= 0.7) return 'good';
-                if (score >= 0.5) return 'neutral';
-                if (score >= 0.3) return 'poor';
-                return 'bad';
-            }
-            
-            const metricDisplayNames = {
-                quitRate: 'Quit Rate',
-                openingsRatio: 'Jobs/Seeker',
-                hiresRate: 'Hiring Rate',
-                layoffsRate: 'Layoff Rate',
-                unempRate: 'Unemployment',
-                fedRate: 'Fed Rate',
-                wageGrowth: 'Wage Growth',
-                lfpr: 'Participation'
+            // Current metric values (reusing currentMetrics from above)
+            const CUR = {
+                quitRate: currentMetrics.quitRate,
+                openingsRatio: currentMetrics.openingsRatio,
+                hiresRate: currentMetrics.hiresRate,
+                layoffsRate: currentMetrics.layoffsRate,
+                unempRate: currentMetrics.unempRate,
+                fedRate: currentMetrics.fedRate,
+                wageGrowth: currentMetrics.wageGrowth,
+                lfpr: currentMetrics.lfpr
             };
 
-            // Format metric values for display
-            const formatMetricValue = (metric, value) => {
-                switch(metric) {
-                    case 'openingsRatio': return value.toFixed(2);
-                    case 'fedRate': return value.toFixed(2) + '%';
-                    case 'lfpr': return value.toFixed(1) + '%';
-                    default: return value.toFixed(1) + '%';
-                }
+            const SCENARIOS = {
+                now:    { ...CUR },
+                frozen: { ...CUR, quitRate: 1.9, openingsRatio: 0.88, hiresRate: 3.0, fedRate: 3.5, unempRate: 4.8 },
+                thaw:   { ...CUR, quitRate: 2.4, openingsRatio: 1.2, hiresRate: 3.6, fedRate: 2.5, unempRate: 4.2 },
+                boom:   { ...CUR, quitRate: 2.5, openingsRatio: 1.4, hiresRate: 3.8, fedRate: 2.25, unempRate: 3.9, wageGrowth: 4.0, layoffsRate: 1.0 },
+                worse:  { ...CUR, quitRate: 1.7, openingsRatio: 0.7, hiresRate: 2.8, layoffsRate: 1.5, fedRate: 3.75, unempRate: 5.4 }
             };
-            
-            const metricScores = Object.entries(currentMetrics)
-                .filter(([k, v]) => v != null)
-                .map(([metric, value]) => ({
-                    metric,
-                    value,
-                    score: getMetricScore(metric, value),
-                    name: metricDisplayNames[metric]
-                }))
-                .sort((a, b) => a.score - b.score);
-            
-            const quitScoreVal = getMetricScore('quitRate', currentMetrics.quitRate);
-            const hiresScoreVal = getMetricScore('hiresRate', currentMetrics.hiresRate);
-            const isFrozenMarket = quitScoreVal < 0.5 && hiresScoreVal < 0.6;
-            
-            const decompositionEl = document.getElementById('decompositionList');
-            decompositionEl.innerHTML = metricScores.map(m => {
-                const isLayoffs = m.metric === 'layoffsRate';
-                const showFootnote = isLayoffs && isFrozenMarket && m.score > 0.7;
-                const formattedValue = formatMetricValue(m.metric, m.value);
-                return `
-                    <div class="decomposition-item">
-                        <span class="metric-name">${m.name}${showFootnote ? ' <span class="footnote-marker">†</span>' : ''}</span>
-                        <span class="metric-current">${formattedValue}</span>
-                        <div class="metric-bar-container">
-                            <div class="metric-bar ${getScoreCategory(m.score)}" style="width: ${m.score * 100}%"></div>
-                        </div>
-                        <span class="metric-score">${Math.round(m.score * 100)}</span>
-                    </div>
-                `;
-            }).join('');
-            
-            if (isFrozenMarket) {
-                decompositionEl.innerHTML += `
-                    <div class="decomposition-footnote">
-                        <span class="footnote-marker">†</span> Low layoffs in a "frozen" market (low quits + low hiring) provides less benefit than the score suggests. 
-                        Employers aren't cutting, but they're also not hiring—limited opportunities for job seekers.
-                    </div>
-                `;
+
+            function calcScenarioScore(m) {
+                const qs = Math.min(1, Math.max(0, (m.quitRate - 1.5) / 1.5));
+                const rs = Math.min(1, Math.max(0, (m.openingsRatio - 0.3) / 1.7));
+                const hs = Math.min(1, Math.max(0, (m.hiresRate - 2.0) / 2.5));
+                const ls = Math.min(1, Math.max(0, (2.5 - m.layoffsRate) / 1.7));
+                const us = Math.min(1, Math.max(0, (7.0 - m.unempRate) / 3.5));
+                const fs = Math.min(1, Math.max(0, (5.5 - m.fedRate) / 5.5));
+                const ws = Math.min(1, Math.max(0, (m.wageGrowth - 2.0) / 3.0));
+                const ps = Math.min(1, Math.max(0, (m.lfpr - 79) / 4.0));
+                const t1 = (qs + rs + hs + ls) / 4 * 0.6;
+                const t2 = (us + fs + ws + ps) / 4 * 0.4;
+                let base = (t1 + t2) * 100;
+                if (m.openingsRatio < 1.0) base *= 0.92;
+                base *= (1 - 0.12 * (1 - Math.min(qs, hs)));
+                if (m.fedRate < 0.5) base *= 1.08;
+                return Math.min(100, Math.round(base));
             }
 
-            // Trigger conditions
-            const getRecentValues = (dataArray, count = 3) => {
-                const values = [];
-                for (let i = 0; i < count && (currentIdx - i) >= 0; i++) {
-                    const val = dataArray[currentIdx - i];
-                    if (val != null) values.push(val);
-                }
-                return values;
-            };
-            
-            const getTrend = (values) => {
-                if (values.length < 2) return { arrow: '→', direction: 'flat' };
-                const recent = values[0];
-                const older = values[values.length - 1];
-                const diff = recent - older;
-                const threshold = Math.abs(older) * 0.05;
-                
-                if (diff > threshold) return { arrow: '↑', direction: 'up' };
-                if (diff < -threshold) return { arrow: '↓', direction: 'down' };
-                return { arrow: '→', direction: 'flat' };
-            };
-            
-            const formatTrendHistory = (values, decimals = 2) => {
-                return values.slice(0, 3).reverse().map(v => v.toFixed(decimals)).join(' → ');
-            };
-            
-            const triggers = [
-                {
-                    condition: 'Quit rate rises above 2.3% for 3+ months',
-                    current: currentMetrics.quitRate,
-                    target: 2.3,
-                    recentValues: getRecentValues(monthlyData.quitRate),
-                    decimals: 1,
-                    goodDirection: 'up',
-                    status: currentMetrics.quitRate > 2.3 ? 'met' : 
-                            currentMetrics.quitRate > 2.1 ? 'watching' : ''
-                },
-                {
-                    condition: 'Jobs per seeker rises above 1.1',
-                    current: currentMetrics.openingsRatio,
-                    target: 1.1,
-                    recentValues: getRecentValues(monthlyData.openingsRatio),
-                    decimals: 2,
-                    goodDirection: 'up',
-                    status: currentMetrics.openingsRatio > 1.1 ? 'met' :
-                            currentMetrics.openingsRatio > 1.0 ? 'watching' : ''
-                },
-                {
-                    condition: 'Hiring rate rises above 3.5%',
-                    current: currentMetrics.hiresRate,
-                    target: 3.5,
-                    recentValues: getRecentValues(monthlyData.hiresRate),
-                    decimals: 1,
-                    goodDirection: 'up',
-                    status: currentMetrics.hiresRate > 3.5 ? 'met' :
-                            currentMetrics.hiresRate > 3.3 ? 'watching' : ''
-                },
-                {
-                    condition: 'Fed rate drops below 3.0%',
-                    current: currentMetrics.fedRate,
-                    target: 3.0,
-                    recentValues: getRecentValues(monthlyData.fedRate),
-                    decimals: 2,
-                    goodDirection: 'down',
-                    status: currentMetrics.fedRate < 3.0 ? 'met' :
-                            currentMetrics.fedRate < 3.5 ? 'watching' : ''
-                }
-            ];
-            
-            const triggerEl = document.getElementById('triggerList');
-            triggerEl.innerHTML = triggers.map(t => {
-                // Use clearer icons: ✓ for met, ● for watching, ○ for not met
-                const icon = t.status === 'met' ? '✓' : t.status === 'watching' ? '●' : '○';
-                const trend = getTrend(t.recentValues);
-                const trendIsGood = (trend.direction === t.goodDirection) || 
-                                   (trend.direction === 'flat' && t.status === 'met');
-                const trendClass = trendIsGood ? 'trend-good' : 
-                                  trend.direction === 'flat' ? 'trend-flat' : 'trend-bad';
-                const trendHistory = formatTrendHistory(t.recentValues, t.decimals);
-                
-                const statusText = t.status === 'met' ? 'Condition met' :
-                                  t.status === 'watching' ? 'Getting close' :
-                                  `Current: ${t.current.toFixed(t.decimals)}`;
-                return `
-                    <div class="trigger-item ${t.status}">
-                        <span class="trigger-icon">${icon}</span>
-                        <div class="trigger-content">
-                            <div class="trigger-condition">${t.condition}</div>
-                            <div class="trigger-status">${statusText}</div>
-                            <div class="trigger-trend ${trendClass}">
-                                <span class="trend-arrow">${trend.arrow}</span>
-                                <span class="trend-history">Last 3 months: ${trendHistory}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            const CUR_SCORE = calcScenarioScore(CUR);
+            const SCENARIO_SCORES = {};
+            for (const [k, v] of Object.entries(SCENARIOS)) SCENARIO_SCORES[k] = calcScenarioScore(v);
 
-            // Recovery summary
-            const triggerAnalysis = triggers.map(t => {
-                const trend = getTrend(t.recentValues);
-                const trendIsGood = trend.direction === t.goodDirection;
-                const trendIsBad = trend.direction !== 'flat' && !trendIsGood;
-                return { ...t, trend, trendIsGood, trendIsBad };
+            function getScenarioRawColor(s) {
+                if (s >= 70) return '#00d9a0';
+                if (s >= 55) return '#ffc940';
+                if (s >= 40) return '#ff8c40';
+                return '#ff4d6a';
+            }
+            function getScenarioDimColor(s, a) {
+                const h = getScenarioRawColor(s);
+                const r = parseInt(h.slice(1,3),16), g = parseInt(h.slice(3,5),16), b = parseInt(h.slice(5,7),16);
+                return `rgba(${r},${g},${b},${a||0.3})`;
+            }
+            function getScenarioCategory(s) {
+                if (s >= 70) return 'Good Time to Move';
+                if (s >= 55) return 'Worth Exploring';
+                if (s >= 40) return 'Build Your Position';
+                return 'Get Creative';
+            }
+
+            // ========================================
+            // HISTORICAL DATA FOR SCENARIO CHART
+            // Derived from main dashboard's monthlyData
+            // ========================================
+
+            const SC_HIST_COUNT = 24;
+            const scStartIdx = monthlyData.labels.length - SC_HIST_COUNT;
+            const SC_HIST_LABELS = monthlyData.labels.slice(scStartIdx).map(l => {
+                return l.replace('-', ' ');
             });
-            
-            const metConditions = triggerAnalysis.filter(t => t.status === 'met');
-            const improvingConditions = triggerAnalysis.filter(t => t.trendIsGood);
-            const worseningConditions = triggerAnalysis.filter(t => t.trendIsBad);
-            
-            let summaryParts = [];
-            
-            if (metConditions.length >= 3) {
-                summaryParts.push(`<strong>Recovery signals strengthening.</strong> ${metConditions.length} of 4 conditions now met.`);
-            } else if (metConditions.length >= 2) {
-                summaryParts.push(`<strong>Early signs of improvement.</strong> ${metConditions.length} of 4 conditions met—worth watching.`);
-            } else if (improvingConditions.length >= 2) {
-                summaryParts.push(`<strong>Some positive movement.</strong> No trigger conditions met yet, but trends bear watching.`);
-            } else if (worseningConditions.length >= 3) {
-                summaryParts.push(`<strong>Conditions weakening.</strong> Most indicators moving in the wrong direction.`);
-            } else {
-                summaryParts.push(`<strong>Holding pattern.</strong> No trigger conditions met, limited momentum in either direction.`);
-            }
-            
-            if (improvingConditions.length > 0) {
-                const names = improvingConditions.map(t => {
-                    if (t.condition.includes('Quit')) return 'quit rate';
-                    if (t.condition.includes('Jobs')) return 'jobs ratio';
-                    if (t.condition.includes('Hiring')) return 'hiring';
-                    if (t.condition.includes('Fed')) return 'Fed rate';
-                    return '';
-                }).filter(n => n);
-                if (names.length) summaryParts.push(`<span class="trend-positive">↑ Improving:</span> ${names.join(', ')}.`);
-            }
-            
-            if (worseningConditions.length > 0) {
-                const names = worseningConditions.map(t => {
-                    if (t.condition.includes('Quit')) return 'quit rate';
-                    if (t.condition.includes('Jobs')) return 'jobs ratio';
-                    if (t.condition.includes('Hiring')) return 'hiring';
-                    if (t.condition.includes('Fed')) return 'Fed rate';
-                    return '';
-                }).filter(n => n);
-                if (names.length) summaryParts.push(`<span class="trend-negative">↓ Worsening:</span> ${names.join(', ')}.`);
-            }
-            
-            document.getElementById('recoverySummary').innerHTML = summaryParts.join(' ');
 
-            // Sensitivity analysis
-            function calculateHypotheticalScore(overrides) {
-                const metrics = { ...currentMetrics, ...overrides };
-                
-                const quitScore = Math.min(1, Math.max(0, (metrics.quitRate - 1.5) / 1.5));
-                const ratioScore = Math.min(1, Math.max(0, (metrics.openingsRatio - 0.3) / 1.7));
-                const hiresScore = Math.min(1, Math.max(0, (metrics.hiresRate - 2.0) / 2.5));
-                const layoffsScore = Math.min(1, Math.max(0, (2.5 - metrics.layoffsRate) / 1.7));
-                const unempScore = Math.min(1, Math.max(0, (7.0 - metrics.unempRate) / 3.5));
-                const fedScore = Math.min(1, Math.max(0, (5.5 - metrics.fedRate) / 5.5));
-                const wageScore = Math.min(1, Math.max(0, (metrics.wageGrowth - 2.0) / 3.0));
-                const lfprScore = Math.min(1, Math.max(0, (metrics.lfpr - 79) / 4.0));
-                
-                const tier1 = (quitScore + ratioScore + hiresScore + layoffsScore) / 4 * 0.6;
-                const tier2 = (unempScore + fedScore + wageScore + lfprScore) / 4 * 0.4;
-                
-                let baseScore = (tier1 + tier2) * 100;
-                
-                if (metrics.openingsRatio < 1.0) baseScore *= 0.92;
-                const churnPenalty = 0.12 * (1 - Math.min(quitScore, hiresScore));
-                baseScore *= (1 - churnPenalty);
-                if (metrics.fedRate < 0.5) baseScore *= 1.08;
-                
-                return Math.min(100, Math.round(baseScore));
+            const scHistScores = [];
+            for (let i = scStartIdx; i < monthlyData.labels.length; i++) {
+                scHistScores.push(calculateCompositeScore(i));
             }
-            
-            const scenarios = [
-                {
-                    name: 'Quit rate rises to 2.3%',
-                    score: calculateHypotheticalScore({ quitRate: 2.3 })
+
+            // ========================================
+            // NARRATIVES
+            // ========================================
+
+            function ss(score) { return '<span class="score-inline" style="color:' + getScenarioRawColor(score) + '">' + score + '</span>'; }
+            function cs(score) { return '<span class="category-inline" style="color:' + getScenarioRawColor(score) + '">' + getScenarioCategory(score) + '</span>'; }
+
+            const SC_NARRATIVES = {
+                _invitation: {
+                    border: 'var(--accent-blue)',
+                    html: '<strong>Four scenarios show the range of plausible futures</strong> \u2014 from continued stasis to genuine recovery. The most likely path is more of the same. Pick one to explore what it means, or build your own.'
                 },
-                {
-                    name: 'Jobs per seeker returns to 1.1',
-                    score: calculateHypotheticalScore({ openingsRatio: 1.1 })
+                now: {
+                    get border() { return getScenarioRawColor(SCENARIO_SCORES.now); },
+                    get html() { return '<strong>Current conditions \u2192 ' + ss(SCENARIO_SCORES.now) + ', ' + cs(SCENARIO_SCORES.now) + '.</strong> Workers staying put, hiring slow, job openings below 1.0 per unemployed for the first time since 2021. Fed cuts underway but haven\u2019t reached the real economy. Stability is the primary asset worth protecting.'; }
                 },
-                {
-                    name: 'Fed cuts rates to 2.5%',
-                    score: calculateHypotheticalScore({ fedRate: 2.5 })
+                frozen: {
+                    get border() { return getScenarioRawColor(SCENARIO_SCORES.frozen); },
+                    get html() { return '<strong>Stays Frozen \u2192 ' + ss(SCENARIO_SCORES.frozen) + ', ' + cs(SCENARIO_SCORES.frozen) + '.</strong> Quit rate stuck near 1.9%, hiring flat, Fed pausing around 3.5%. Not a crash \u2014 another year of stasis where opportunities quietly narrow while nothing feels urgent. The most likely path.'; }
                 },
-                {
-                    name: 'Hiring rate recovers to 3.6%',
-                    score: calculateHypotheticalScore({ hiresRate: 3.6 })
+                thaw: {
+                    get border() { return getScenarioRawColor(SCENARIO_SCORES.thaw); },
+                    get html() { return '<strong>Gradual Thaw \u2192 ' + ss(SCENARIO_SCORES.thaw) + ', ' + cs(SCENARIO_SCORES.thaw) + '.</strong> Fed cuts gain traction \u2014 quits climb to 2.4%, openings back above 1.0 per unemployed. Not a boom, but a functional market where active searching is rewarded. Plausible by late 2027 if policy headwinds ease.'; }
                 },
-                {
-                    name: 'Combined: Quit 2.3% + Ratio 1.1',
-                    score: calculateHypotheticalScore({ quitRate: 2.3, openingsRatio: 1.1 })
+                boom: {
+                    get border() { return getScenarioRawColor(SCENARIO_SCORES.boom); },
+                    get html() { return '<strong>Bets Pay Off \u2192 ' + ss(SCENARIO_SCORES.boom) + ', ' + cs(SCENARIO_SCORES.boom) + '.</strong> Aggressive Fed cuts spark hiring \u2014 quits climbing past 2.5%, openings ratio back to 1.4. Even in this optimistic case, you only just cross into Good Time to Move. That\u2019s how far below baseline the market currently sits. Expand the sliders to see what has to be true.'; }
+                },
+                worse: {
+                    get border() { return getScenarioRawColor(SCENARIO_SCORES.worse); },
+                    get html() { return '<strong>Gets Worse \u2192 ' + ss(SCENARIO_SCORES.worse) + ', ' + cs(SCENARIO_SCORES.worse) + '.</strong> Headwinds intensify \u2014 layoffs rise, hiring freezes deepen, the Fed pauses cuts. Even strong candidates face slow processes and lowball offers. Protecting your current position becomes the priority.'; }
                 }
+            };
+
+            function getCustomNarrative(score) {
+                const d = score - CUR_SCORE;
+                var text;
+                if (score >= 70) {
+                    text = '<strong>Your scenario \u2192 ' + ss(score) + ', ' + cs(score) + '.</strong> At these levels the market is genuinely employee-favorable \u2014 workers quit confidently, employers compete for talent. Strong conditions for an active search.';
+                } else if (score >= 55) {
+                    text = '<strong>Your scenario \u2192 ' + ss(score) + ', ' + cs(score) + '.</strong> A functional market with real opportunities. Selective searching for strong-fit roles makes sense. Not a boom, but applications yield meaningful responses.';
+                } else if (d >= -3 && d <= 3) {
+                    text = '<strong>Your scenario \u2192 ' + ss(score) + '.</strong> Roughly current conditions \u2014 still ' + cs(score) + '. The holding pattern continues. Stability remains the primary asset worth protecting.';
+                } else if (score >= 40) {
+                    text = '<strong>Your scenario \u2192 ' + ss(score) + ', ' + cs(score) + '.</strong> Headwinds still present. Patience and positioning beat aggressive searching. Wait for sustained indicator movement before committing to a search.';
+                } else {
+                    text = '<strong>Your scenario \u2192 ' + ss(score) + ', ' + cs(score) + '.</strong> Employer-favorable market \u2014 searching is costly and slow. Focus on stability. Only move for truly exceptional opportunities.';
+                }
+                return { border: getScenarioRawColor(score), html: text };
+            }
+
+            // ========================================
+            // SLIDERS
+            // ========================================
+
+            const SLIDER_DEFS = [
+                { key: 'quit',  name: 'Quit Rate',            metric: 'quitRate',      min: 1.4, max: 3.2, step: 0.1,  cur: CUR.quitRate,      fmt: function(v) { return v.toFixed(1)+'%'; },  inv: false },
+                { key: 'ratio', name: 'Openings / Unemployed', metric: 'openingsRatio', min: 0.3, max: 2.0, step: 0.05, cur: CUR.openingsRatio,  fmt: function(v) { return v.toFixed(2); },      inv: false },
+                { key: 'hires', name: 'Hires Rate',            metric: 'hiresRate',     min: 2.0, max: 4.8, step: 0.1,  cur: CUR.hiresRate,      fmt: function(v) { return v.toFixed(1)+'%'; },  inv: false },
+                { key: 'fed',   name: 'Fed Funds Rate',        metric: 'fedRate',       min: 0,   max: 5.5, step: 0.25, cur: CUR.fedRate,        fmt: function(v) { return v.toFixed(2)+'%'; },  inv: true },
+                { key: 'unemp', name: 'Unemployment',          metric: 'unempRate',     min: 3.4, max: 7.0, step: 0.1,  cur: CUR.unempRate,      fmt: function(v) { return v.toFixed(1)+'%'; },  inv: true }
             ];
-            
-            const sensitivityEl = document.getElementById('sensitivityList');
-            sensitivityEl.innerHTML = scenarios.map(s => {
-                const delta = s.score - currentScore;
-                const deltaStr = delta >= 0 ? `+${delta}` : `${delta}`;
-                const category = s.score >= 55 ? 'positive' : s.score >= 48 ? 'neutral' : 'negative';
-                const reachesTarget = s.score >= nextTierThreshold ? ` → ${nextTierName}` : '';
-                return `
-                    <div class="sensitivity-item">
-                        <span class="sensitivity-scenario">${s.name}</span>
-                        <span class="sensitivity-result ${category}">Score: ${s.score} (${deltaStr})${reachesTarget}</span>
-                    </div>
-                `;
-            }).join('');
+
+            function renderSliders() {
+                document.getElementById('slider-grid').innerHTML = SLIDER_DEFS.map(function(d) {
+                    return '<div class="slider-group">' +
+                        '<div class="slider-header">' +
+                            '<span class="slider-name">' + d.name + '</span>' +
+                            '<div class="slider-vals">' +
+                                '<span class="slider-cur">' + d.fmt(d.cur) + '</span>' +
+                                '<span class="slider-arrow">\u2192</span>' +
+                                '<span class="slider-proj same" id="sl-' + d.key + '-val">' + d.fmt(d.cur) + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<input type="range" min="' + d.min + '" max="' + d.max + '" step="' + d.step + '" value="' + d.cur + '"' +
+                               ' id="sl-' + d.key + '" aria-label="' + d.name + '">' +
+                    '</div>';
+                }).join('');
+                SLIDER_DEFS.forEach(function(d) {
+                    document.getElementById('sl-' + d.key).addEventListener('input', onSliderInput);
+                });
+            }
+
+            function readSliders() {
+                var m = Object.assign({}, CUR);
+                SLIDER_DEFS.forEach(function(d) { m[d.metric] = parseFloat(document.getElementById('sl-' + d.key).value); });
+                return m;
+            }
+
+            function setSliders(m) {
+                SLIDER_DEFS.forEach(function(d) { document.getElementById('sl-' + d.key).value = m[d.metric]; });
+                updateSliderLabels(m);
+            }
+
+            function updateSliderLabels(m) {
+                SLIDER_DEFS.forEach(function(d) {
+                    var val = m[d.metric];
+                    var el = document.getElementById('sl-' + d.key + '-val');
+                    el.textContent = d.fmt(val);
+                    var diff = d.inv ? (d.cur - val) : (val - d.cur);
+                    el.className = 'slider-proj ' + (diff > 0.03 ? 'better' : diff < -0.03 ? 'worse' : 'same');
+                });
+            }
+
+            // ========================================
+            // SCENARIO CHART
+            // ========================================
+
+            // scenarioChart declared globally for theme toggle access
+            var SC_PROJ_MONTHS = 12;
+            var SC_PROJ_LABELS = Array.from({length: SC_PROJ_MONTHS}, function() { return ''; });
+            var SC_ALL_LABELS = SC_HIST_LABELS.concat(SC_PROJ_LABELS);
+            var SC_LAST_HIST = SC_HIST_LABELS.length - 1;
+            var SC_TOTAL = SC_ALL_LABELS.length;
+
+            var SCENARIO_DS = { frozen: 1, thaw: 2, worse: 3, boom: 4, custom: 5 };
+            var PRESET_LINES = ['frozen', 'thaw', 'worse', 'boom'];
+
+            var SC_OVERLAP = 3; // overlap dashed lines with solid for seamless transition
+
+            function buildPath(target) {
+                var arr = new Array(SC_TOTAL).fill(null);
+                // Start a few points back into historical data for visual continuity
+                for (var j = SC_OVERLAP; j >= 0; j--) {
+                    var idx = SC_LAST_HIST - j;
+                    if (idx >= 0 && scHistScores[idx] != null) arr[idx] = scHistScores[idx];
+                }
+                for (var i = 1; i <= SC_PROJ_MONTHS; i++) {
+                    var t = i / SC_PROJ_MONTHS;
+                    var eased = 1 - Math.pow(1 - t, 2);
+                    arr[SC_LAST_HIST + i] = scHistScores[SC_LAST_HIST] + (target - scHistScores[SC_LAST_HIST]) * eased;
+                }
+                return arr;
+            }
+
+            function endpointRadius(size) {
+                return function(ctx) { return ctx.dataIndex === SC_TOTAL - 1 ? size : 0; };
+            }
+
+            function makeScenarioDataset(label, target, color, order) {
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                return {
+                    label: label,
+                    data: buildPath(target),
+                    borderColor: color,
+                    borderDash: [8, 4],
+                    tension: 0.3,
+                    pointRadius: endpointRadius(5),
+                    pointBackgroundColor: color,
+                    pointBorderColor: isDark ? '#12121a' : '#ffffff',
+                    pointBorderWidth: 2,
+                    borderWidth: 2,
+                    order: order
+                };
+            }
+
+            function initScenarioChart() {
+                var ctx = document.getElementById('scenarioChart').getContext('2d');
+                var histData = scHistScores.concat(new Array(SC_PROJ_MONTHS).fill(null));
+                const themeColors = getThemeColors();
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+
+                scenarioChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: SC_ALL_LABELS,
+                        datasets: [
+                            // 0: Historical
+                            {
+                                label: 'Historical',
+                                data: histData,
+                                borderColor: '#9898a8',
+                                segment: { borderColor: function(ctx) { return getScenarioRawColor(ctx.p0.parsed.y); } },
+                                backgroundColor: 'transparent',
+                                tension: 0.3,
+                                pointRadius: 0,
+                                pointHoverRadius: 5,
+                                pointHoverBackgroundColor: isDark ? '#fff' : '#1a1a2e',
+                                borderWidth: 2,
+                                spanGaps: true,
+                                order: 10
+                            },
+                            // 1: Frozen
+                            makeScenarioDataset('🥶 Stays Frozen', SCENARIO_SCORES.frozen, getScenarioRawColor(SCENARIO_SCORES.frozen), 6),
+                            // 2: Thaw
+                            makeScenarioDataset('🌤️ Gradual Thaw', SCENARIO_SCORES.thaw, getScenarioRawColor(SCENARIO_SCORES.thaw), 5),
+                            // 3: Worse
+                            makeScenarioDataset('⛈️ Gets Worse', SCENARIO_SCORES.worse, getScenarioRawColor(SCENARIO_SCORES.worse), 7),
+                            // 4: Boom
+                            makeScenarioDataset('🚀 Bets Pay Off', SCENARIO_SCORES.boom, getScenarioRawColor(SCENARIO_SCORES.boom), 4),
+                            // 5: Custom (hidden)
+                            {
+                                label: '\u2726 Your Scenario',
+                                data: new Array(SC_TOTAL).fill(null),
+                                borderColor: '#4d9fff',
+                                borderDash: [5, 3],
+                                tension: 0.3,
+                                pointRadius: endpointRadius(7),
+                                pointBackgroundColor: '#4d9fff',
+                                pointBorderColor: isDark ? '#12121a' : '#ffffff',
+                                pointBorderWidth: 2,
+                                borderWidth: 2.5,
+                                hidden: true,
+                                order: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 400, easing: 'easeOutQuart' },
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: themeColors.tooltipBg,
+                                titleColor: themeColors.tooltipText,
+                                bodyColor: themeColors.tooltipSecondary,
+                                borderColor: themeColors.tooltipBorder,
+                                borderWidth: 1,
+                                padding: 10,
+                                filter: function(item) {
+                                    if (item.raw === null) return false;
+                                    // In projected zone, hide dimmed scenario lines
+                                    if (item.dataIndex > SC_LAST_HIST && item.datasetIndex >= 1 && item.datasetIndex <= 5) {
+                                        var ds = item.chart.data.datasets[item.datasetIndex];
+                                        if (ds.hidden) return false;
+                                        if (ds.borderWidth < 2) return false;
+                                    }
+                                    return true;
+                                },
+                                callbacks: {
+                                    title: function(items) {
+                                        if (!items.length) return '';
+                                        return items[0].dataIndex > SC_LAST_HIST ? 'Projected' : (items[0].label || '');
+                                    },
+                                    label: function(item) {
+                                        var s = Math.round(item.raw);
+                                        if (item.datasetIndex === 0) return 'Score: ' + s + ' (' + getScenarioCategory(s) + ')';
+                                        // Strip emoji prefix for cleaner tooltip
+                                        var name = item.dataset.label.replace(/^[^\w]+/, '').trim();
+                                        return name + ': ' + s + ' (' + getScenarioCategory(s) + ')';
+                                    }
+                                }
+                            },
+                            annotation: {
+                                annotations: {
+                                    branchLine: {
+                                        type: 'line', xMin: SC_LAST_HIST, xMax: SC_LAST_HIST,
+                                        borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', borderWidth: 1, borderDash: [4,4]
+                                    },
+                                    projZone: {
+                                        type: 'box', xMin: SC_LAST_HIST, xMax: SC_TOTAL - 1,
+                                        backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', borderWidth: 0
+                                    },
+                                    projLabel: {
+                                        type: 'label', xValue: SC_LAST_HIST + 3, yValue: 94,
+                                        content: ['12-MONTH HORIZON'],
+                                        font: { size: 8, weight: 600, family: "'JetBrains Mono'" },
+                                        color: isDark ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.25)'
+                                    },
+                                    endFrozen: {
+                                        type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.frozen,
+                                        content: ['🥶 ' + SCENARIO_SCORES.frozen], font: { size: 9 },
+                                        color: getScenarioRawColor(SCENARIO_SCORES.frozen), position: { x: 'start' }
+                                    },
+                                    endThaw: {
+                                        type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.thaw,
+                                        content: ['🌤️ ' + SCENARIO_SCORES.thaw], font: { size: 9 },
+                                        color: getScenarioRawColor(SCENARIO_SCORES.thaw), position: { x: 'start' }
+                                    },
+                                    endWorse: {
+                                        type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.worse,
+                                        content: ['⛈️ ' + SCENARIO_SCORES.worse], font: { size: 9 },
+                                        color: getScenarioRawColor(SCENARIO_SCORES.worse), position: { x: 'start' }
+                                    },
+                                    endBoom: {
+                                        type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.boom,
+                                        content: ['🚀 ' + SCENARIO_SCORES.boom], font: { size: 9 },
+                                        color: getScenarioRawColor(SCENARIO_SCORES.boom), position: { x: 'start' }
+                                    },
+                                    scLine70: {
+                                        type: 'line', yMin: 70, yMax: 70,
+                                        borderColor: 'rgba(0,217,160,0.25)', borderWidth: 1, borderDash: [4,4],
+                                        label: {
+                                            display: true, content: 'Good Time to Move', position: 'start',
+                                            font: { size: 8 }, color: 'rgba(0,217,160,0.5)',
+                                            backgroundColor: 'transparent', padding: 2
+                                        }
+                                    },
+                                    scLine55: {
+                                        type: 'line', yMin: 55, yMax: 55,
+                                        borderColor: 'rgba(255,201,64,0.25)', borderWidth: 1, borderDash: [4,4],
+                                        label: {
+                                            display: true, content: 'Worth Exploring', position: 'start',
+                                            font: { size: 8 }, color: 'rgba(255,201,64,0.5)',
+                                            backgroundColor: 'transparent', padding: 2
+                                        }
+                                    },
+                                    scLine40: {
+                                        type: 'line', yMin: 40, yMax: 40,
+                                        borderColor: 'rgba(255,140,64,0.22)', borderWidth: 1, borderDash: [4,4],
+                                        label: {
+                                            display: true, content: 'Get Creative', position: 'start',
+                                            font: { size: 8 }, color: 'rgba(255,140,64,0.45)',
+                                            backgroundColor: 'transparent', padding: 2
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: themeColors.grid, drawBorder: false },
+                                ticks: {
+                                    maxTicksLimit: 10, maxRotation: 0,
+                                    callback: function(value, index) {
+                                        if (index > SC_LAST_HIST) return '';
+                                        return this.getLabelForValue(value);
+                                    },
+                                    color: themeColors.textMuted
+                                }
+                            },
+                            y: {
+                                min: 20, max: 100,
+                                grid: { color: themeColors.grid, drawBorder: false },
+                                ticks: { stepSize: 20, color: themeColors.textMuted }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // ========================================
+            // SCENARIO STATE MANAGEMENT
+            // ========================================
+
+            var activePreset = null;
+
+            function selectPreset(key) {
+                activePreset = key;
+
+                document.querySelectorAll('.preset-pill').forEach(function(p) {
+                    var a = p.dataset.key === key;
+                    p.classList.toggle('active', a);
+                    p.setAttribute('aria-pressed', a);
+                });
+
+                setSliders(SCENARIOS[key] || CUR);
+                updateChartEmphasis(key);
+                setNarrative(SC_NARRATIVES[key] || SC_NARRATIVES.now);
+
+                var panel = document.getElementById('slider-panel');
+                var toggle = document.getElementById('slider-toggle');
+                if (panel.classList.contains('collapsed')) {
+                    panel.classList.remove('collapsed');
+                    toggle.classList.add('open');
+                    toggle.setAttribute('aria-expanded', 'true');
+                }
+            }
+
+            function updateChartEmphasis(key) {
+                scenarioChart.data.datasets[5].hidden = true;
+                delete scenarioChart.options.plugins.annotation.annotations.endCustom;
+
+                if (key === 'now') {
+                    PRESET_LINES.forEach(function(sk) {
+                        var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]];
+                        ds.borderWidth = 2;
+                        ds.borderDash = [8, 4];
+                        ds.borderColor = getScenarioRawColor(SCENARIO_SCORES[sk]);
+                    });
+                } else if (PRESET_LINES.indexOf(key) >= 0) {
+                    PRESET_LINES.forEach(function(sk) {
+                        var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]];
+                        if (sk === key) {
+                            ds.borderWidth = 3;
+                            ds.borderDash = [10, 3];
+                            ds.borderColor = getScenarioRawColor(SCENARIO_SCORES[sk]);
+                        } else {
+                            ds.borderWidth = 1.5;
+                            ds.borderDash = [8, 4];
+                            ds.borderColor = getScenarioDimColor(SCENARIO_SCORES[sk]);
+                        }
+                    });
+                }
+
+                scenarioChart.update();
+            }
+
+            function onSliderInput() {
+                activePreset = 'custom';
+
+                document.querySelectorAll('.preset-pill').forEach(function(p) {
+                    p.classList.remove('active');
+                    p.setAttribute('aria-pressed', 'false');
+                });
+
+                var m = readSliders();
+                updateSliderLabels(m);
+                var score = calcScenarioScore(m);
+
+                scenarioChart.data.datasets[5].data = buildPath(score);
+                scenarioChart.data.datasets[5].hidden = false;
+                scenarioChart.data.datasets[5].borderColor = getScenarioRawColor(score);
+                scenarioChart.data.datasets[5].pointBackgroundColor = getScenarioRawColor(score);
+                scenarioChart.data.datasets[5].borderWidth = 3;
+
+                PRESET_LINES.forEach(function(sk) {
+                    var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]];
+                    ds.borderWidth = 1.5;
+                    ds.borderColor = getScenarioDimColor(SCENARIO_SCORES[sk]);
+                });
+
+                scenarioChart.options.plugins.annotation.annotations.endCustom = {
+                    type: 'label', xValue: SC_TOTAL - 0.2, yValue: score,
+                    content: ['\u2726 ' + score],
+                    font: { size: 10, weight: 700, family: "'JetBrains Mono'" },
+                    color: getScenarioRawColor(score), position: { x: 'start' }
+                };
+
+                scenarioChart.update();
+                setNarrative(getCustomNarrative(score));
+            }
+
+            // ========================================
+            // NARRATIVE MANAGEMENT
+            // ========================================
+
+            function setNarrative(n) {
+                var wrap = document.getElementById('recoveryInterpretation');
+                var text = document.getElementById('interp-text');
+                var btn = document.getElementById('interp-more');
+
+                text.classList.remove('expanded');
+                btn.classList.remove('visible');
+                btn.textContent = 'more \u25be';
+
+                wrap.classList.add('fading');
+
+                setTimeout(function() {
+                    text.innerHTML = n.html;
+                    wrap.style.borderLeftColor = n.border;
+
+                    requestAnimationFrame(function() {
+                        wrap.classList.remove('fading');
+                        checkMobileTruncation();
+                    });
+                }, 200);
+            }
+
+            function checkMobileTruncation() {
+                var text = document.getElementById('interp-text');
+                var btn = document.getElementById('interp-more');
+
+                if (window.innerWidth <= 640) {
+                    requestAnimationFrame(function() {
+                        if (text.scrollHeight > text.clientHeight + 2) {
+                            btn.classList.add('visible');
+                        } else {
+                            btn.classList.remove('visible');
+                        }
+                    });
+                }
+            }
+
+            function resetScenarios() {
+                activePreset = null;
+
+                document.querySelectorAll('.preset-pill').forEach(function(p) {
+                    p.classList.remove('active');
+                    p.setAttribute('aria-pressed', 'false');
+                });
+
+                setSliders(CUR);
+
+                PRESET_LINES.forEach(function(sk) {
+                    var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]];
+                    ds.borderWidth = 2;
+                    ds.borderDash = [8, 4];
+                    ds.borderColor = getScenarioRawColor(SCENARIO_SCORES[sk]);
+                });
+                scenarioChart.data.datasets[5].hidden = true;
+                scenarioChart.data.datasets[5].data = new Array(SC_TOTAL).fill(null);
+                delete scenarioChart.options.plugins.annotation.annotations.endCustom;
+                scenarioChart.update();
+
+                setNarrative(SC_NARRATIVES._invitation);
+
+                var panel = document.getElementById('slider-panel');
+                var toggle = document.getElementById('slider-toggle');
+                panel.classList.add('collapsed');
+                toggle.classList.remove('open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+
+            // ========================================
+            // SCENARIO SECTION INIT
+            // ========================================
+
+            // Populate pill scores
+            for (var key in SCENARIO_SCORES) {
+                var el = document.querySelector('[data-pill="' + key + '"]');
+                if (el) { el.textContent = SCENARIO_SCORES[key]; el.style.color = getScenarioRawColor(SCENARIO_SCORES[key]); }
+            }
+
+            renderSliders();
+            initScenarioChart();
+
+            // Preset clicks
+            document.querySelectorAll('.preset-pill').forEach(function(p) {
+                p.addEventListener('click', function() {
+                    if (p.dataset.key === 'now' && activePreset === 'now') {
+                        resetScenarios();
+                    } else {
+                        selectPreset(p.dataset.key);
+                    }
+                });
+            });
+
+            // Slider toggle
+            document.getElementById('slider-toggle').addEventListener('click', function() {
+                var panel = document.getElementById('slider-panel');
+                var toggle = document.getElementById('slider-toggle');
+                var collapsed = panel.classList.contains('collapsed');
+                panel.classList.toggle('collapsed');
+                toggle.classList.toggle('open');
+                toggle.setAttribute('aria-expanded', collapsed);
+            });
+
+            // Mobile read-more toggle
+            document.getElementById('interp-more').addEventListener('click', function() {
+                var text = document.getElementById('interp-text');
+                var btn = document.getElementById('interp-more');
+                var expanded = text.classList.contains('expanded');
+                text.classList.toggle('expanded');
+                btn.textContent = expanded ? 'more \u25be' : 'less \u25b4';
+            });
+
+            window.addEventListener('resize', checkMobileTruncation);
 
             // Charts
             Chart.defaults.color = '#9898a8';
