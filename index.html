@@ -1127,7 +1127,7 @@
                     </button>
                 </div>
             </div>
-            <p class="subtitle">Data to help you decide when to look for a new job.</p>
+            <p class="subtitle">Giving job seekers the same market intelligence employers have. An experiment in AI-assisted pro-worker tooling.</p>
         </header>
 
         <!-- PHASE 8: About section defaults to collapsed -->
@@ -1151,14 +1151,14 @@
                     <p>Job market conditions shift before the narrative catches up. By the time "it's a great market" or "hiring is frozen" becomes conventional wisdom, the data has usually been pointing that direction for months.</p>
                     <p>This dashboard uses eight economic indicators to cut through the noise and give job seekers a clearer, earlier read on conditions. The score runs from 0 to 100 — higher means better for workers. Data comes from the Bureau of Labor Statistics and Federal Reserve, updated monthly.</p>
                     <p>Start with the score, then explore what's driving it, then see what would need to change.</p>
-                    <p class="about-note">This tracks the US labor market overall — tech, healthcare, and finance each have their own dynamics. Your mileage will vary by industry, role, and location.</p>
+                    <p class="about-note">This tracks the US labor market overall. Tech can freeze 18 months before it shows in national data; healthcare and government often move on different cycles entirely. If your sector feels worse than the score suggests, trust your network over the number.</p>
                 </div>
                 <div class="about-how">
                     <h3>What the score means</h3>
                     <ul>
-                        <li><strong>70+</strong> — Recruiters reaching out. Negotiation pays off.</li>
+                        <li><strong>70+</strong> — Opportunities find you. Real leverage to negotiate.</li>
                         <li><strong>55–69</strong> — Opportunities if you look. Some room to negotiate.</li>
-                        <li><strong>40–54</strong> — Competitive. Employers have options.</li>
+                        <li><strong>40–54</strong> — Slow going. Employers can afford to wait.</li>
                         <li><strong>&lt;40</strong> — Hiring freezes. Little leverage.</li>
                     </ul>
                 </div>
@@ -1215,7 +1215,7 @@
                         </div>
                         <div class="score-guide-item orange" id="guideOrange">
                             <div class="score-guide-range">40–54</div>
-                            <div class="score-guide-feel">Competitive. Employers have options.</div>
+                            <div class="score-guide-feel">Slow going. Employers can afford to wait.</div>
                         </div>
                         <div class="score-guide-item yellow" id="guideYellow">
                             <div class="score-guide-range">55–69</div>
@@ -1223,7 +1223,7 @@
                         </div>
                         <div class="score-guide-item green" id="guideGreen">
                             <div class="score-guide-range">70+</div>
-                            <div class="score-guide-feel">Recruiters reaching out. Negotiation pays off.</div>
+                            <div class="score-guide-feel">Opportunities find you. Real leverage to negotiate.</div>
                         </div>
                     </div>
                 </div>
@@ -1406,7 +1406,7 @@
             </div>
 
             <div class="narrative-assessment">
-                <strong>The market has been frozen since mid-2024.</strong> Employers aren't cutting — layoffs at 1.1% remain historically low — but they're not hiring either. Quit rates stuck near 2.0%, more job seekers than openings for the first time since 2021. Fed cuts are underway but haven't thawed hiring. The score has drifted from the mid-50s to the upper 40s.
+                <strong>The market has been frozen since mid-2024.</strong> Overall layoffs at 1.1% remain historically low — though tech and media have seen concentrated cuts that national data smooths over. Meanwhile, hiring has stalled. Quit rates stuck near 2.0%, more job seekers than openings for the first time since 2021. Fed cuts are underway but haven't thawed hiring. The score has drifted from the mid-50s to the upper 40s.
             </div>
 
             <div class="scenario-chart-area">
@@ -1686,7 +1686,7 @@
         const actionAdvice = {
             'good-time': {
                 intro: 'The market favors job seekers right now. People are moving, employers are competing for talent, and there\'s room to negotiate.',
-                actions: ['Active job searching is well-rewarded in this market','Recruiter outreach is worth engaging with','Negotiation leverage is real—employers expect it','Informational interviews often lead somewhere']
+                actions: ['Active job searching is well-rewarded in this market','Inbound interest is worth engaging with — recruiters, referrals, former colleagues reaching out','Negotiation leverage is real—employers expect it','Informational interviews often lead somewhere']
             },
             'worth-exploring': {
                 intro: 'Conditions are decent for job seekers. Opportunities are out there for those who look, though the market isn\'t handing them to you.',
@@ -1694,7 +1694,7 @@
             },
             'build-your-position': {
                 intro: 'The market currently tilts toward employers. Competition for open roles is stiffer and timelines are longer.',
-                actions: ['Current roles are worth investing in—skill-building pays off later','Quiet networking keeps doors open without pressure','Financial runway matters more in a slow market','Exceptional opportunities still exist, but are rarer']
+                actions: ['If your seat feels stable, invest in it — skill-building pays off when conditions turn','Quiet networking keeps doors open without pressure','Financial runway matters more in a slow market','Exceptional opportunities still exist, but are rarer']
             },
             'tough-market': {
                 intro: 'Conditions favor employers. Hiring is slow, competition is high, and stability has real value.',
@@ -2007,7 +2007,7 @@
             var SC_NARRATIVES = {
                 _invitation: { border: 'var(--accent-blue)', html: '<strong>Four scenarios show the range of plausible futures</strong> \u2014 from continued stasis to genuine recovery. The most likely path is more of the same. Pick one to explore what it means, or build your own.' },
                 now: { get border() { return getScenarioRawColor(SCENARIO_SCORES.now); }, get html() { return '<strong>Current conditions \u2192 ' + ss(SCENARIO_SCORES.now) + ', ' + cs(SCENARIO_SCORES.now) + '.</strong> Workers staying put, hiring slow, job openings below 1.0 per unemployed for the first time since 2021. Fed cuts underway but haven\u2019t reached the real economy. Stability is the primary asset worth protecting.'; } },
-                frozen: { get border() { return getScenarioRawColor(SCENARIO_SCORES.frozen); }, get html() { return '<strong>Stays Frozen \u2192 ' + ss(SCENARIO_SCORES.frozen) + ', ' + cs(SCENARIO_SCORES.frozen) + '.</strong> Quit rate stuck near 1.9%, hiring flat, Fed pausing around 3.5%. Not a crash \u2014 another year of stasis where opportunities quietly narrow while nothing feels urgent. The most likely path.'; } },
+                frozen: { get border() { return getScenarioRawColor(SCENARIO_SCORES.frozen); }, get html() { return '<strong>Stays Frozen \u2192 ' + ss(SCENARIO_SCORES.frozen) + ', ' + cs(SCENARIO_SCORES.frozen) + '.</strong> Quit rate stuck near 1.9%, hiring flat, Fed pausing around 3.5%. Not a macro crash \u2014 but another year where the aggregate data stays flat while specific sectors keep bleeding. If you\'re in one of them, you already know.'; } },
                 thaw: { get border() { return getScenarioRawColor(SCENARIO_SCORES.thaw); }, get html() { return '<strong>Gradual Thaw \u2192 ' + ss(SCENARIO_SCORES.thaw) + ', ' + cs(SCENARIO_SCORES.thaw) + '.</strong> Fed cuts gain traction \u2014 quits climb to 2.4%, openings back above 1.0 per unemployed. Not a boom, but a functional market where active searching is rewarded. Plausible by late 2027 if policy headwinds ease.'; } },
                 boom: { get border() { return getScenarioRawColor(SCENARIO_SCORES.boom); }, get html() { return '<strong>Bets Pay Off \u2192 ' + ss(SCENARIO_SCORES.boom) + ', ' + cs(SCENARIO_SCORES.boom) + '.</strong> Aggressive Fed cuts spark hiring \u2014 quits climbing past 2.5%, openings ratio back to 1.4. Even in this optimistic case, you only just cross into Good Time to Move. That\u2019s how far below baseline the market currently sits. Expand the sliders to see what has to be true.'; } },
                 worse: { get border() { return getScenarioRawColor(SCENARIO_SCORES.worse); }, get html() { return '<strong>Gets Worse \u2192 ' + ss(SCENARIO_SCORES.worse) + ', ' + cs(SCENARIO_SCORES.worse) + '.</strong> Headwinds intensify \u2014 layoffs rise, hiring freezes deepen, the Fed pauses cuts. Even strong candidates face slow processes and lowball offers. Protecting your current position becomes the priority.'; } }
