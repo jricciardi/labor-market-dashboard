@@ -576,6 +576,26 @@
             color: var(--text-muted);
         }
 
+        .vibe-validation {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            padding: 12px 16px;
+            margin: 12px 0;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            border-left: 3px solid var(--text-muted);
+            transition: background var(--theme-transition), border-color var(--theme-transition);
+        }
+
+        .vibe-validation em {
+            font-style: normal;
+        }
+
+        .action-section.build-your-position .vibe-validation,
+        .action-section.tough-market .vibe-validation {
+            border-left-color: var(--accent-orange);
+        }
+
         /* Score Guide */
         .score-guide {
             padding-top: 16px;
@@ -650,7 +670,41 @@
             gap: 12px;
         }
 
+        .chart-title-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
         .chart-title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); transition: color var(--theme-transition); }
+
+        .chart-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            user-select: none;
+            transition: color var(--theme-transition);
+        }
+
+        .chart-toggle:hover {
+            color: var(--text-secondary);
+        }
+
+        .chart-toggle input[type="checkbox"] {
+            width: 14px;
+            height: 14px;
+            accent-color: var(--accent-blue);
+            cursor: pointer;
+        }
+
+        .toggle-label {
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
 
         .chart-legend { display: flex; gap: 16px; font-size: 0.65rem; flex-wrap: wrap; }
         .legend-item { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); }
@@ -1233,7 +1287,13 @@
         <!-- Main Time Series Chart -->
         <section class="main-chart" data-nav-section="chart">
             <div class="chart-header">
-                <div class="chart-title" id="chartTitle">How has the market shifted?</div>
+                <div class="chart-title-row">
+                    <div class="chart-title" id="chartTitle">How has the market shifted?</div>
+                    <label class="chart-toggle">
+                        <input type="checkbox" id="annotationsToggle" onchange="toggleChartAnnotations()">
+                        <span class="toggle-label">Show key moments</span>
+                    </label>
+                </div>
                 <div class="chart-legend">
                     <div class="legend-item"><span class="legend-dot green"></span> Good Time to Move (70+)</div>
                     <div class="legend-item"><span class="legend-dot yellow"></span> Worth Exploring (55–69)</div>
@@ -1544,6 +1604,65 @@
         let mainChartInstance = null;
         let sparklineInstances = {};
         let scenarioChart = null;
+        let annotationsVisible = false;
+
+        // Historical event annotations for main chart
+        const historicalAnnotations = {
+            covidCrash: {
+                type: 'label',
+                xValue: 'Apr-20',
+                yValue: 95,
+                content: ['COVID'],
+                backgroundColor: 'rgba(255, 77, 106, 0.9)',
+                color: '#fff',
+                font: { size: 10, weight: 600 },
+                padding: { top: 4, bottom: 4, left: 8, right: 8 },
+                borderRadius: 4,
+                callout: {
+                    display: true,
+                    side: 10,
+                    borderColor: 'rgba(255, 77, 106, 0.6)',
+                    borderWidth: 1,
+                    borderDash: [3, 3]
+                }
+            },
+            peak2022: {
+                type: 'label',
+                xValue: 'Feb-22',
+                yValue: 95,
+                content: ['Peak'],
+                backgroundColor: 'rgba(0, 180, 130, 0.9)',
+                color: '#fff',
+                font: { size: 10, weight: 600 },
+                padding: { top: 4, bottom: 4, left: 8, right: 8 },
+                borderRadius: 4,
+                callout: {
+                    display: true,
+                    side: 10,
+                    borderColor: 'rgba(0, 217, 160, 0.6)',
+                    borderWidth: 1,
+                    borderDash: [3, 3]
+                }
+            },
+            fedPivot: {
+                type: 'label',
+                xValue: 'Sep-24',
+                yValue: 95,
+                content: ['Fed Cuts'],
+                backgroundColor: 'rgba(200, 160, 40, 0.9)',
+                color: '#fff',
+                font: { size: 10, weight: 600 },
+                padding: { top: 4, bottom: 4, left: 8, right: 8 },
+                borderRadius: 4,
+                callout: {
+                    display: true,
+                    side: 10,
+                    borderColor: 'rgba(255, 201, 64, 0.6)',
+                    borderWidth: 1,
+                    borderDash: [3, 3]
+                }
+            }
+        };
         
         function toggleTheme() {
             const html = document.documentElement;
@@ -1634,6 +1753,30 @@
             localStorage.setItem('scoreGuideOpen', !isOpen);
         }
 
+        function toggleChartAnnotations() {
+            const checkbox = document.getElementById('annotationsToggle');
+            annotationsVisible = checkbox.checked;
+
+            if (mainChartInstance) {
+                const annotations = mainChartInstance.options.plugins.annotation.annotations;
+
+                if (annotationsVisible) {
+                    // Add historical annotations
+                    Object.assign(annotations, historicalAnnotations);
+                } else {
+                    // Remove historical annotations
+                    delete annotations.covidCrash;
+                    delete annotations.peak2022;
+                    delete annotations.fedPivot;
+                }
+
+                mainChartInstance.update();
+            }
+
+            // Remember preference
+            localStorage.setItem('chartAnnotations', annotationsVisible);
+        }
+
         // PHASE 8: Toggle metrics on mobile
         function toggleMetrics(sectionId) {
             var section = document.getElementById(sectionId);
@@ -1683,22 +1826,47 @@
             'tough-market': 'Get Creative'
         };
 
+        // Action advice for each tier
         const actionAdvice = {
             'good-time': {
                 intro: 'The market favors job seekers right now. People are moving, employers are competing for talent, and there\'s room to negotiate.',
-                actions: ['Active job searching is well-rewarded in this market','Inbound interest is worth engaging with — recruiters, referrals, former colleagues reaching out','Negotiation leverage is real—employers expect it','Informational interviews often lead somewhere']
+                vibe: null, // Good vibes are self-evident
+                actions: [
+                    'Active job searching is well-rewarded in this market',
+                    'Inbound interest is worth engaging with — recruiters, referrals, former colleagues reaching out',
+                    'Negotiation leverage is real—employers expect it',
+                    'Informational interviews often lead somewhere'
+                ]
             },
             'worth-exploring': {
                 intro: 'Conditions are decent for job seekers. Opportunities are out there for those who look, though the market isn\'t handing them to you.',
-                actions: ['Strong-fit roles are worth pursuing','Networking tends to pay off in this environment','There\'s no rush—good opportunities reward patience','A thoughtful search beats a broad one right now']
+                vibe: 'If the market feels middling — not terrible, but not exciting — that\'s an accurate read.',
+                actions: [
+                    'Strong-fit roles are worth pursuing',
+                    'Networking tends to pay off in this environment',
+                    'There\'s no rush—good opportunities reward patience',
+                    'A thoughtful search beats a broad one right now'
+                ]
             },
             'build-your-position': {
                 intro: 'The market currently tilts toward employers. Competition for open roles is stiffer and timelines are longer.',
-                actions: ['If your seat feels stable, invest in it — skill-building pays off when conditions turn','Quiet networking keeps doors open without pressure','Financial runway matters more in a slow market','Exceptional opportunities still exist, but are rarer']
+                vibe: 'If the market feels harder than the headlines suggest, you\'re not imagining it — the data shows real headwinds.',
+                actions: [
+                    'If your seat feels stable, invest in it — skill-building pays off when conditions turn',
+                    'Quiet networking keeps doors open without pressure',
+                    'Financial runway matters more in a slow market',
+                    'Exceptional opportunities still exist, but are rarer'
+                ]
             },
             'tough-market': {
                 intro: 'Conditions favor employers. Hiring is slow, competition is high, and stability has real value.',
-                actions: ['Stability is an asset worth protecting right now','Skills built now will compound when conditions turn','Keeping your network warm matters—pushing it doesn\'t','Moves driven by necessity or truly exceptional fit still make sense']
+                vibe: 'This is genuinely difficult. The numbers confirm what your network is probably telling you.',
+                actions: [
+                    'Stability is an asset worth protecting right now',
+                    'Skills built now will compound when conditions turn',
+                    'Keeping your network warm matters—pushing it doesn\'t',
+                    'Moves driven by necessity or truly exceptional fit still make sense'
+                ]
             }
         };
 
@@ -1816,10 +1984,16 @@
             var diff = peakScore - currentScore;
             document.getElementById('scoreChange').textContent = '\u2193 ' + diff + ' pts from peak (' + monthlyData.labels[peakIdx] + ')';
             
-            // Action content
-            var advice = actionAdvice[tierKey];
-            var actionHTML = '<p>' + advice.intro + '</p><ul class="action-list">';
-            advice.actions.forEach(function(a) { actionHTML += '<li>' + a + '</li>'; });
+            // Update action content
+            const advice = actionAdvice[tierKey];
+            let actionHTML = `<p>${advice.intro}</p>`;
+            if (advice.vibe) {
+                actionHTML += `<p class="vibe-validation"><em>${advice.vibe}</em></p>`;
+            }
+            actionHTML += '<ul class="action-list">';
+            advice.actions.forEach(action => {
+                actionHTML += `<li>${action}</li>`;
+            });
             actionHTML += '</ul>';
             document.getElementById('actionContent').innerHTML = actionHTML;
 
@@ -2255,6 +2429,7 @@
                             line70: { type: 'line', yMin: 70, yMax: 70, borderColor: 'rgba(0, 217, 160, 0.3)', borderWidth: 1, borderDash: [5, 5] },
                             line55: { type: 'line', yMin: 55, yMax: 55, borderColor: 'rgba(255, 201, 64, 0.3)', borderWidth: 1, borderDash: [5, 5] },
                             line40: { type: 'line', yMin: 40, yMax: 40, borderColor: 'rgba(255, 140, 64, 0.3)', borderWidth: 1, borderDash: [5, 5] }
+                            // Historical annotations added dynamically via toggle
                         } }
                     },
                     scales: {
@@ -2263,6 +2438,13 @@
                     }
                 }
             });
+
+            // Restore chart annotations preference
+            const savedAnnotations = localStorage.getItem('chartAnnotations');
+            if (savedAnnotations === 'true') {
+                document.getElementById('annotationsToggle').checked = true;
+                toggleChartAnnotations();
+            }
 
             // Sparklines
             function createSparkline(canvasId, dataArray, metric, rangeId) {
