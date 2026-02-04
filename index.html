@@ -1716,6 +1716,11 @@
                 if (ann.branchLine) ann.branchLine.borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
                 if (ann.projZone) ann.projZone.backgroundColor = isDark ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.02)';
                 if (ann.projLabel) ann.projLabel.color = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.15)';
+                // Threshold lines
+                if (ann.scLine70) { ann.scLine70.borderColor = isDark ? 'rgba(0,217,160,0.35)' : 'rgba(0,180,130,0.40)'; ann.scLine70.label.color = isDark ? 'rgba(0,217,160,0.85)' : 'rgba(0,150,110,0.9)'; }
+                if (ann.scLine55) { ann.scLine55.borderColor = isDark ? 'rgba(255,201,64,0.35)' : 'rgba(220,170,40,0.40)'; ann.scLine55.label.color = isDark ? 'rgba(255,201,64,0.85)' : 'rgba(190,150,20,0.9)'; }
+                if (ann.scLine47) { ann.scLine47.borderColor = isDark ? 'rgba(255,140,64,0.30)' : 'rgba(220,110,40,0.35)'; ann.scLine47.label.color = isDark ? 'rgba(255,140,64,0.80)' : 'rgba(200,100,30,0.9)'; }
+                if (ann.scLine32) { ann.scLine32.borderColor = isDark ? 'rgba(255,77,106,0.30)' : 'rgba(220,50,80,0.35)'; ann.scLine32.label.color = isDark ? 'rgba(255,77,106,0.80)' : 'rgba(200,40,70,0.9)'; }
                 scenarioChart.data.datasets[0].pointHoverBackgroundColor = isDark ? '#fff' : '#1a1a2e';
                 scenarioChart.update('none');
             }
@@ -2288,9 +2293,10 @@
                                     endThaw: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.thaw, content: ['\ud83c\udf24\ufe0f ' + SCENARIO_SCORES.thaw], font: { size: 9 }, color: getScenarioRawColor(SCENARIO_SCORES.thaw), position: { x: 'start' } },
                                     endWorse: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.worse, content: ['\u26c8\ufe0f ' + SCENARIO_SCORES.worse], font: { size: 9 }, color: getScenarioRawColor(SCENARIO_SCORES.worse), position: { x: 'start' } },
                                     endBoom: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.boom, content: ['\ud83d\ude80 ' + SCENARIO_SCORES.boom], font: { size: 9 }, color: getScenarioRawColor(SCENARIO_SCORES.boom), position: { x: 'start' } },
-                                    scLine70: { type: 'line', yMin: 70, yMax: 70, borderColor: 'rgba(0,217,160,0.25)', borderWidth: 1, borderDash: [4,4], label: { display: true, content: 'Good Time to Move', position: 'start', font: { size: 8 }, color: 'rgba(0,217,160,0.5)', backgroundColor: 'transparent', padding: 2 } },
-                                    scLine55: { type: 'line', yMin: 55, yMax: 55, borderColor: 'rgba(255,201,64,0.25)', borderWidth: 1, borderDash: [4,4], label: { display: true, content: 'Worth Exploring', position: 'start', font: { size: 8 }, color: 'rgba(255,201,64,0.5)', backgroundColor: 'transparent', padding: 2 } },
-                                    scLine40: { type: 'line', yMin: 40, yMax: 40, borderColor: 'rgba(255,140,64,0.22)', borderWidth: 1, borderDash: [4,4], label: { display: true, content: 'Get Creative', position: 'start', font: { size: 8 }, color: 'rgba(255,140,64,0.45)', backgroundColor: 'transparent', padding: 2 } }
+                                    scLine70: { type: 'line', yMin: 70, yMax: 70, borderColor: isDark ? 'rgba(0,217,160,0.35)' : 'rgba(0,180,130,0.40)', borderWidth: 1.5, borderDash: [6,4], label: { display: true, content: 'Good Time to Move (70+)', position: 'start', font: { size: 10, weight: 500 }, color: isDark ? 'rgba(0,217,160,0.85)' : 'rgba(0,150,110,0.9)', backgroundColor: 'transparent', padding: 3 } },
+                                    scLine55: { type: 'line', yMin: 55, yMax: 55, borderColor: isDark ? 'rgba(255,201,64,0.35)' : 'rgba(220,170,40,0.40)', borderWidth: 1.5, borderDash: [6,4], label: { display: true, content: 'Worth Exploring (55-69)', position: 'end', font: { size: 10, weight: 500 }, color: isDark ? 'rgba(255,201,64,0.85)' : 'rgba(190,150,20,0.9)', backgroundColor: 'transparent', padding: 3 } },
+                                    scLine47: { type: 'line', yMin: 47, yMax: 47, borderColor: isDark ? 'rgba(255,140,64,0.30)' : 'rgba(220,110,40,0.35)', borderWidth: 1.5, borderDash: [6,4], label: { display: true, content: 'Build Your Position (40-54)', position: 'start', font: { size: 10, weight: 500 }, color: isDark ? 'rgba(255,140,64,0.80)' : 'rgba(200,100,30,0.9)', backgroundColor: 'transparent', padding: 3 } },
+                                    scLine32: { type: 'line', yMin: 32, yMax: 32, borderColor: isDark ? 'rgba(255,77,106,0.30)' : 'rgba(220,50,80,0.35)', borderWidth: 1.5, borderDash: [6,4], label: { display: true, content: 'Get Creative (<40)', position: 'end', font: { size: 10, weight: 500 }, color: isDark ? 'rgba(255,77,106,0.80)' : 'rgba(200,40,70,0.9)', backgroundColor: 'transparent', padding: 3 } }
                                 }
                             }
                         },
