@@ -1863,18 +1863,18 @@
         </header>
 
         <!-- Collapsible About Section -->
-        <section class="about-section" id="aboutSection">
-            <div class="about-header" 
-                 onclick="toggleAbout()" 
+        <section class="about-section collapsed" id="aboutSection">
+            <div class="about-header"
+                 onclick="toggleAbout()"
                  onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAbout();}"
-                 role="button" 
-                 tabindex="0" 
-                 aria-expanded="true" 
+                 role="button"
+                 tabindex="0"
+                 aria-expanded="false"
                  aria-controls="aboutContent"
                  id="aboutHeader">
                 <h2>What is this?</h2>
                 <span class="about-toggle">
-                    <span id="aboutToggleText">Hide</span>
+                    <span id="aboutToggleText">Show</span>
                     <span class="chevron"></span>
                 </span>
             </div>
@@ -2430,10 +2430,11 @@
         // Check if about section should be collapsed on load
         document.addEventListener('DOMContentLoaded', function() {
             const aboutCollapsed = localStorage.getItem('aboutCollapsed');
-            if (aboutCollapsed === 'true') {
-                document.getElementById('aboutSection').classList.add('collapsed');
-                document.getElementById('aboutToggleText').textContent = 'Show';
-                document.getElementById('aboutHeader').setAttribute('aria-expanded', 'false');
+            // Default to collapsed; expand only if user explicitly opened it
+            if (aboutCollapsed === 'false') {
+                document.getElementById('aboutSection').classList.remove('collapsed');
+                document.getElementById('aboutToggleText').textContent = 'Hide';
+                document.getElementById('aboutHeader').setAttribute('aria-expanded', 'true');
             }
             
             // Restore score guide state
