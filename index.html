@@ -63,6 +63,9 @@
             --bg-nav-translucent: rgba(10, 10, 15, 0.88);
             --shimmer-highlight: rgba(255, 255, 255, 0.08);
             --accent-blue-border: rgba(77, 159, 255, 0.3);
+
+            --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         /* ========================================
@@ -197,7 +200,7 @@
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
             transform: translateY(-100%);
-            transition: transform 0.3s ease, background var(--theme-transition), border-color var(--theme-transition);
+            transition: transform 0.35s var(--ease-out-expo), background var(--theme-transition), border-color var(--theme-transition);
             padding: 0 24px;
         }
 
@@ -392,7 +395,7 @@
             transition: color var(--theme-transition);
         }
 
-        .about-toggle .icon { transition: transform 0.2s ease; }
+        .about-toggle .icon { transition: transform 0.25s var(--ease-out-quart); }
         .about-section.collapsed .about-toggle .icon { transform: rotate(-90deg); }
 
         .about-content {
@@ -888,8 +891,8 @@
         .score-inline { font-weight: 700; font-variant-numeric: tabular-nums; }
         .category-inline { font-style: italic; }
 
-        .narrative-interpretation.fading { opacity: 0; transition: opacity 0.2s ease; }
-        .narrative-interpretation:not(.fading) { opacity: 1; transition: opacity 0.25s ease 0.05s; }
+        .narrative-interpretation.fading { opacity: 0; transition: opacity 0.2s var(--ease-out-quart); }
+        .narrative-interpretation:not(.fading) { opacity: 1; transition: opacity 0.25s var(--ease-out-quart) 0.05s; }
 
         .interp-more {
             display: none; font-family: inherit; font-size: 0.65rem; color: var(--accent-blue);
@@ -931,17 +934,18 @@
         }
         .slider-toggle:hover { color: var(--text-secondary); border-color: var(--text-muted); }
         .slider-toggle.open { color: var(--text-primary); border-color: var(--accent-blue); background: var(--accent-blue-dim); }
-        .toggle-arrow { transition: transform 0.3s; display: inline-block; font-size: 0.6rem; }
+        .toggle-arrow { transition: transform 0.3s var(--ease-out-quart); display: inline-block; font-size: 0.6rem; }
         .slider-toggle.open .toggle-arrow { transform: rotate(180deg); }
 
         .slider-panel {
-            max-height: 500px; overflow: hidden;
-            transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+            display: grid;
+            grid-template-rows: 1fr;
+            transition: grid-template-rows 0.4s var(--ease-out-quart), opacity 0.3s var(--ease-out-quart), margin 0.3s var(--ease-out-quart);
             opacity: 1; margin-top: 16px;
         }
-        .slider-panel.collapsed { max-height: 0; opacity: 0; margin-top: 0; }
+        .slider-panel.collapsed { grid-template-rows: 0fr; opacity: 0; margin-top: 0; }
 
-        .slider-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .slider-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; overflow: hidden; }
         .slider-grid .slider-group:last-child:nth-child(odd) { grid-column: 1 / -1; }
 
         .slider-group { padding: 12px 16px; background: var(--bg-tertiary); border-radius: 8px; transition: background var(--theme-transition); }
@@ -994,12 +998,12 @@
         }
 
         .accordion-trigger:hover { background: var(--bg-tertiary); }
-        .accordion-trigger .icon { color: var(--text-muted); transition: transform 0.2s ease; font-size: 0.6rem; }
+        .accordion-trigger .icon { color: var(--text-muted); transition: transform 0.25s var(--ease-out-quart); font-size: 0.6rem; }
 
         .chevron {
             display: inline-block; width: 8px; height: 8px;
             border-right: 2px solid var(--text-muted); border-bottom: 2px solid var(--text-muted);
-            transform: rotate(45deg); transition: transform 0.2s ease; margin-bottom: 2px;
+            transform: rotate(45deg); transition: transform 0.25s var(--ease-out-quart); margin-bottom: 2px;
         }
 
         .accordion-item.open .chevron,
@@ -1010,8 +1014,19 @@
         .about-section:not(.collapsed) .chevron { transform: rotate(45deg); }
         .accordion-item.open .accordion-trigger .icon { transform: rotate(180deg); }
 
-        .accordion-panel { display: none; padding: 0 24px 20px 24px; }
-        .accordion-item.open .accordion-panel { display: block; }
+        .accordion-panel {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s var(--ease-out-quart);
+        }
+        .accordion-panel-inner {
+            overflow: hidden;
+            padding: 0 24px;
+            padding-bottom: 0;
+            transition: padding-bottom 0.3s var(--ease-out-quart);
+        }
+        .accordion-item.open .accordion-panel { grid-template-rows: 1fr; }
+        .accordion-item.open .accordion-panel-inner { padding-bottom: 20px; }
 
         .accordion-panel p { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
         .accordion-panel p:last-child { margin-bottom: 0; }
@@ -1089,7 +1104,8 @@
             .tier-header { flex-wrap: wrap; }
             .tier-subtitle { width: 100%; margin-left: 0; margin-top: 4px; }
             .accordion-trigger { padding: 14px 16px; font-size: 0.75rem; }
-            .accordion-panel { padding: 0 16px 16px 16px; }
+            .accordion-panel-inner { padding: 0 16px; }
+            .accordion-item.open .accordion-panel-inner { padding-bottom: 16px; }
             .scenarios-section { padding: 16px; }
             .scenario-chart-area { height: 260px; }
             .controls-sep { display: none; }
@@ -1109,17 +1125,20 @@
                 transition: background var(--theme-transition), border-color var(--theme-transition);
             }
 
-            .metrics-grid {
-                max-height: 3000px;
-                overflow: hidden;
+            .metrics-grid-wrapper {
+                display: grid;
+                grid-template-rows: 1fr;
                 opacity: 1;
-                transition: max-height 0.4s ease, opacity 0.3s ease;
+                transition: grid-template-rows 0.4s var(--ease-out-quart), opacity 0.3s var(--ease-out-quart);
             }
 
-            .metrics-grid.mobile-collapsed {
-                max-height: 0;
+            .metrics-grid-wrapper .metrics-grid {
+                overflow: hidden;
+            }
+
+            .metrics-grid-wrapper.mobile-collapsed {
+                grid-template-rows: 0fr;
                 opacity: 0;
-                margin-top: 0;
             }
         }
 
@@ -1167,7 +1186,8 @@
             .score-verdict { background: none !important; border: 1px solid currentColor !important; }
             .action-section { background: #f9f9f9 !important; border-color: #999 !important; }
             .metric-chart-wrapper, .sparkline-time, .sparkline-range { display: none !important; }
-            .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-height: none !important; opacity: 1 !important; }
+            .metrics-grid-wrapper { display: contents !important; }
+            .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; overflow: visible !important; }
             .metric-card { background: #f5f5f5 !important; border: 1px solid #ddd !important; padding: 8px !important; page-break-inside: avoid; }
             .metric-header { flex-direction: column; gap: 2px; }
             .metric-info h3 { font-size: 9pt; color: #333 !important; }
@@ -1357,6 +1377,7 @@
                     <span class="chevron"></span>
                 </button>
             </div>
+            <div class="metrics-grid-wrapper" id="coreMetricsGridWrapper">
             <div class="metrics-grid" id="coreMetricsGrid">
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1415,6 +1436,7 @@
                     <div class="sparkline-time"><span>'15</span><span>Now</span></div>
                 </div>
             </div>
+            </div>
         </section>
 
         <!-- Bigger Picture -->
@@ -1432,6 +1454,7 @@
                     <span class="chevron"></span>
                 </button>
             </div>
+            <div class="metrics-grid-wrapper" id="contextMetricsGridWrapper">
             <div class="metrics-grid" id="contextMetricsGrid">
                 <div class="metric-card">
                     <div class="metric-header">
@@ -1489,6 +1512,7 @@
                     </div>
                     <div class="sparkline-time"><span>'15</span><span>Now</span></div>
                 </div>
+            </div>
             </div>
         </section>
 
@@ -1558,6 +1582,7 @@
                     <span class="chevron" aria-hidden="true"></span>
                 </button>
                 <div class="accordion-panel" id="panel-calc" role="region" aria-labelledby="trigger-calc">
+                    <div class="accordion-panel-inner">
                     <p>The score combines eight labor market indicators, weighted by how directly they measure worker leverage:</p>
                     <ul>
                         <li><strong>Core metrics (60% of score):</strong> Quit rate, job openings per unemployed worker, hiring rate, and layoff rate. These directly measure whether workers or employers have the upper hand.</li>
@@ -1569,6 +1594,7 @@
                         <code>Score = (0.6 × CoreAvg + 0.4 × ContextAvg) × 100 × adjustments</code>
                         <p>Each metric is normalized to 0–1 based on historical ranges (e.g., quit rate: 1.5% = 0, 3.0% = 1). Adjustments: ×0.92 if jobs/seeker &lt; 1.0; up to ×0.88 for frozen market; ×1.08 if Fed rate &lt; 0.5%.</p>
                         <a href="https://github.com/jricciardi/labor-market-dashboard/blob/main/index.html#L1850" target="_blank">View source code →</a>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -1583,10 +1609,12 @@
                     <span class="chevron" aria-hidden="true"></span>
                 </button>
                 <div class="accordion-panel" id="panel-limits" role="region" aria-labelledby="trigger-limits">
+                    <div class="accordion-panel-inner">
                     <p><strong>This is national data.</strong> Your industry, region, and role may differ significantly. Tech hiring can freeze while healthcare booms. San Francisco and rural Ohio are different markets.</p>
                     <p><strong>The data lags reality.</strong> BLS releases come 4-6 weeks after the reference month. By the time you see it here, conditions may have shifted.</p>
                     <p><strong>The thresholds are calibrated to recent history.</strong> A "bad" quit rate today might have been normal in 2010. The score tells you how now compares to 2015-2025, not to all of history.</p>
                     <p><strong>There's no confidence interval.</strong> The score of "47" should really be read as "somewhere around 45-50" given measurement uncertainty and model choices.</p>
+                    </div>
                 </div>
             </div>
             
@@ -1600,6 +1628,7 @@
                     <span class="chevron" aria-hidden="true"></span>
                 </button>
                 <div class="accordion-panel" id="panel-data" role="region" aria-labelledby="trigger-data">
+                    <div class="accordion-panel-inner">
                     <p>All data comes from official government sources, retrieved via the <a href="https://fred.stlouisfed.org/" target="_blank">Federal Reserve Economic Data (FRED)</a> API:</p>
                     <ul>
                         <li><strong>Quit rate, hiring rate, layoff rate, job openings:</strong> Bureau of Labor Statistics <a href="https://www.bls.gov/jlt/" target="_blank">Job Openings and Labor Turnover Survey (JOLTS)</a></li>
@@ -1607,6 +1636,7 @@
                         <li><strong>Fed interest rate:</strong> Federal Reserve <a href="https://www.federalreserve.gov/monetarypolicy/openmarket.htm" target="_blank">Open Market Operations</a></li>
                     </ul>
                     <p>Data updates automatically each month after BLS releases. The code is open source if you want to verify or adapt it.</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1823,17 +1853,18 @@
         // PHASE 8: Toggle metrics on mobile
         function toggleMetrics(sectionId) {
             var section = document.getElementById(sectionId);
+            var wrapper = section.querySelector('.metrics-grid-wrapper');
             var grid = section.querySelector('.metrics-grid');
             var toggle = section.querySelector('.summary-toggle');
-            var isCollapsed = grid.classList.contains('mobile-collapsed');
-            
+            var isCollapsed = wrapper.classList.contains('mobile-collapsed');
+
             if (isCollapsed) {
-                grid.classList.remove('mobile-collapsed');
+                wrapper.classList.remove('mobile-collapsed');
                 toggle.querySelector('.toggle-text').textContent = 'Hide details';
                 toggle.setAttribute('aria-expanded', 'true');
                 section.classList.add('metrics-expanded');
             } else {
-                grid.classList.add('mobile-collapsed');
+                wrapper.classList.add('mobile-collapsed');
                 toggle.querySelector('.toggle-text').textContent = 'Show ' + grid.querySelectorAll('.metric-card').length + ' metrics';
                 toggle.setAttribute('aria-expanded', 'false');
                 section.classList.remove('metrics-expanded');
@@ -2521,8 +2552,8 @@
             // PHASE 8: Collapse metrics on mobile (after charts render)
             // ========================================
             if (window.innerWidth <= 768) {
-                document.querySelectorAll('.metrics-grid').forEach(function(grid) {
-                    grid.classList.add('mobile-collapsed');
+                document.querySelectorAll('.metrics-grid-wrapper').forEach(function(wrapper) {
+                    wrapper.classList.add('mobile-collapsed');
                 });
             }
 
