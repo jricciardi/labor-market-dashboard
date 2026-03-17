@@ -59,6 +59,10 @@
             
             --noise-opacity: 0.025;
             --theme-transition: 200ms ease;
+
+            --bg-nav-translucent: rgba(10, 10, 15, 0.88);
+            --shimmer-highlight: rgba(255, 255, 255, 0.08);
+            --accent-blue-border: rgba(77, 159, 255, 0.3);
         }
 
         /* ========================================
@@ -97,6 +101,10 @@
             --sparkline-bad: #dc3545;
             
             --noise-opacity: 0;
+
+            --bg-nav-translucent: rgba(245, 246, 248, 0.88);
+            --shimmer-highlight: rgba(0, 0, 0, 0.06);
+            --accent-blue-border: rgba(30, 100, 200, 0.3);
         }
 
         @keyframes shimmer {
@@ -128,9 +136,9 @@
         }
 
         .skeleton {
-            background: linear-gradient(90deg, 
-                var(--bg-tertiary) 25%, 
-                rgba(255,255,255,0.08) 50%, 
+            background: linear-gradient(90deg,
+                var(--bg-tertiary) 25%,
+                var(--shimmer-highlight) 50%,
                 var(--bg-tertiary) 75%);
             background-size: 200% 100%;
             animation: shimmer 1.5s infinite;
@@ -184,7 +192,7 @@
             position: fixed;
             top: 0; left: 0; right: 0;
             z-index: 500;
-            background: rgba(10, 10, 15, 0.88);
+            background: var(--bg-nav-translucent);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
@@ -196,7 +204,7 @@
         .sticky-nav.visible { transform: translateY(0); }
 
         [data-theme="light"] .sticky-nav {
-            background: rgba(245, 246, 248, 0.88);
+            background: var(--bg-nav-translucent);
         }
 
         .nav-inner {
@@ -592,21 +600,14 @@
         .vibe-validation {
             font-size: 0.8rem;
             color: var(--text-secondary);
-            padding: 12px 16px;
+            padding: 8px 0 8px 16px;
             margin: 12px 0;
-            background: var(--bg-primary);
-            border-radius: 6px;
-            border-left: 3px solid var(--text-muted);
-            transition: background var(--theme-transition), border-color var(--theme-transition);
+            font-style: italic;
+            opacity: 0.85;
         }
 
         .vibe-validation em {
             font-style: normal;
-        }
-
-        .action-section.build-your-position .vibe-validation,
-        .action-section.tough-market .vibe-validation {
-            border-left-color: var(--accent-orange);
         }
 
         /* Score Guide */
@@ -669,7 +670,7 @@
         .main-chart {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 24px;
             margin-bottom: 24px;
             transition: background var(--theme-transition), border-color var(--theme-transition);
@@ -749,9 +750,9 @@
             border-radius: 4px;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            background: rgba(77, 159, 255, 0.15);
+            background: var(--accent-blue-dim);
             color: var(--accent-blue);
-            border: 1px solid rgba(77, 159, 255, 0.3);
+            border: 1px solid var(--accent-blue-border);
         }
 
         .tier-title { font-size: 0.85rem; font-weight: 500; color: var(--text-primary); }
@@ -871,7 +872,7 @@
         .narrative-assessment {
             font-size: 0.8rem; color: var(--text-secondary); line-height: 1.75;
             padding: 14px 16px; background: var(--bg-tertiary); border-radius: 8px;
-            border-left: 3px solid var(--text-muted); margin-bottom: 16px;
+            border: 1px solid var(--border-color); margin-bottom: 16px;
             transition: background var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition);
         }
         .narrative-assessment strong { color: var(--text-primary); }
@@ -974,7 +975,7 @@
         /* Accordion */
         .accordion-section {
             background: var(--bg-secondary); border: 1px solid var(--border-color);
-            border-radius: 12px; margin-bottom: 24px; overflow: hidden;
+            border-radius: 8px; margin-bottom: 24px; overflow: hidden;
         }
 
         .accordion-header {
@@ -1020,7 +1021,7 @@
         .accordion-panel a { color: var(--accent-blue); text-decoration: none; }
         .accordion-panel a:hover { text-decoration: underline; }
 
-        .formula-block { margin-top: 16px; padding: 14px 16px; background: var(--bg-primary); border-radius: 8px; border-left: 3px solid var(--accent-blue); }
+        .formula-block { margin-top: 16px; padding: 14px 16px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-color); }
         .formula-block strong { display: block; margin-bottom: 8px; font-size: 0.7rem; }
         .formula-block code { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--accent-yellow-text); background: var(--bg-tertiary); padding: 10px 12px; border-radius: 4px; margin-bottom: 10px; overflow-x: auto; }
         .formula-block p { font-size: 0.65rem; margin-bottom: 8px; }
