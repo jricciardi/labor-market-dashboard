@@ -1908,7 +1908,7 @@
             var nextReleaseMonth = new Date(dataThroughDate);
             nextReleaseMonth.setMonth(nextReleaseMonth.getMonth() + 2);
             nextReleaseMonth.setDate(7);
-            if (nextReleaseMonth < today) nextReleaseMonth.setMonth(nextReleaseMonth.getMonth() + 1);
+            while (nextReleaseMonth < today) nextReleaseMonth.setMonth(nextReleaseMonth.getMonth() + 1);
             document.getElementById('nextUpdate').textContent = 'Next update: ~' + monthNames[nextReleaseMonth.getMonth()] + ' ' + nextReleaseMonth.getDate();
             
             var dataEndDate = new Date(parseInt(dataMonth[0]), parseInt(dataMonth[1]), 0);

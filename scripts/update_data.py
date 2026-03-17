@@ -208,6 +208,32 @@ def main():
     fed_rate = fed_rate[:trim_to]
     wage_growth = wage_growth[:trim_to]
     lfpr = lfpr[:trim_to]
+
+    def interpolate_interior_nulls(arr):
+        """Fill null values that are surrounded by real data (not at the end) via linear interpolation."""
+        result = list(arr)
+        n = len(result)
+        i = 0
+        while i < n:
+            if result[i] is None:
+                start = i
+                while i < n and result[i] is None:
+                    i += 1
+                end = i
+                # Only interpolate if gap is interior (has valid data on both sides)
+                if start > 0 and end < n and result[start - 1] is not None and result[end] is not None:
+                    span = end - start + 1
+                    for j in range(start, end):
+                        t = (j - start + 1) / span
+                        result[j] = round(result[start - 1] + t * (result[end] - result[start - 1]), 2)
+            else:
+                i += 1
+        return result
+
+    openings_ratio = interpolate_interior_nulls(openings_ratio)
+    unemp_rate = interpolate_interior_nulls(unemp_rate)
+    lfpr = interpolate_interior_nulls(lfpr)
+    wage_growth = interpolate_interior_nulls(wage_growth)
     
     # Determine data coverage
     last_label = labels[-1]  # e.g., "Nov-25"
