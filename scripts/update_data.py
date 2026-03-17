@@ -180,11 +180,19 @@ def main():
         else:
             openings_ratio.append(None)
     
-    # Find the last date with actual JOLTS data (quit rate is a good proxy)
-    last_data_idx = len(quit_rate) - 1
-    while last_data_idx >= 0 and quit_rate[last_data_idx] is None:
-        last_data_idx -= 1
-    
+    # Find the last date where any major indicator has actual data.
+    # This allows non-JOLTS data (unemployment, wages, LFPR, fed rate)
+    # to appear even when JOLTS hasn't been released yet for that month.
+    def last_valid_index(arr):
+        for i in range(len(arr) - 1, -1, -1):
+            if arr[i] is not None:
+                return i
+        return -1
+
+    all_series = [quit_rate, unemp_rate, fed_rate, wage_growth, lfpr,
+                  hires_rate, layoffs_rate, openings_ratio]
+    last_data_idx = max(last_valid_index(s) for s in all_series)
+
     if last_data_idx < 0:
         print("Error: No valid data found")
         sys.exit(1)
@@ -205,12 +213,21 @@ def main():
     last_label = labels[-1]  # e.g., "Nov-25"
     last_month_dt = datetime.strptime(f"01-{last_label}", "%d-%b-%y")
     data_through = last_month_dt.strftime('%Y-%m')
-    
+
+    # Track JOLTS coverage separately since it lags behind other series
+    jolts_last_idx = last_valid_index(quit_rate)
+    jolts_through = None
+    if jolts_last_idx >= 0:
+        jolts_label = labels[jolts_last_idx]
+        jolts_dt = datetime.strptime(f"01-{jolts_label}", "%d-%b-%y")
+        jolts_through = jolts_dt.strftime('%Y-%m')
+
     # Build output JSON
     output = {
         "metadata": {
             "lastUpdated": datetime.now().strftime('%Y-%m-%d'),
             "dataThrough": data_through,
+            "joltsThrough": jolts_through,
             "description": "Labor market indicators for job search timing decisions"
         },
         "labels": labels,
@@ -234,9 +251,12 @@ def main():
     print(f"\nData updated successfully!")
     print(f"  Last updated: {output['metadata']['lastUpdated']}")
     print(f"  Data through: {output['metadata']['dataThrough']}")
+    print(f"  JOLTS through: {jolts_through or 'N/A'}")
     print(f"  Total months: {len(labels)}")
     print(f"  Latest quit rate: {quit_rate[-1]}")
     print(f"  Latest openings ratio: {openings_ratio[-1]}")
+    print(f"  Latest unemp rate: {unemp_rate[-1]}")
+    print(f"  Latest fed rate: {fed_rate[-1]}")
 
 if __name__ == '__main__':
     main()

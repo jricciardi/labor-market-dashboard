@@ -1,10 +1,12 @@
 name: Update Labor Market Data
 
 on:
-  # Run on the 7th of each month at 10:00 AM UTC
-  # JOLTS data releases ~35 days after reference month (around 6th-10th)
+  # Run twice monthly to catch staggered BLS releases:
+  # - 7th: Employment Situation data (released first Friday of month)
+  # - 14th: JOLTS data (released ~10th-12th of month)
   schedule:
     - cron: '0 10 7 * *'
+    - cron: '0 10 14 * *'
   
   # Allow manual trigger from GitHub UI
   workflow_dispatch:
