@@ -232,6 +232,12 @@
             border-bottom-color: var(--accent-blue);
         }
 
+        .nav-link:focus-visible {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -343,9 +349,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
             padding: 16px 24px;
             cursor: pointer;
             user-select: none;
+            border: none;
+            background: none;
+            font-family: inherit;
+            text-align: left;
+            color: inherit;
             transition: background var(--theme-transition);
         }
 
@@ -1010,6 +1022,18 @@
         .formula-block p { font-size: 0.65rem; margin-bottom: 8px; }
         .formula-block a { font-size: 0.65rem; }
 
+        /* Load error */
+        .load-error {
+            padding: 32px 24px;
+            text-align: center;
+            color: var(--accent-red-text);
+            font-size: 0.8rem;
+            border: 1px solid var(--accent-red);
+            border-radius: 8px;
+            background: var(--accent-red-dim);
+            margin-bottom: 24px;
+        }
+
         /* Footer */
         footer {
             text-align: left; padding: 28px 0; font-size: 0.7rem; color: var(--text-muted);
@@ -1109,6 +1133,17 @@
         }
 
         /* ========================================
+           REDUCED MOTION
+           ======================================== */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ========================================
            PRINT STYLES
            ======================================== */
         @media print {
@@ -1175,8 +1210,8 @@
                         <span class="freshness-text"></span>
                     </div>
                     <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle light/dark theme">
-                        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-                        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
                         <span>Theme</span>
                     </button>
                 </div>
@@ -1186,12 +1221,9 @@
 
         <!-- PHASE 8: About section defaults to collapsed -->
         <section class="about-section collapsed" id="aboutSection">
-            <div class="about-header" 
-                 onclick="toggleAbout()" 
-                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAbout();}"
-                 role="button" 
-                 tabindex="0" 
-                 aria-expanded="false" 
+            <button class="about-header"
+                 onclick="toggleAbout()"
+                 aria-expanded="false"
                  aria-controls="aboutContent"
                  id="aboutHeader">
                 <h2>What is this?</h2>
@@ -1199,7 +1231,7 @@
                     <span id="aboutToggleText">Show</span>
                     <span class="chevron"></span>
                 </span>
-            </div>
+            </button>
             <div class="about-content" id="aboutContent">
                 <div class="about-main">
                     <p>Job market conditions shift before the narrative catches up. By the time "it's a great market" or "hiring is frozen" becomes conventional wisdom, the data has usually been pointing that direction for months.</p>
@@ -1243,7 +1275,7 @@
             
             <div class="action-section" id="actionSection">
                 <div class="action-header">
-                    <span>💡</span>
+                    <span aria-hidden="true">💡</span>
                     <span>What does this mean?</span>
                 </div>
                 <div class="action-content" id="actionContent">
@@ -1259,7 +1291,7 @@
                         aria-controls="scoreGuideContent"
                         id="scoreGuideTrigger">
                     <span id="scoreGuideText">What does a different score feel like?</span>
-                    <span id="scoreGuideChevron">▾</span>
+                    <span id="scoreGuideChevron" aria-hidden="true">▾</span>
                 </button>
                 <div class="score-guide-content" id="scoreGuideContent">
                     <div class="score-guide-grid">
@@ -1482,25 +1514,25 @@
 
             <div class="controls-row" style="margin-top: 16px;">
                 <button class="preset-pill" data-key="worse" aria-pressed="false">
-                    <span>⛈️</span> <span>Gets Worse</span> <span class="pill-score" data-pill="worse"></span>
+                    <span aria-hidden="true">⛈️</span> <span>Gets Worse</span> <span class="pill-score" data-pill="worse"></span>
                 </button>
                 <button class="preset-pill" data-key="frozen" aria-pressed="false">
-                    <span>🥶</span> <span>Stays Frozen</span> <span class="pill-score" data-pill="frozen"></span>
+                    <span aria-hidden="true">🥶</span> <span>Stays Frozen</span> <span class="pill-score" data-pill="frozen"></span>
                 </button>
                 <button class="preset-pill" data-key="now" aria-pressed="false">
-                    <span>📍</span> <span>Now</span> <span class="pill-score" data-pill="now"></span>
+                    <span aria-hidden="true">📍</span> <span>Now</span> <span class="pill-score" data-pill="now"></span>
                 </button>
                 <button class="preset-pill" data-key="thaw" aria-pressed="false">
-                    <span>🌤️</span> <span>Gradual Thaw</span> <span class="pill-score" data-pill="thaw"></span>
+                    <span aria-hidden="true">🌤️</span> <span>Gradual Thaw</span> <span class="pill-score" data-pill="thaw"></span>
                 </button>
                 <button class="preset-pill" data-key="boom" aria-pressed="false">
-                    <span>🚀</span> <span>Bets Pay Off</span> <span class="pill-score" data-pill="boom"></span>
+                    <span aria-hidden="true">🚀</span> <span>Bets Pay Off</span> <span class="pill-score" data-pill="boom"></span>
                 </button>
 
                 <span class="controls-sep"></span>
 
                 <button class="slider-toggle" id="slider-toggle" aria-expanded="false" aria-controls="slider-panel">
-                    Build your own <span class="toggle-arrow">▾</span>
+                    Build your own <span class="toggle-arrow" aria-hidden="true">▾</span>
                 </button>
             </div>
 
@@ -1514,14 +1546,15 @@
             <div class="accordion-header">Understanding the Score</div>
             
             <div class="accordion-item" id="accordion-calc">
-                <button class="accordion-trigger" 
+                <button class="accordion-trigger"
+                        id="trigger-calc"
                         onclick="toggleAccordion('accordion-calc')"
                         aria-expanded="false"
                         aria-controls="panel-calc">
                     <span>How is this calculated?</span>
-                    <span class="chevron"></span>
+                    <span class="chevron" aria-hidden="true"></span>
                 </button>
-                <div class="accordion-panel" id="panel-calc" role="region" aria-labelledby="accordion-calc">
+                <div class="accordion-panel" id="panel-calc" role="region" aria-labelledby="trigger-calc">
                     <p>The score combines eight labor market indicators, weighted by how directly they measure worker leverage:</p>
                     <ul>
                         <li><strong>Core metrics (60% of score):</strong> Quit rate, job openings per unemployed worker, hiring rate, and layoff rate. These directly measure whether workers or employers have the upper hand.</li>
@@ -1538,14 +1571,15 @@
             </div>
             
             <div class="accordion-item" id="accordion-limits">
-                <button class="accordion-trigger" 
+                <button class="accordion-trigger"
+                        id="trigger-limits"
                         onclick="toggleAccordion('accordion-limits')"
                         aria-expanded="false"
                         aria-controls="panel-limits">
                     <span>What are the limitations?</span>
-                    <span class="chevron"></span>
+                    <span class="chevron" aria-hidden="true"></span>
                 </button>
-                <div class="accordion-panel" id="panel-limits" role="region">
+                <div class="accordion-panel" id="panel-limits" role="region" aria-labelledby="trigger-limits">
                     <p><strong>This is national data.</strong> Your industry, region, and role may differ significantly. Tech hiring can freeze while healthcare booms. San Francisco and rural Ohio are different markets.</p>
                     <p><strong>The data lags reality.</strong> BLS releases come 4-6 weeks after the reference month. By the time you see it here, conditions may have shifted.</p>
                     <p><strong>The thresholds are calibrated to recent history.</strong> A "bad" quit rate today might have been normal in 2010. The score tells you how now compares to 2015-2025, not to all of history.</p>
@@ -1554,14 +1588,15 @@
             </div>
             
             <div class="accordion-item" id="accordion-data">
-                <button class="accordion-trigger" 
+                <button class="accordion-trigger"
+                        id="trigger-data"
                         onclick="toggleAccordion('accordion-data')"
                         aria-expanded="false"
                         aria-controls="panel-data">
                     <span>Where does the data come from?</span>
-                    <span class="chevron"></span>
+                    <span class="chevron" aria-hidden="true"></span>
                 </button>
-                <div class="accordion-panel" id="panel-data" role="region">
+                <div class="accordion-panel" id="panel-data" role="region" aria-labelledby="trigger-data">
                     <p>All data comes from official government sources, retrieved via the <a href="https://fred.stlouisfed.org/" target="_blank">Federal Reserve Economic Data (FRED)</a> API:</p>
                     <ul>
                         <li><strong>Quit rate, hiring rate, layoff rate, job openings:</strong> Bureau of Labor Statistics <a href="https://www.bls.gov/jlt/" target="_blank">Job Openings and Labor Turnover Survey (JOLTS)</a></li>
@@ -2540,7 +2575,16 @@
         }
 
         // Initialize everything
-        initDashboard();
+        initDashboard().catch(function() {
+            document.body.classList.remove('js-loading');
+            var container = document.querySelector('.container');
+            if (container) {
+                var errEl = document.createElement('div');
+                errEl.className = 'load-error';
+                errEl.textContent = 'Unable to load data. Please refresh the page.';
+                container.insertBefore(errEl, container.firstChild);
+            }
+        });
         initStickyNav();
     </script>
 </body>
