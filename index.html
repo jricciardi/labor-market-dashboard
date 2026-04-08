@@ -1227,7 +1227,7 @@
                 <h1>Is Now a Good Time?</h1>
                 <div class="header-meta">
                     <span class="last-updated" id="lastUpdated"><span class="skeleton skeleton-text" style="width: 180px;"></span></span>
-                    <span class="next-update" id="nextUpdate">Next update expected: ~Feb 7</span>
+                    <span class="next-update" id="nextUpdate"><span class="skeleton skeleton-text" style="width: 140px;"></span></span>
                     <div class="data-freshness" id="dataFreshness">
                         <span class="freshness-dot"></span>
                         <span class="freshness-text"></span>
@@ -1524,8 +1524,9 @@
                 <span class="scenarios-title">Where Things Could Go</span>
             </div>
 
-            <div class="narrative-assessment">
-                <strong>The market has been frozen since mid-2024.</strong> Overall layoffs at 1.1% remain historically low — though tech and media have seen concentrated cuts that national data smooths over. Meanwhile, hiring has stalled. Quit rates stuck near 2.0%, more job seekers than openings for the first time since 2021. Fed cuts are underway but haven't thawed hiring. The score has drifted from the mid-50s to the upper 40s.
+            <div class="narrative-assessment" id="narrativeAssessment">
+                <span class="skeleton skeleton-text" style="width: 100%;"></span>
+                <span class="skeleton skeleton-text" style="width: 95%; margin-top: 6px;"></span>
             </div>
 
             <div class="scenario-chart-area">
@@ -1593,7 +1594,7 @@
                         <strong>The formula:</strong>
                         <code>Score = (0.6 × CoreAvg + 0.4 × ContextAvg) × 100 × adjustments</code>
                         <p>Each metric is normalized to 0–1 based on historical ranges (e.g., quit rate: 1.5% = 0, 3.0% = 1). Adjustments: ×0.92 if jobs/seeker &lt; 1.0; up to ×0.88 for frozen market; ×1.08 if Fed rate &lt; 0.5%.</p>
-                        <a href="https://github.com/jricciardi/labor-market-dashboard/blob/main/index.html#L1850" target="_blank">View source code →</a>
+                        <a href="https://github.com/jricciardi/labor-market-dashboard/blob/main/index.html" target="_blank">View source code →</a>
                     </div>
                     </div>
                 </div>
@@ -1613,7 +1614,7 @@
                     <p><strong>This is national data.</strong> Your industry, region, and role may differ significantly. Tech hiring can freeze while healthcare booms. San Francisco and rural Ohio are different markets.</p>
                     <p><strong>The data lags reality.</strong> BLS releases come 4-6 weeks after the reference month. By the time you see it here, conditions may have shifted.</p>
                     <p><strong>The thresholds are calibrated to recent history.</strong> A "bad" quit rate today might have been normal in 2010. The score tells you how now compares to 2015-2025, not to all of history.</p>
-                    <p><strong>There's no confidence interval.</strong> The score of "47" should really be read as "somewhere around 45-50" given measurement uncertainty and model choices.</p>
+                    <p><strong>There's no confidence interval.</strong> <span id="limitationsScoreText">The score should really be read as ±3 points given measurement uncertainty and model choices.</span></p>
                     </div>
                 </div>
             </div>
@@ -1758,6 +1759,7 @@
         
         function updateChartsForTheme() {
             const colors = getThemeColors();
+            const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
             if (mainChartInstance) {
                 mainChartInstance.options.scales.x.grid.color = colors.grid;
                 mainChartInstance.options.scales.y.grid.color = colors.grid;
@@ -1767,11 +1769,17 @@
                 mainChartInstance.options.plugins.tooltip.borderColor = colors.tooltipBorder;
                 mainChartInstance.options.plugins.tooltip.titleColor = colors.tooltipText;
                 mainChartInstance.options.plugins.tooltip.bodyColor = colors.tooltipSecondary;
+                mainChartInstance.data.datasets[0].pointHoverBackgroundColor = isDark ? '#fff' : '#1a1a2e';
                 mainChartInstance.update('none');
             }
-            Object.values(sparklineInstances).forEach(chart => { if (chart) chart.update('none'); });
+            var sparkBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)';
+            Object.values(sparklineInstances).forEach(chart => {
+                if (chart) {
+                    chart.data.datasets[0].backgroundColor = sparkBg;
+                    chart.update('none');
+                }
+            });
             if (typeof scenarioChart !== 'undefined' && scenarioChart) {
-                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
                 scenarioChart.options.scales.x.grid.color = colors.grid;
                 scenarioChart.options.scales.y.grid.color = colors.grid;
                 scenarioChart.options.scales.x.ticks.color = colors.textMuted;
@@ -1787,9 +1795,14 @@
                 // Threshold lines
                 if (ann.scLine70) ann.scLine70.borderColor = isDark ? 'rgba(0,217,160,0.35)' : 'rgba(0,180,130,0.40)';
                 if (ann.scLine55) ann.scLine55.borderColor = isDark ? 'rgba(255,201,64,0.35)' : 'rgba(220,170,40,0.40)';
-                if (ann.scLine47) ann.scLine47.borderColor = isDark ? 'rgba(255,140,64,0.30)' : 'rgba(220,110,40,0.35)';
-                if (ann.scLine32) ann.scLine32.borderColor = isDark ? 'rgba(255,77,106,0.30)' : 'rgba(220,50,80,0.35)';
+                if (ann.scLine40) ann.scLine40.borderColor = isDark ? 'rgba(255,140,64,0.30)' : 'rgba(220,110,40,0.35)';
                 scenarioChart.data.datasets[0].pointHoverBackgroundColor = isDark ? '#fff' : '#1a1a2e';
+                var scBorderColor = isDark ? '#12121a' : '#ffffff';
+                for (var i = 1; i <= 5; i++) {
+                    if (scenarioChart.data.datasets[i]) {
+                        scenarioChart.data.datasets[i].pointBorderColor = scBorderColor;
+                    }
+                }
                 scenarioChart.update('none');
             }
         }
@@ -1970,7 +1983,13 @@
             const dataMonth = data.metadata.dataThrough.split('-');
             const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const dataThrough = monthNames[parseInt(dataMonth[1]) - 1] + ' ' + dataMonth[0];
-            document.getElementById('lastUpdated').textContent = 'Updated ' + formattedDate + ' \u2022 Data through ' + dataThrough;
+            var joltsMonth = data.metadata.joltsThrough ? data.metadata.joltsThrough.split('-') : null;
+            var joltsThrough = joltsMonth ? monthNames[parseInt(joltsMonth[1]) - 1] + ' ' + joltsMonth[0] : null;
+            var updatedText = 'Updated ' + formattedDate + ' \u2022 Data through ' + dataThrough;
+            if (joltsThrough && joltsThrough !== dataThrough) {
+                updatedText += ' (score through ' + joltsThrough + ')';
+            }
+            document.getElementById('lastUpdated').textContent = updatedText;
             
             var dataThroughDate = new Date(parseInt(dataMonth[0]), parseInt(dataMonth[1]) - 1, 1);
             var today = new Date();
@@ -2057,7 +2076,14 @@
             
             var diff = peakScore - currentScore;
             document.getElementById('scoreChange').textContent = '\u2193 ' + diff + ' pts from peak (' + monthlyData.labels[peakIdx] + ')';
-            
+
+            // Update limitations score text dynamically
+            var limEl = document.getElementById('limitationsScoreText');
+            if (limEl) {
+                var lo = Math.max(0, currentScore - 3), hi = Math.min(100, currentScore + 3);
+                limEl.textContent = 'A score of \u201c' + currentScore + '\u201d should really be read as \u201csomewhere around ' + lo + '\u2013' + hi + '\u201d given measurement uncertainty and model choices.';
+            }
+
             // Update action content
             const advice = actionAdvice[tierKey];
             let actionHTML = `<p>${advice.intro}</p>`;
@@ -2104,6 +2130,95 @@
                 '<span class="context-chip"><span class="context-chip-label">COVID low</span> <span class="context-chip-value">' + covidScore + '</span></span>' +
                 '<span class="context-sep">\u00b7</span>' +
                 '<span class="context-chip"><span class="context-chip-label">Similar to</span> <span class="context-chip-value">' + analogText + '</span></span>';
+
+            // ========================================
+            // DYNAMIC NARRATIVE ASSESSMENT
+            // ========================================
+            (function generateNarrativeAssessment() {
+                var el = document.getElementById('narrativeAssessment');
+                if (!el) return;
+
+                // Gather current values from the score index (last valid JOLTS month)
+                var quit = monthlyData.quitRate[currentIdx];
+                var ratio = monthlyData.openingsRatio[currentIdx];
+                var hires = monthlyData.hiresRate[currentIdx];
+                var layoffs = monthlyData.layoffsRate[currentIdx];
+                var unemp = monthlyData.unempRate[currentIdx];
+                var fed = monthlyData.fedRate[currentIdx];
+
+                // Determine 6-month score trend
+                var trendStart = Math.max(0, currentIdx - 5);
+                var trendScores = compositeScores.slice(trendStart, currentIdx + 1).filter(function(s) { return s !== null; });
+                var trendDir = 'flat';
+                if (trendScores.length >= 3) {
+                    var trendDelta = trendScores[trendScores.length - 1] - trendScores[0];
+                    if (trendDelta >= 4) trendDir = 'rising';
+                    else if (trendDelta <= -4) trendDir = 'falling';
+                }
+
+                // Score range description
+                var scoreRange;
+                if (currentScore >= 70) scoreRange = 'the ' + (currentScore >= 80 ? 'low 80s' : 'low 70s');
+                else if (currentScore >= 60) scoreRange = 'the ' + (currentScore >= 65 ? 'upper' : 'low') + ' 60s';
+                else if (currentScore >= 50) scoreRange = 'the ' + (currentScore >= 55 ? 'upper' : 'low') + ' 50s';
+                else if (currentScore >= 40) scoreRange = 'the ' + (currentScore >= 45 ? 'upper' : 'low') + ' 40s';
+                else scoreRange = 'the ' + (currentScore >= 35 ? 'upper' : 'low') + ' 30s';
+
+                // Build headline
+                var headline;
+                if (currentScore >= 70) {
+                    headline = 'The market is strong for workers.';
+                } else if (currentScore >= 55) {
+                    if (trendDir === 'rising') headline = 'The market is recovering.';
+                    else if (trendDir === 'falling') headline = 'The market is cooling.';
+                    else headline = 'The market is decent but not generous.';
+                } else if (currentScore >= 40) {
+                    if (trendDir === 'rising') headline = 'The market is starting to thaw.';
+                    else if (trendDir === 'falling') headline = 'The market continues to soften.';
+                    else headline = 'The market remains slow.';
+                } else {
+                    headline = 'The market is tough for workers right now.';
+                }
+
+                // Build body sentences from actual data
+                var sentences = [];
+
+                // Layoffs context
+                if (layoffs != null) {
+                    if (layoffs <= 1.2) sentences.push('Layoffs at ' + layoffs.toFixed(1) + '% remain historically low \u2014 though concentrated cuts in specific sectors can feel worse than national data suggests.');
+                    else if (layoffs <= 1.5) sentences.push('Layoffs at ' + layoffs.toFixed(1) + '% are moderate, adding pressure in affected sectors.');
+                    else sentences.push('Layoffs have risen to ' + layoffs.toFixed(1) + '%, creating real instability.');
+                }
+
+                // Hiring and quit dynamics
+                if (quit != null && hires != null) {
+                    if (quit < 2.2 && hires < 3.5) sentences.push('Hiring has stalled with quit rates at ' + quit.toFixed(1) + '% and hires at ' + hires.toFixed(1) + '% \u2014 workers staying put, employers not adding.');
+                    else if (quit >= 2.5 && hires >= 3.8) sentences.push('Workers are moving \u2014 quit rate at ' + quit.toFixed(1) + '% and hiring at ' + hires.toFixed(1) + '% signal genuine confidence.');
+                    else if (quit < 2.2) sentences.push('Quit rate stuck near ' + quit.toFixed(1) + '%, reflecting low confidence in outside options.');
+                    else sentences.push('Quit rate at ' + quit.toFixed(1) + '% and hiring at ' + hires.toFixed(1) + '% show a mixed picture.');
+                }
+
+                // Openings ratio
+                if (ratio != null) {
+                    if (ratio < 1.0) sentences.push('More job seekers than openings (ratio: ' + ratio.toFixed(2) + '), tipping leverage toward employers.');
+                    else if (ratio >= 1.5) sentences.push('Strong openings ratio at ' + ratio.toFixed(2) + ' jobs per seeker gives workers real choices.');
+                    else sentences.push('The openings-to-seekers ratio sits at ' + ratio.toFixed(2) + '.');
+                }
+
+                // Fed rate context
+                if (fed != null) {
+                    if (fed < 1.0) sentences.push('Near-zero Fed rates are historically stimulative for hiring.');
+                    else if (fed > 4.0) sentences.push('The Fed rate at ' + fed.toFixed(1) + '% keeps borrowing expensive, weighing on hiring budgets.');
+                    else if (fed > 2.5) sentences.push('The Fed rate at ' + fed.toFixed(1) + '% has eased but hasn\u2019t fully translated to hiring activity yet.');
+                }
+
+                // Score trend
+                if (trendDir === 'rising') sentences.push('The score has been climbing into ' + scoreRange + '.');
+                else if (trendDir === 'falling') sentences.push('The score has drifted down into ' + scoreRange + '.');
+                else sentences.push('The score has held steady in ' + scoreRange + '.');
+
+                el.innerHTML = '<strong>' + headline + '</strong> ' + sentences.join(' ');
+            })();
 
             // ========================================
             // METRIC VALUES
@@ -2254,7 +2369,25 @@
 
             var SC_NARRATIVES = {
                 _invitation: { border: 'var(--accent-blue)', html: '<strong>Four scenarios show the range of plausible futures</strong> \u2014 from continued stasis to genuine recovery. The most likely path is more of the same. Pick one to explore what it means, or build your own.' },
-                now: { get border() { return getScenarioRawColor(SCENARIO_SCORES.now); }, get html() { return '<strong>Current conditions \u2192 ' + ss(SCENARIO_SCORES.now) + ', ' + cs(SCENARIO_SCORES.now) + '.</strong> Workers staying put, hiring slow, job openings below 1.0 per unemployed for the first time since 2021. Fed cuts underway but haven\u2019t reached the real economy. Stability is the primary asset worth protecting.'; } },
+                now: { get border() { return getScenarioRawColor(SCENARIO_SCORES.now); }, get html() {
+                    var parts = ['<strong>Current conditions \u2192 ' + ss(SCENARIO_SCORES.now) + ', ' + cs(SCENARIO_SCORES.now) + '.</strong>'];
+                    // Quit + hiring dynamics
+                    if (CUR.quitRate < 2.2 && CUR.hiresRate < 3.5) parts.push('Workers staying put (quit rate ' + CUR.quitRate.toFixed(1) + '%), hiring slow (' + CUR.hiresRate.toFixed(1) + '%).');
+                    else if (CUR.quitRate >= 2.5) parts.push('Workers are moving \u2014 quit rate at ' + CUR.quitRate.toFixed(1) + '%, hiring at ' + CUR.hiresRate.toFixed(1) + '%.');
+                    else parts.push('Quit rate at ' + CUR.quitRate.toFixed(1) + '%, hiring at ' + CUR.hiresRate.toFixed(1) + '%.');
+                    // Openings ratio
+                    if (CUR.openingsRatio < 1.0) parts.push('More job seekers than openings (ratio: ' + CUR.openingsRatio.toFixed(2) + ').');
+                    else parts.push('Openings ratio at ' + CUR.openingsRatio.toFixed(2) + ' jobs per seeker.');
+                    // Fed rate context
+                    if (CUR.fedRate > 4.0) parts.push('Fed rate at ' + CUR.fedRate.toFixed(1) + '% keeps borrowing costs high.');
+                    else if (CUR.fedRate > 2.5) parts.push('Fed rate at ' + CUR.fedRate.toFixed(1) + '% \u2014 easing, but not yet translating to hiring.');
+                    else if (CUR.fedRate > 0.5) parts.push('Fed rate at ' + CUR.fedRate.toFixed(1) + '% is accommodative.');
+                    // Tier-based advice
+                    if (SCENARIO_SCORES.now >= 55) parts.push('Opportunities exist for those who look.');
+                    else if (SCENARIO_SCORES.now >= 40) parts.push('Stability is the primary asset worth protecting.');
+                    else parts.push('Caution is warranted \u2014 focus on resilience.');
+                    return parts.join(' ');
+                } },
                 frozen: { get border() { return getScenarioRawColor(SCENARIO_SCORES.frozen); }, get html() { return '<strong>Stays Frozen \u2192 ' + ss(SCENARIO_SCORES.frozen) + ', ' + cs(SCENARIO_SCORES.frozen) + '.</strong> Quit rate stuck near 1.9%, hiring flat, Fed pausing around 3.5%. Not a macro crash \u2014 but another year where the aggregate data stays flat while specific sectors keep bleeding. If you\'re in one of them, you already know.'; } },
                 thaw: { get border() { return getScenarioRawColor(SCENARIO_SCORES.thaw); }, get html() { return '<strong>Gradual Thaw \u2192 ' + ss(SCENARIO_SCORES.thaw) + ', ' + cs(SCENARIO_SCORES.thaw) + '.</strong> Fed cuts gain traction \u2014 quits climb to 2.4%, openings back above 1.0 per unemployed. Not a boom, but a functional market where active searching is rewarded. Plausible by late 2027 if policy headwinds ease.'; } },
                 boom: { get border() { return getScenarioRawColor(SCENARIO_SCORES.boom); }, get html() { return '<strong>Bets Pay Off \u2192 ' + ss(SCENARIO_SCORES.boom) + ', ' + cs(SCENARIO_SCORES.boom) + '.</strong> Aggressive Fed cuts spark hiring \u2014 quits climbing past 2.5%, openings ratio back to 1.4. Even in this optimistic case, you only just cross into Good Time to Move. That\u2019s how far below baseline the market currently sits. Expand the sliders to see what has to be true.'; } },
@@ -2364,8 +2497,7 @@
                                     endBoom: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.boom, content: ['\ud83d\ude80 ' + SCENARIO_SCORES.boom], font: { size: 9 }, color: getScenarioRawColor(SCENARIO_SCORES.boom), position: { x: 'start' } },
                                     scLine70: { type: 'line', yMin: 70, yMax: 70, borderColor: isDark ? 'rgba(0,217,160,0.35)' : 'rgba(0,180,130,0.40)', borderWidth: 1.5, borderDash: [6,4] },
                                     scLine55: { type: 'line', yMin: 55, yMax: 55, borderColor: isDark ? 'rgba(255,201,64,0.35)' : 'rgba(220,170,40,0.40)', borderWidth: 1.5, borderDash: [6,4] },
-                                    scLine47: { type: 'line', yMin: 47, yMax: 47, borderColor: isDark ? 'rgba(255,140,64,0.30)' : 'rgba(220,110,40,0.35)', borderWidth: 1.5, borderDash: [6,4] },
-                                    scLine32: { type: 'line', yMin: 32, yMax: 32, borderColor: isDark ? 'rgba(255,77,106,0.30)' : 'rgba(220,50,80,0.35)', borderWidth: 1.5, borderDash: [6,4] }
+                                    scLine40: { type: 'line', yMin: 40, yMax: 40, borderColor: isDark ? 'rgba(255,140,64,0.30)' : 'rgba(220,110,40,0.35)', borderWidth: 1.5, borderDash: [6,4] }
                                 }
                             }
                         },
