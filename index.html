@@ -835,6 +835,7 @@
         .metric-delta.up { color: var(--accent-green-text); background: var(--accent-green-dim); }
         .metric-delta.down { color: var(--accent-red-text); background: var(--accent-red-dim); }
         .metric-delta.flat { color: var(--text-muted); background: var(--bg-tertiary); }
+        .metric-lag { font-size: 0.55rem; color: var(--text-muted); opacity: 0.7; margin-left: 4px; font-weight: 400; }
         .metric-delta.up.inverted { color: var(--accent-red-text); background: var(--accent-red-dim); }
         .metric-delta.down.inverted { color: var(--accent-green-text); background: var(--accent-green-dim); }
 
@@ -1983,13 +1984,7 @@
             const dataMonth = data.metadata.dataThrough.split('-');
             const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             const dataThrough = monthNames[parseInt(dataMonth[1]) - 1] + ' ' + dataMonth[0];
-            var joltsMonth = data.metadata.joltsThrough ? data.metadata.joltsThrough.split('-') : null;
-            var joltsThrough = joltsMonth ? monthNames[parseInt(joltsMonth[1]) - 1] + ' ' + joltsMonth[0] : null;
-            var updatedText = 'Updated ' + formattedDate + ' \u2022 Data through ' + dataThrough;
-            if (joltsThrough && joltsThrough !== dataThrough) {
-                updatedText += ' (score through ' + joltsThrough + ')';
-            }
-            document.getElementById('lastUpdated').textContent = updatedText;
+            document.getElementById('lastUpdated').textContent = 'Updated ' + formattedDate + ' \u2022 Data through ' + dataThrough;
             
             var dataThroughDate = new Date(parseInt(dataMonth[0]), parseInt(dataMonth[1]) - 1, 1);
             var today = new Date();
@@ -2022,6 +2017,16 @@
                 var hires = monthlyData.hiresRate[idx], layoffs = monthlyData.layoffsRate[idx];
                 var unemp = monthlyData.unempRate[idx], fed = monthlyData.fedRate[idx];
                 var wage = monthlyData.wageGrowth[idx], lfpr = monthlyData.lfpr[idx];
+                // Carry forward JOLTS from previous month if null (JOLTS data lags ~1 month)
+                if (quit == null || ratio == null || hires == null || layoffs == null) {
+                    for (var p = idx - 1; p >= 0; p--) {
+                        if (quit == null && monthlyData.quitRate[p] != null) quit = monthlyData.quitRate[p];
+                        if (ratio == null && monthlyData.openingsRatio[p] != null) ratio = monthlyData.openingsRatio[p];
+                        if (hires == null && monthlyData.hiresRate[p] != null) hires = monthlyData.hiresRate[p];
+                        if (layoffs == null && monthlyData.layoffsRate[p] != null) layoffs = monthlyData.layoffsRate[p];
+                        if (quit != null && ratio != null && hires != null && layoffs != null) break;
+                    }
+                }
                 if (quit == null || ratio == null) return null;
                 var qs = Math.min(1, Math.max(0, (quit - 1.5) / 1.5));
                 var rs = Math.min(1, Math.max(0, (ratio - 0.3) / 1.7));
@@ -2233,7 +2238,17 @@
                 wageGrowth: monthlyData.wageGrowth[currentIdx],
                 lfpr: monthlyData.lfpr[currentIdx]
             };
-            
+
+            // Carry forward JOLTS if null for current month (JOLTS data lags ~1 month)
+            var joltsCarried = {};
+            ['quitRate', 'openingsRatio', 'hiresRate', 'layoffsRate'].forEach(function(k) {
+                if (currentMetrics[k] == null) {
+                    for (var p = currentIdx - 1; p >= 0; p--) {
+                        if (monthlyData[k][p] != null) { currentMetrics[k] = monthlyData[k][p]; joltsCarried[k] = true; break; }
+                    }
+                }
+            });
+
             var prevIdx = currentIdx > 0 ? currentIdx - 1 : currentIdx;
             var prevMetrics = {
                 quitRate: monthlyData.quitRate[prevIdx],
@@ -2273,13 +2288,14 @@
                 return '<span class="metric-delta ' + dir + inv + '">' + sign + d.toFixed(decimals) + '</span>';
             }
             
-            document.getElementById('quitValue').innerHTML = currentMetrics.quitRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.quitRate, prevMetrics.quitRate, 1);
+            var lagTag = '<span class="metric-lag">(prior mo.)</span>';
+            document.getElementById('quitValue').innerHTML = currentMetrics.quitRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.quitRate, prevMetrics.quitRate, 1) + (joltsCarried.quitRate ? lagTag : '');
             document.getElementById('quitValue').className = 'metric-value ' + getMetricClass(currentMetrics.quitRate, 'quitRate');
-            document.getElementById('ratioValue').innerHTML = currentMetrics.openingsRatio.toFixed(2) + getDeltaHTML(currentMetrics.openingsRatio, prevMetrics.openingsRatio, 2);
+            document.getElementById('ratioValue').innerHTML = currentMetrics.openingsRatio.toFixed(2) + getDeltaHTML(currentMetrics.openingsRatio, prevMetrics.openingsRatio, 2) + (joltsCarried.openingsRatio ? lagTag : '');
             document.getElementById('ratioValue').className = 'metric-value ' + getMetricClass(currentMetrics.openingsRatio, 'openingsRatio');
-            document.getElementById('hiresValue').innerHTML = currentMetrics.hiresRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.hiresRate, prevMetrics.hiresRate, 1);
+            document.getElementById('hiresValue').innerHTML = currentMetrics.hiresRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.hiresRate, prevMetrics.hiresRate, 1) + (joltsCarried.hiresRate ? lagTag : '');
             document.getElementById('hiresValue').className = 'metric-value ' + getMetricClass(currentMetrics.hiresRate, 'hiresRate');
-            document.getElementById('layoffsValue').innerHTML = currentMetrics.layoffsRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.layoffsRate, prevMetrics.layoffsRate, 1, true);
+            document.getElementById('layoffsValue').innerHTML = currentMetrics.layoffsRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.layoffsRate, prevMetrics.layoffsRate, 1, true) + (joltsCarried.layoffsRate ? lagTag : '');
             document.getElementById('layoffsValue').className = 'metric-value ' + getMetricClass(currentMetrics.layoffsRate, 'layoffsRate');
             document.getElementById('unempValue').innerHTML = (currentMetrics.unempRate || 0).toFixed(1) + '%' + getDeltaHTML(currentMetrics.unempRate, prevMetrics.unempRate, 1, true);
             document.getElementById('unempValue').className = 'metric-value ' + getMetricClass(currentMetrics.unempRate || 5, 'unempRate');
