@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "lastUpdated": "2026-05-14",
-    "dataThrough": "2026-04",
-    "joltsThrough": "2026-03",
+    "lastUpdated": "2026-06-07",
+    "dataThrough": "2026-05",
+    "joltsThrough": "2026-04",
     "description": "Labor market indicators for job search timing decisions"
   },
   "labels": [
@@ -141,7 +141,8 @@
     "Jan-26",
     "Feb-26",
     "Mar-26",
-    "Apr-26"
+    "Apr-26",
+    "May-26"
   ],
   "quitRate": [
     2.0,
@@ -279,6 +280,7 @@
     2.0,
     1.9,
     2.0,
+    1.9,
     null
   ],
   "openingsRatio": [
@@ -417,6 +419,7 @@
     0.98,
     0.91,
     0.95,
+    1.03,
     null
   ],
   "hiresRate": [
@@ -555,6 +558,7 @@
     3.4,
     3.1,
     3.5,
+    3.2,
     null
   ],
   "layoffsRate": [
@@ -693,6 +697,7 @@
     1.0,
     1.1,
     1.2,
+    1.1,
     null
   ],
   "unempRate": [
@@ -830,6 +835,7 @@
     4.4,
     4.3,
     4.4,
+    4.3,
     4.3,
     4.3
   ],
@@ -969,7 +975,8 @@
     3.64,
     3.64,
     3.64,
-    3.64
+    3.64,
+    3.63
   ],
   "wageGrowth": [
     null,
@@ -1107,7 +1114,8 @@
     3.7,
     3.7,
     3.4,
-    3.6
+    3.6,
+    3.4
   ],
   "lfpr": [
     81.0,
@@ -1245,6 +1253,7 @@
     84.0,
     83.9,
     83.8,
-    83.8
+    83.8,
+    83.9
   ]
 }
