@@ -774,8 +774,43 @@
             gap: 16px;
         }
 
-        /* PHASE 8: Metrics Summary (mobile-only) */
-        .metrics-summary { display: none; }
+        /* Movers strip — which metrics drove the score this month */
+        .metric-movers {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px;
+            padding: 12px 16px; margin-bottom: 24px;
+            background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px;
+            font-size: 0.75rem;
+            transition: background var(--theme-transition), border-color var(--theme-transition);
+        }
+        .movers-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); white-space: nowrap; }
+        .movers-items { display: inline-flex; flex-wrap: wrap; gap: 6px 14px; }
+        .mover { display: inline-flex; align-items: center; gap: 2px; }
+        .mover-name { color: var(--text-secondary); transition: color var(--theme-transition); }
+
+        /* Metrics summary strip — all viewports; card grids expand on demand */
+        .metrics-summary {
+            display: block;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 12px;
+            transition: background var(--theme-transition), border-color var(--theme-transition);
+        }
+
+        .metrics-grid-wrapper {
+            display: grid;
+            grid-template-rows: 1fr;
+            opacity: 1;
+            transition: grid-template-rows 0.4s var(--ease-out-quart), opacity 0.3s var(--ease-out-quart);
+        }
+
+        .metrics-grid-wrapper .metrics-grid { overflow: hidden; }
+
+        .metrics-grid-wrapper.grid-collapsed {
+            grid-template-rows: 0fr;
+            opacity: 0;
+        }
 
         .summary-items { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 10px; }
 
@@ -1154,33 +1189,6 @@
             .preset-pill, .slider-toggle { padding: 6px 10px; font-size: 0.65rem; }
             .nav-inner { gap: 16px; }
             .sticky-nav { padding: 0 16px; }
-
-            /* PHASE 8: Mobile metrics collapse */
-            .metrics-summary {
-                display: block;
-                padding: 12px 16px;
-                background: var(--bg-secondary);
-                border: 1px solid var(--border-color);
-                border-radius: 10px;
-                margin-bottom: 12px;
-                transition: background var(--theme-transition), border-color var(--theme-transition);
-            }
-
-            .metrics-grid-wrapper {
-                display: grid;
-                grid-template-rows: 1fr;
-                opacity: 1;
-                transition: grid-template-rows 0.4s var(--ease-out-quart), opacity 0.3s var(--ease-out-quart);
-            }
-
-            .metrics-grid-wrapper .metrics-grid {
-                overflow: hidden;
-            }
-
-            .metrics-grid-wrapper.mobile-collapsed {
-                grid-template-rows: 0fr;
-                opacity: 0;
-            }
         }
 
         @media (max-width: 480px) {
@@ -1406,6 +1414,12 @@
                 <p class="sr-only" id="mainChartDesc">Historical composite score tracking labor market conditions for job seekers. Higher scores indicate better conditions for finding new employment.</p>
             </div>
         </section>
+
+        <!-- What moved the score this month -->
+        <div class="metric-movers" id="metricMovers" hidden>
+            <span class="movers-label">Moved this month</span>
+            <span class="movers-items" id="moversItems"></span>
+        </div>
 
         <!-- Core Metrics -->
         <section class="tier-section" id="coreSection" data-nav-section="metrics">
@@ -1920,25 +1934,26 @@
             localStorage.setItem('chartAnnotations', annotationsVisible);
         }
 
-        // PHASE 8: Toggle metrics on mobile
+        // Toggle a tier's metric card grid (all viewports); remembers the preference
         function toggleMetrics(sectionId) {
             var section = document.getElementById(sectionId);
             var wrapper = section.querySelector('.metrics-grid-wrapper');
             var grid = section.querySelector('.metrics-grid');
             var toggle = section.querySelector('.summary-toggle');
-            var isCollapsed = wrapper.classList.contains('mobile-collapsed');
+            var isCollapsed = wrapper.classList.contains('grid-collapsed');
 
             if (isCollapsed) {
-                wrapper.classList.remove('mobile-collapsed');
+                wrapper.classList.remove('grid-collapsed');
                 toggle.querySelector('.toggle-text').textContent = 'Hide details';
                 toggle.setAttribute('aria-expanded', 'true');
                 section.classList.add('metrics-expanded');
             } else {
-                wrapper.classList.add('mobile-collapsed');
+                wrapper.classList.add('grid-collapsed');
                 toggle.querySelector('.toggle-text').textContent = 'Show ' + grid.querySelectorAll('.metric-card').length + ' metrics';
                 toggle.setAttribute('aria-expanded', 'false');
                 section.classList.remove('metrics-expanded');
             }
+            localStorage.setItem('metricsOpen-' + sectionId, String(isCollapsed));
         }
 
         // Restore UI state on load
@@ -2435,6 +2450,44 @@
             ]);
 
             // ========================================
+            // MOVERS — which metrics drove the score this month,
+            // ranked by contribution to the composite, shown in real units
+            // ========================================
+            (function renderMovers() {
+                var el = document.getElementById('metricMovers'), itemsEl = document.getElementById('moversItems');
+                if (!el || !itemsEl) return;
+                var defs = [
+                    { key: 'quitRate', name: 'Quit Rate', norm: function(v) { return (v - 1.5) / 1.5; }, weight: 0.15, dec: 1, unit: '%', inv: false },
+                    { key: 'openingsRatio', name: 'Jobs per Seeker', norm: function(v) { return (v - 0.3) / 1.7; }, weight: 0.15, dec: 2, unit: '', inv: false },
+                    { key: 'hiresRate', name: 'Hiring Rate', norm: function(v) { return (v - 2.0) / 2.5; }, weight: 0.15, dec: 1, unit: '%', inv: false },
+                    { key: 'layoffsRate', name: 'Layoffs', norm: function(v) { return (2.5 - v) / 1.7; }, weight: 0.15, dec: 1, unit: '%', inv: true },
+                    { key: 'unempRate', name: 'Unemployment', norm: function(v) { return (7.0 - v) / 3.5; }, weight: 0.1, dec: 1, unit: '%', inv: true },
+                    { key: 'fedRate', name: 'Fed Rate', norm: function(v) { return (5.5 - v) / 5.5; }, weight: 0.1, dec: 2, unit: '%', inv: true },
+                    { key: 'wageGrowth', name: 'Wage Growth', norm: function(v) { return (v - 2.0) / 3.0; }, weight: 0.1, dec: 1, unit: '%', inv: false },
+                    { key: 'lfpr', name: 'Participation', norm: function(v) { return (v - 79) / 4.0; }, weight: 0.1, dec: 1, unit: '%', inv: false }
+                ];
+                function clampN(v) { return Math.min(1, Math.max(0, v)); }
+                var movers = [];
+                defs.forEach(function(d) {
+                    var cur = currentMetrics[d.key], prev = prevMetrics[d.key];
+                    if (cur == null || prev == null) return;
+                    var contrib = (clampN(d.norm(cur)) - clampN(d.norm(prev))) * d.weight * 100;
+                    var rawDelta = cur - prev;
+                    if (Math.abs(rawDelta) < Math.pow(10, -d.dec) / 2) return;
+                    movers.push({ d: d, contrib: contrib, rawDelta: rawDelta });
+                });
+                movers.sort(function(a, b) { return Math.abs(b.contrib) - Math.abs(a.contrib); });
+                var top = movers.slice(0, 3).filter(function(m) { return Math.abs(m.contrib) > 0.05; });
+                if (!top.length) { el.hidden = true; return; }
+                itemsEl.innerHTML = top.map(function(m) {
+                    var sign = m.rawDelta > 0 ? '+' : '';
+                    var dirClass = (m.rawDelta > 0 ? 'up' : 'down') + (m.d.inv ? ' inverted' : '');
+                    return '<span class="mover"><span class="mover-name">' + m.d.name + '</span> <span class="metric-delta ' + dirClass + '">' + sign + m.rawDelta.toFixed(m.d.dec) + m.d.unit + '</span></span>';
+                }).join('');
+                el.hidden = false;
+            })();
+
+            // ========================================
             // SCENARIOS
             // ========================================
             var CUR = { quitRate: currentMetrics.quitRate, openingsRatio: currentMetrics.openingsRatio, hiresRate: currentMetrics.hiresRate, layoffsRate: currentMetrics.layoffsRate, unempRate: currentMetrics.unempRate, fedRate: currentMetrics.fedRate, wageGrowth: currentMetrics.wageGrowth, lfpr: currentMetrics.lfpr };
@@ -2862,13 +2915,23 @@
             });
 
             // ========================================
-            // PHASE 8: Collapse metrics on mobile (after charts render)
+            // Metric card grids start collapsed behind their summary strips
+            // (all viewports); a remembered preference reopens them
             // ========================================
-            if (window.innerWidth <= 768) {
-                document.querySelectorAll('.metrics-grid-wrapper').forEach(function(wrapper) {
-                    wrapper.classList.add('mobile-collapsed');
-                });
-            }
+            document.querySelectorAll('.tier-section').forEach(function(section) {
+                var wrapper = section.querySelector('.metrics-grid-wrapper');
+                if (!wrapper) return;
+                if (localStorage.getItem('metricsOpen-' + section.id) === 'true') {
+                    section.classList.add('metrics-expanded');
+                    var toggle = section.querySelector('.summary-toggle');
+                    if (toggle) {
+                        toggle.querySelector('.toggle-text').textContent = 'Hide details';
+                        toggle.setAttribute('aria-expanded', 'true');
+                    }
+                } else {
+                    wrapper.classList.add('grid-collapsed');
+                }
+            });
 
             // Remove loading state
             document.body.classList.remove('js-loading');
