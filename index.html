@@ -2098,15 +2098,33 @@
             else if (currentScore >= 40) { tierClass = 'build-your-position'; tierKey = 'build-your-position'; }
             else { tierClass = 'tough-market'; tierKey = 'tough-market'; }
             
-            document.getElementById('currentScore').textContent = currentScore;
             document.getElementById('currentScore').className = 'score-value ' + tierClass;
             document.getElementById('scoreVerdict').className = 'score-verdict ' + tierClass;
             document.getElementById('verdictText').textContent = tierNames[tierKey];
             document.getElementById('actionSection').className = 'action-section ' + tierClass;
 
-            // Anchor the spectrum marker at the current score — the scale is signal, not decoration
-            var scoreMarker = document.getElementById('scoreMarker');
-            if (scoreMarker) scoreMarker.style.left = Math.min(100, Math.max(0, currentScore)) + '%';
+            // One-time settle: the score counts up once and the spectrum marker
+            // rides along to its resting place. Skipped under reduced motion.
+            (function settleScore() {
+                var scoreEl = document.getElementById('currentScore');
+                var scoreMarker = document.getElementById('scoreMarker');
+                function setScoreDisplay(v) {
+                    scoreEl.textContent = v;
+                    if (scoreMarker) scoreMarker.style.left = Math.min(100, Math.max(0, v)) + '%';
+                }
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    setScoreDisplay(currentScore);
+                    return;
+                }
+                var start = null, duration = 700;
+                requestAnimationFrame(function step(ts) {
+                    if (start === null) start = ts;
+                    var t = Math.min(1, (ts - start) / duration);
+                    var eased = 1 - Math.pow(1 - t, 4);
+                    setScoreDisplay(Math.round(currentScore * eased));
+                    if (t < 1) requestAnimationFrame(step);
+                });
+            })();
             
             var accentColors = { 'good-time': 'var(--accent-green)', 'worth-exploring': 'var(--accent-yellow)', 'build-your-position': 'var(--accent-orange)', 'tough-market': 'var(--accent-red)' };
             document.getElementById('actionSection').style.borderLeft = '3px solid ' + accentColors[tierKey];
@@ -2656,11 +2674,11 @@
             function selectPreset(key) {
                 activePreset = key;
                 document.querySelectorAll('.preset-pill').forEach(function(p) { var a = p.dataset.key === key; p.classList.toggle('active', a); p.setAttribute('aria-pressed', a); });
+                // Sliders stay where the user left them (open or closed) — presets
+                // only sync the values; the panel opens via its own toggle
                 setSliders(SCENARIOS[key] || CUR);
                 updateChartEmphasis(key);
                 setNarrative(SC_NARRATIVES[key] || SC_NARRATIVES.now);
-                var panel = document.getElementById('slider-panel'), toggle = document.getElementById('slider-toggle');
-                if (panel.classList.contains('collapsed')) { panel.classList.remove('collapsed'); toggle.classList.add('open'); toggle.setAttribute('aria-expanded', 'true'); }
             }
 
             function updateChartEmphasis(key) {
