@@ -220,7 +220,7 @@
 
         .nav-link {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: var(--text-muted);
@@ -291,7 +291,7 @@
         }
 
         .next-update {
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             color: var(--text-muted);
             transition: color var(--theme-transition);
         }
@@ -300,7 +300,7 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             margin-top: 4px;
         }
 
@@ -324,7 +324,7 @@
             align-items: center;
             gap: 6px;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.08em;
@@ -375,7 +375,7 @@
 
         .about-header h2 {
             font-family: 'Instrument Serif', serif;
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             font-weight: 400;
             color: var(--text-primary);
             display: flex;
@@ -406,7 +406,7 @@
         .about-section.collapsed .about-content { display: none; }
 
         .about-main p {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
             line-height: 1.7;
             margin-bottom: 10px;
@@ -572,7 +572,7 @@
         }
 
         .action-content {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
             line-height: 1.7;
             transition: color var(--theme-transition);
@@ -599,7 +599,7 @@
         }
 
         .vibe-validation {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--text-secondary);
             padding: 8px 0 8px 16px;
             margin: 12px 0;
@@ -693,7 +693,9 @@
             flex-wrap: wrap;
         }
 
-        .chart-title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); transition: color var(--theme-transition); }
+        .chart-title { font-family: 'Instrument Serif', serif; font-size: 1.3rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; color: var(--text-primary); transition: color var(--theme-transition); }
+
+        .chart-range { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; transition: color var(--theme-transition); }
 
         .chart-toggle {
             display: flex;
@@ -745,7 +747,7 @@
         }
 
         .tier-badge {
-            font-size: 0.55rem;
+            font-size: 0.6rem;
             font-weight: 700;
             padding: 4px 8px;
             border-radius: 4px;
@@ -756,7 +758,7 @@
             border: 1px solid var(--accent-blue-border);
         }
 
-        .tier-title { font-size: 0.85rem; font-weight: 500; color: var(--text-primary); }
+        .tier-title { font-family: 'Instrument Serif', serif; font-size: 1.3rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; color: var(--text-primary); }
         .tier-subtitle { font-size: 0.75rem; color: var(--text-muted); margin-left: 4px; }
 
         /* Metrics Grid */
@@ -842,18 +844,18 @@
         .metric-delta.down.inverted { color: var(--accent-green-text); background: var(--accent-green-dim); }
 
         .metric-chart-wrapper { display: flex; align-items: stretch; gap: 6px; margin-top: 8px; width: 100%; max-width: 100%; }
-        .metric-chart { height: 80px; flex: 1; min-width: 0; max-width: calc(100% - 38px); position: relative; }
+        .metric-chart { height: 80px; flex: 1; min-width: 0; max-width: calc(100% - 40px); position: relative; }
 
         .sparkline-range {
             display: flex; flex-direction: column; justify-content: space-between;
-            font-size: 0.55rem; color: var(--text-muted); text-align: right; padding: 2px 0; min-width: 32px;
+            font-size: 0.65rem; color: var(--text-muted); text-align: right; padding: 2px 0; min-width: 34px;
         }
 
         .sparkline-range .max, .sparkline-range .min { font-variant-numeric: tabular-nums; }
 
         .sparkline-time {
             display: flex; justify-content: space-between;
-            font-size: 0.6rem; color: var(--text-muted); margin-top: 4px; padding: 0 2px;
+            font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; padding: 0 2px;
         }
 
         /* Scenarios Section */
@@ -873,10 +875,10 @@
             transition: border-color var(--theme-transition);
         }
 
-        .scenarios-title { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+        .scenarios-title { font-family: 'Instrument Serif', serif; font-size: 1.3rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; color: var(--text-primary); }
 
         .narrative-assessment {
-            font-size: 0.8rem; color: var(--text-secondary); line-height: 1.75;
+            font-size: 0.85rem; color: var(--text-secondary); line-height: 1.75;
             padding: 14px 16px; background: var(--bg-tertiary); border-radius: 8px;
             border: 1px solid var(--border-color); margin-bottom: 16px;
             transition: background var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition);
@@ -884,7 +886,7 @@
         .narrative-assessment strong { color: var(--text-primary); }
 
         .narrative-interpretation {
-            font-size: 0.8rem; color: var(--text-secondary); line-height: 1.75;
+            font-size: 0.85rem; color: var(--text-secondary); line-height: 1.75;
             padding: 14px 16px; background: var(--bg-tertiary); border-radius: 8px;
             border-left: 3px solid var(--accent-blue);
             transition: border-color 0.3s ease, background var(--theme-transition), color var(--theme-transition);
@@ -966,7 +968,7 @@
         .slider-group { padding: 12px 16px; background: var(--bg-tertiary); border-radius: 8px; transition: background var(--theme-transition); }
         .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
         .slider-name { font-size: 0.7rem; color: var(--text-primary); font-weight: 500; }
-        .slider-vals { display: flex; align-items: center; gap: 5px; font-size: 0.68rem; }
+        .slider-vals { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; }
         .slider-cur { color: var(--text-muted); }
         .slider-arrow { color: var(--text-muted); font-size: 0.6rem; }
         .slider-proj { font-weight: 600; }
@@ -998,7 +1000,9 @@
         }
 
         .accordion-header {
-            font-size: 0.9rem; font-weight: 600; color: var(--text-primary);
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.3rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em;
+            color: var(--text-primary);
             padding: 20px 24px; border-bottom: 1px solid var(--border-color);
         }
 
@@ -1043,9 +1047,9 @@
         .accordion-item.open .accordion-panel { grid-template-rows: 1fr; }
         .accordion-item.open .accordion-panel-inner { padding-bottom: 20px; }
 
-        .accordion-panel p { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .accordion-panel p { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
         .accordion-panel p:last-child { margin-bottom: 0; }
-        .accordion-panel ul { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.7; margin-left: 20px; margin-bottom: 12px; }
+        .accordion-panel ul { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.7; margin-left: 20px; margin-bottom: 12px; }
         .accordion-panel li { margin-bottom: 6px; }
         .accordion-panel strong { color: var(--text-primary); }
         .accordion-panel a { color: var(--accent-blue); text-decoration: none; }
@@ -1127,7 +1131,7 @@
             .metrics-grid { grid-template-columns: 1fr; }
             .header-top { flex-direction: column; gap: 12px; }
             .header-meta { text-align: left; }
-            .chart-legend { gap: 8px; font-size: 0.6rem; }
+            .chart-legend { gap: 8px; font-size: 0.65rem; }
             .legend-item { gap: 4px; }
             .legend-dot { width: 8px; height: 8px; }
             .score-header { flex-direction: column; gap: 16px; }
@@ -1179,8 +1183,8 @@
             .action-list li { font-size: 0.75rem; }
             .metric-header { flex-direction: column; gap: 8px; }
             .metric-value { font-size: 1.5rem; }
-            .sparkline-range { font-size: 0.6rem; min-width: 28px; }
-            .metric-chart { max-width: calc(100% - 34px); }
+            .sparkline-range { min-width: 30px; }
+            .metric-chart { max-width: calc(100% - 36px); }
             .metric-card { padding: 16px; }
             .nav-inner { gap: 12px; }
         }
@@ -1378,7 +1382,8 @@
         <section class="main-chart" data-nav-section="chart">
             <div class="chart-header">
                 <div class="chart-title-row">
-                    <div class="chart-title" id="chartTitle">How has the market shifted?</div>
+                    <div class="chart-title">How has the market shifted?</div>
+                    <span class="chart-range" id="chartRange"></span>
                     <label class="chart-toggle">
                         <input type="checkbox" id="annotationsToggle" onchange="toggleChartAnnotations()">
                         <span class="toggle-label">Show key moments</span>
@@ -2053,7 +2058,7 @@
 
             var firstLabel = monthlyData.labels[0];
             var lastLabel = monthlyData.labels[monthlyData.labels.length - 1];
-            document.getElementById('chartTitle').textContent = 'How has the market shifted? (' + firstLabel + ' \u2013 ' + lastLabel + ')';
+            document.getElementById('chartRange').textContent = firstLabel + ' \u2013 ' + lastLabel;
 
             // Composite score calculation
             function calculateCompositeScore(idx) {
@@ -2578,11 +2583,11 @@
                                 annotations: {
                                     branchLine: { type: 'line', xMin: SC_LAST_HIST, xMax: SC_LAST_HIST, borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', borderWidth: 1, borderDash: [4,4] },
                                     projZone: { type: 'box', xMin: SC_LAST_HIST, xMax: SC_TOTAL - 1, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', borderWidth: 0 },
-                                    projLabel: { type: 'label', xValue: SC_LAST_HIST + 3, yValue: 94, content: ['12-MONTH HORIZON'], font: { size: 8, weight: 600, family: "'JetBrains Mono'" }, color: isDark ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.25)' },
-                                    endFrozen: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.frozen, content: ['\ud83e\udd76 ' + SCENARIO_SCORES.frozen], font: { size: 9 }, color: getScenarioTextColor(SCENARIO_SCORES.frozen), position: { x: 'start' } },
-                                    endThaw: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.thaw, content: ['\ud83c\udf24\ufe0f ' + SCENARIO_SCORES.thaw], font: { size: 9 }, color: getScenarioTextColor(SCENARIO_SCORES.thaw), position: { x: 'start' } },
-                                    endWorse: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.worse, content: ['\u26c8\ufe0f ' + SCENARIO_SCORES.worse], font: { size: 9 }, color: getScenarioTextColor(SCENARIO_SCORES.worse), position: { x: 'start' } },
-                                    endBoom: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.boom, content: ['\ud83d\ude80 ' + SCENARIO_SCORES.boom], font: { size: 9 }, color: getScenarioTextColor(SCENARIO_SCORES.boom), position: { x: 'start' } },
+                                    projLabel: { type: 'label', xValue: SC_LAST_HIST + 3, yValue: 94, content: ['12-MONTH HORIZON'], font: { size: 9, weight: 600, family: "'JetBrains Mono'" }, color: isDark ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.25)' },
+                                    endFrozen: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.frozen, content: ['\ud83e\udd76 ' + SCENARIO_SCORES.frozen], font: { size: 10 }, color: getScenarioTextColor(SCENARIO_SCORES.frozen), position: { x: 'start' } },
+                                    endThaw: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.thaw, content: ['\ud83c\udf24\ufe0f ' + SCENARIO_SCORES.thaw], font: { size: 10 }, color: getScenarioTextColor(SCENARIO_SCORES.thaw), position: { x: 'start' } },
+                                    endWorse: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.worse, content: ['\u26c8\ufe0f ' + SCENARIO_SCORES.worse], font: { size: 10 }, color: getScenarioTextColor(SCENARIO_SCORES.worse), position: { x: 'start' } },
+                                    endBoom: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.boom, content: ['\ud83d\ude80 ' + SCENARIO_SCORES.boom], font: { size: 10 }, color: getScenarioTextColor(SCENARIO_SCORES.boom), position: { x: 'start' } },
                                     scLine70: { type: 'line', yMin: 70, yMax: 70, borderColor: isDark ? 'rgba(0,217,160,0.35)' : 'rgba(0,160,112,0.45)', borderWidth: 1.5, borderDash: [6,4] },
                                     scLine55: { type: 'line', yMin: 55, yMax: 55, borderColor: isDark ? 'rgba(255,201,64,0.35)' : 'rgba(180,140,0,0.45)', borderWidth: 1.5, borderDash: [6,4] },
                                     scLine40: { type: 'line', yMin: 40, yMax: 40, borderColor: isDark ? 'rgba(255,140,64,0.30)' : 'rgba(210,105,30,0.45)', borderWidth: 1.5, borderDash: [6,4] }
@@ -2780,7 +2785,7 @@
                         } }
                     },
                     scales: {
-                        x: { grid: { color: tc.grid, drawBorder: false }, ticks: { maxTicksLimit: window.innerWidth < 480 ? 5 : window.innerWidth < 768 ? 8 : 12, maxRotation: 0, font: { size: window.innerWidth < 480 ? 8 : 10 }, color: tc.textMuted } },
+                        x: { grid: { color: tc.grid, drawBorder: false }, ticks: { maxTicksLimit: window.innerWidth < 480 ? 5 : window.innerWidth < 768 ? 8 : 12, maxRotation: 0, font: { size: window.innerWidth < 480 ? 9 : 10 }, color: tc.textMuted } },
                         y: { min: 0, max: 100, grid: { color: tc.grid, drawBorder: false }, ticks: { stepSize: 20, color: tc.textMuted } }
                     }
                 }
