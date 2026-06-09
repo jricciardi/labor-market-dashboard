@@ -348,9 +348,9 @@
         [data-theme="light"] .theme-toggle .icon-moon { display: none; }
 
         .subtitle {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
-            max-width: 700px;
+            max-width: 72ch;
         }
 
         /* About Section — plain prose on the page, no card chrome */
@@ -377,7 +377,7 @@
 
         .about-header h2 {
             font-family: 'Instrument Serif', serif;
-            font-size: 1.3rem;
+            font-size: 1.6rem;
             font-weight: 400;
             color: var(--text-primary);
             display: flex;
@@ -406,10 +406,10 @@
         .about-section.collapsed .about-content { display: none; }
 
         .about-main p {
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: var(--text-secondary);
-            line-height: 1.7;
-            margin-bottom: 10px;
+            line-height: 1.75;
+            margin-bottom: 12px;
             transition: color var(--theme-transition);
         }
 
@@ -550,9 +550,10 @@
         }
 
         .action-content {
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: var(--text-secondary);
-            line-height: 1.7;
+            line-height: 1.75;
+            max-width: 72ch;
             transition: color var(--theme-transition);
         }
 
@@ -577,7 +578,7 @@
         }
 
         .vibe-validation {
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: var(--text-secondary);
             padding: 8px 0 8px 16px;
             margin: 12px 0;
@@ -669,7 +670,7 @@
             flex-wrap: wrap;
         }
 
-        .chart-title { font-family: 'Instrument Serif', serif; font-size: 1.3rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; color: var(--text-primary); transition: color var(--theme-transition); }
+        .chart-title { font-family: 'Instrument Serif', serif; font-size: 1.6rem; font-weight: 400; line-height: 1.15; letter-spacing: -0.01em; color: var(--text-primary); transition: color var(--theme-transition); }
 
         .chart-range { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; transition: color var(--theme-transition); }
 
@@ -723,18 +724,18 @@
         }
 
         .tier-badge {
-            font-size: 0.6rem;
+            font-size: 0.7rem;
             font-weight: 700;
             padding: 4px 8px;
             border-radius: 4px;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.08em;
             background: var(--accent-blue-dim);
             color: var(--accent-blue);
             border: 1px solid var(--accent-blue-border);
         }
 
-        .tier-title { font-family: 'Instrument Serif', serif; font-size: 1.3rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; color: var(--text-primary); }
+        .tier-title { font-family: 'Instrument Serif', serif; font-size: 1.6rem; font-weight: 400; line-height: 1.15; letter-spacing: -0.01em; color: var(--text-primary); }
         .tier-subtitle { font-size: 0.75rem; color: var(--text-muted); margin-left: 4px; }
 
         /* Metrics Grid */
@@ -894,18 +895,18 @@
             transition: border-color var(--theme-transition);
         }
 
-        .scenarios-title { font-family: 'Instrument Serif', serif; font-size: 1.3rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; color: var(--text-primary); }
+        .scenarios-title { font-family: 'Instrument Serif', serif; font-size: 1.6rem; font-weight: 400; line-height: 1.15; letter-spacing: -0.01em; color: var(--text-primary); }
 
         .narrative-assessment {
-            font-size: 0.85rem; color: var(--text-secondary); line-height: 1.75;
-            margin-bottom: 16px; max-width: 78ch;
+            font-size: 0.95rem; color: var(--text-secondary); line-height: 1.75;
+            margin-bottom: 16px; max-width: 72ch;
             transition: color var(--theme-transition);
         }
         .narrative-assessment strong { color: var(--text-primary); }
 
         .narrative-interpretation {
-            font-size: 0.85rem; color: var(--text-secondary); line-height: 1.75;
-            padding: 4px 0 4px 16px;
+            font-size: 0.95rem; color: var(--text-secondary); line-height: 1.75;
+            padding: 4px 0 4px 16px; max-width: 72ch;
             border-left: 3px solid var(--accent-blue);
             transition: border-color 0.3s ease, color var(--theme-transition);
         }
@@ -1018,7 +1019,7 @@
 
         .accordion-header {
             font-family: 'Instrument Serif', serif;
-            font-size: 1.3rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em;
+            font-size: 1.6rem; font-weight: 400; line-height: 1.15; letter-spacing: -0.01em;
             color: var(--text-primary);
             padding: 0 0 12px; border-bottom: 1px solid var(--border-color);
         }
@@ -1028,7 +1029,7 @@
         .accordion-trigger {
             display: flex; justify-content: space-between; align-items: center;
             width: 100%; padding: 16px 0; background: none; border: none;
-            color: var(--text-primary); font-family: inherit; font-size: 0.8rem;
+            color: var(--text-primary); font-family: inherit; font-size: 0.875rem;
             font-weight: 500; cursor: pointer; text-align: left;
         }
 
@@ -1063,9 +1064,9 @@
         .accordion-item.open .accordion-panel { grid-template-rows: 1fr; }
         .accordion-item.open .accordion-panel-inner { padding-bottom: 20px; }
 
-        .accordion-panel p { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .accordion-panel p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.75; margin-bottom: 12px; }
         .accordion-panel p:last-child { margin-bottom: 0; }
-        .accordion-panel ul { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.7; margin-left: 20px; margin-bottom: 12px; }
+        .accordion-panel ul { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.75; margin-left: 20px; margin-bottom: 12px; }
         .accordion-panel li { margin-bottom: 6px; }
         .accordion-panel strong { color: var(--text-primary); }
         .accordion-panel a { color: var(--accent-blue); text-decoration: none; }
@@ -1116,7 +1117,7 @@
 
         /* Footer */
         footer {
-            text-align: left; padding: 28px 0; font-size: 0.7rem; color: var(--text-muted);
+            text-align: left; padding: 28px 0; font-size: 0.75rem; color: var(--text-muted);
             border-top: 1px solid var(--border-color); margin-top: 20px;
             transition: color var(--theme-transition), border-color var(--theme-transition);
         }
@@ -1149,7 +1150,7 @@
             .score-header { flex-direction: column; align-items: flex-start; gap: 16px; }
             .tier-header { flex-wrap: wrap; }
             .tier-subtitle { width: 100%; margin-left: 0; margin-top: 4px; }
-            .accordion-trigger { padding: 14px 0; font-size: 0.75rem; }
+            .accordion-trigger { padding: 14px 0; font-size: 0.8rem; }
             .accordion-item.open .accordion-panel-inner { padding-bottom: 16px; }
             .scenarios-section { padding: 16px; }
             .scenario-chart-area { height: 260px; }
@@ -1162,7 +1163,7 @@
 
         @media (max-width: 480px) {
             .chart-legend { flex-direction: column; align-items: flex-start; gap: 6px; }
-            .action-list li { font-size: 0.75rem; }
+            .action-list li { font-size: 0.85rem; }
             .metric-header { flex-direction: column; gap: 8px; }
             .metric-value { font-size: 1.5rem; }
             .sparkline-range { min-width: 30px; }
