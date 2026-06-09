@@ -497,6 +497,7 @@
             font-weight: 400;
             color: var(--text-muted);
             margin-right: -4px;
+            cursor: help;
             transition: color var(--theme-transition);
         }
 
@@ -1319,7 +1320,7 @@
                 <div>
                     <div class="score-label">The Score</div>
                     <div class="score-display">
-                        <span class="score-approx">~</span>
+                        <span class="score-approx" title="Approximate — read it as ±3 points">~</span>
                         <span class="score-value" id="currentScore"><span class="skeleton skeleton-score"></span></span>
                         <span class="score-max">/ 100</span>
                     </div>
@@ -1337,7 +1338,6 @@
             
             <div class="action-section" id="actionSection">
                 <div class="action-header">
-                    <span aria-hidden="true">💡</span>
                     <span>What does this mean?</span>
                 </div>
                 <div class="action-content" id="actionContent">
@@ -1586,7 +1586,7 @@
                     <span aria-hidden="true">⛈️</span> <span>Gets Worse</span> <span class="pill-score" data-pill="worse"></span>
                 </button>
                 <button class="preset-pill" data-key="frozen" aria-pressed="false">
-                    <span aria-hidden="true">🥶</span> <span>Stays Frozen</span> <span class="pill-score" data-pill="frozen"></span>
+                    <span aria-hidden="true">❄️</span> <span>Stays Frozen</span> <span class="pill-score" data-pill="frozen"></span>
                 </button>
                 <button class="preset-pill" data-key="now" aria-pressed="false">
                     <span aria-hidden="true">📍</span> <span>Now</span> <span class="pill-score" data-pill="now"></span>
@@ -1595,7 +1595,7 @@
                     <span aria-hidden="true">🌤️</span> <span>Gradual Thaw</span> <span class="pill-score" data-pill="thaw"></span>
                 </button>
                 <button class="preset-pill" data-key="boom" aria-pressed="false">
-                    <span aria-hidden="true">🚀</span> <span>Bets Pay Off</span> <span class="pill-score" data-pill="boom"></span>
+                    <span aria-hidden="true">☀️</span> <span>Bets Pay Off</span> <span class="pill-score" data-pill="boom"></span>
                 </button>
 
                 <span class="controls-sep"></span>
@@ -2128,8 +2128,25 @@
             var cg = document.getElementById(guideMapping[tierKey]);
             if (cg) { cg.classList.add('current'); var r = cg.querySelector('.score-guide-range'); if (r && !r.textContent.includes('\u2190')) r.textContent += ' \u2190'; }
             
-            var diff = peakScore - currentScore;
-            document.getElementById('scoreChange').textContent = '\u2193 ' + diff + ' pts from peak (' + monthlyData.labels[peakIdx] + ')';
+            // Trend over the trailing year \u2014 actionable, unlike distance from the anomalous all-time peak
+            // (which stays available in the context chips below)
+            (function setScoreTrend() {
+                var el = document.getElementById('scoreChange');
+                var windowStart = Math.max(0, compositeScores.length - 12);
+                var recent = [];
+                for (var i = windowStart; i < compositeScores.length; i++) {
+                    if (compositeScores[i] != null) recent.push({ idx: i, score: compositeScores[i] });
+                }
+                if (recent.length < 3) { el.textContent = ''; return; }
+                var lo = recent[0], hi = recent[0];
+                recent.forEach(function(p) { if (p.score < lo.score) lo = p; if (p.score > hi.score) hi = p; });
+                var rising = currentScore - lo.score >= 4 && lo.idx < currentIdx;
+                var falling = hi.score - currentScore >= 4 && hi.idx < currentIdx;
+                if (rising && falling) { if (lo.idx >= hi.idx) falling = false; else rising = false; }
+                if (rising) el.textContent = '\u2191 ' + (currentScore - lo.score) + ' pts from the ' + monthlyData.labels[lo.idx] + ' low';
+                else if (falling) el.textContent = '\u2193 ' + (hi.score - currentScore) + ' pts since ' + monthlyData.labels[hi.idx];
+                else el.textContent = 'Holding steady near ' + currentScore + ' over the past year';
+            })();
 
             // Update limitations score text dynamically
             var limEl = document.getElementById('limitationsScoreText');
@@ -2561,10 +2578,10 @@
                         labels: SC_ALL_LABELS,
                         datasets: [
                             { label: 'Historical', data: histData, borderColor: '#9898a8', segment: { borderColor: function(ctx) { return getScenarioLineColor(ctx.p0.parsed.y); } }, backgroundColor: 'transparent', tension: 0.3, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: isDark ? '#fff' : '#1a1a2e', borderWidth: 2, spanGaps: true, order: 10 },
-                            makeScenarioDataset('\ud83e\udd76 Stays Frozen', SCENARIO_SCORES.frozen, getScenarioLineColor(SCENARIO_SCORES.frozen), 6),
+                            makeScenarioDataset('\u2744\ufe0f Stays Frozen', SCENARIO_SCORES.frozen, getScenarioLineColor(SCENARIO_SCORES.frozen), 6),
                             makeScenarioDataset('\ud83c\udf24\ufe0f Gradual Thaw', SCENARIO_SCORES.thaw, getScenarioLineColor(SCENARIO_SCORES.thaw), 5),
                             makeScenarioDataset('\u26c8\ufe0f Gets Worse', SCENARIO_SCORES.worse, getScenarioLineColor(SCENARIO_SCORES.worse), 7),
-                            makeScenarioDataset('\ud83d\ude80 Bets Pay Off', SCENARIO_SCORES.boom, getScenarioLineColor(SCENARIO_SCORES.boom), 4),
+                            makeScenarioDataset('\u2600\ufe0f Bets Pay Off', SCENARIO_SCORES.boom, getScenarioLineColor(SCENARIO_SCORES.boom), 4),
                             { label: '\u2726 Your Scenario', data: new Array(SC_TOTAL).fill(null), borderColor: '#4d9fff', borderDash: [5, 3], tension: 0.3, pointRadius: endpointRadius(7), pointBackgroundColor: '#4d9fff', pointBorderColor: isDark ? '#12121a' : '#ffffff', pointBorderWidth: 2, borderWidth: 2.5, hidden: true, order: 1, spanGaps: false }
                         ]
                     },
@@ -2584,10 +2601,10 @@
                                     branchLine: { type: 'line', xMin: SC_LAST_HIST, xMax: SC_LAST_HIST, borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', borderWidth: 1, borderDash: [4,4] },
                                     projZone: { type: 'box', xMin: SC_LAST_HIST, xMax: SC_TOTAL - 1, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', borderWidth: 0 },
                                     projLabel: { type: 'label', xValue: SC_LAST_HIST + 3, yValue: 94, content: ['12-MONTH HORIZON'], font: { size: 9, weight: 600, family: "'JetBrains Mono'" }, color: isDark ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.25)' },
-                                    endFrozen: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.frozen, content: ['\ud83e\udd76 ' + SCENARIO_SCORES.frozen], font: { size: 10 }, color: getScenarioTextColor(SCENARIO_SCORES.frozen), position: { x: 'start' } },
+                                    endFrozen: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.frozen, content: ['\u2744\ufe0f ' + SCENARIO_SCORES.frozen], font: { size: 10 }, color: getScenarioTextColor(SCENARIO_SCORES.frozen), position: { x: 'start' } },
                                     endThaw: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.thaw, content: ['\ud83c\udf24\ufe0f ' + SCENARIO_SCORES.thaw], font: { size: 10 }, color: getScenarioTextColor(SCENARIO_SCORES.thaw), position: { x: 'start' } },
                                     endWorse: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.worse, content: ['\u26c8\ufe0f ' + SCENARIO_SCORES.worse], font: { size: 10 }, color: getScenarioTextColor(SCENARIO_SCORES.worse), position: { x: 'start' } },
-                                    endBoom: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.boom, content: ['\ud83d\ude80 ' + SCENARIO_SCORES.boom], font: { size: 10 }, color: getScenarioTextColor(SCENARIO_SCORES.boom), position: { x: 'start' } },
+                                    endBoom: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.boom, content: ['\u2600\ufe0f ' + SCENARIO_SCORES.boom], font: { size: 10 }, color: getScenarioTextColor(SCENARIO_SCORES.boom), position: { x: 'start' } },
                                     scLine70: { type: 'line', yMin: 70, yMax: 70, borderColor: isDark ? 'rgba(0,217,160,0.35)' : 'rgba(0,160,112,0.45)', borderWidth: 1.5, borderDash: [6,4] },
                                     scLine55: { type: 'line', yMin: 55, yMax: 55, borderColor: isDark ? 'rgba(255,201,64,0.35)' : 'rgba(180,140,0,0.45)', borderWidth: 1.5, borderDash: [6,4] },
                                     scLine40: { type: 'line', yMin: 40, yMax: 40, borderColor: isDark ? 'rgba(255,140,64,0.30)' : 'rgba(210,105,30,0.45)', borderWidth: 1.5, borderDash: [6,4] }
