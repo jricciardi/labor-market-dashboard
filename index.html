@@ -29,8 +29,8 @@
             --bg-card: #161620;
             --text-primary: #e8e8ed;
             --text-secondary: #9898a8;
-            --text-muted: #606070;
-            
+            --text-muted: #82829a;
+
             --accent-green: #00d9a0;
             --accent-green-dim: rgba(0, 217, 160, 0.12);
             --accent-yellow: #ffc940;
@@ -52,11 +52,7 @@
             --chart-grid: rgba(255, 255, 255, 0.04);
             --chart-tooltip-bg: rgba(22, 22, 32, 0.95);
             --chart-tooltip-border: #28283a;
-            
-            --sparkline-good: #00d9a0;
-            --sparkline-neutral: #ffc940;
-            --sparkline-bad: #ff4d6a;
-            
+
             --noise-opacity: 0.025;
             --theme-transition: 200ms ease;
 
@@ -79,30 +75,32 @@
             
             --text-primary: #1a1a2e;
             --text-secondary: #5a5a6e;
-            --text-muted: #8888a0;
-            
+            --text-muted: #62627a;
+
             --border-color: #d8dae0;
             --bg-hover: #e8e9ec;
+            --accent-blue: #1e64c8;
             --accent-blue-dim: rgba(30, 100, 200, 0.12);
-            
+
+            --accent-green: #00a070;
+            --accent-yellow: #b48c00;
+            --accent-orange: #d2691e;
+            --accent-red: #dc3545;
+
             --accent-green-dim: rgba(0, 160, 112, 0.12);
             --accent-yellow-dim: rgba(180, 140, 0, 0.15);
             --accent-orange-dim: rgba(220, 120, 40, 0.12);
             --accent-red-dim: rgba(220, 60, 80, 0.12);
-            
-            --accent-green-text: #00a070;
-            --accent-yellow-text: #c99700;
-            --accent-orange-text: #d2691e;
-            --accent-red-text: #dc3545;
-            
+
+            --accent-green-text: #00785a;
+            --accent-yellow-text: #856300;
+            --accent-orange-text: #a85000;
+            --accent-red-text: #c92a3e;
+
             --chart-grid: rgba(0, 0, 0, 0.06);
             --chart-tooltip-bg: rgba(255, 255, 255, 0.95);
             --chart-tooltip-border: #d8dae0;
-            
-            --sparkline-good: #00a070;
-            --sparkline-neutral: #b48c00;
-            --sparkline-bad: #dc3545;
-            
+
             --noise-opacity: 0;
 
             --bg-nav-translucent: rgba(245, 246, 248, 0.88);
@@ -835,7 +833,7 @@
         .metric-delta.up { color: var(--accent-green-text); background: var(--accent-green-dim); }
         .metric-delta.down { color: var(--accent-red-text); background: var(--accent-red-dim); }
         .metric-delta.flat { color: var(--text-muted); background: var(--bg-tertiary); }
-        .metric-lag { font-size: 0.55rem; color: var(--text-muted); opacity: 0.7; margin-left: 4px; font-weight: 400; }
+        .metric-lag { font-size: 0.55rem; color: var(--text-muted); margin-left: 4px; font-weight: 400; }
         .metric-delta.up.inverted { color: var(--accent-red-text); background: var(--accent-red-dim); }
         .metric-delta.down.inverted { color: var(--accent-green-text); background: var(--accent-green-dim); }
 
@@ -851,7 +849,7 @@
 
         .sparkline-time {
             display: flex; justify-content: space-between;
-            font-size: 0.6rem; color: var(--text-muted); margin-top: 4px; padding: 0 2px; opacity: 0.7;
+            font-size: 0.6rem; color: var(--text-muted); margin-top: 4px; padding: 0 2px;
         }
 
         /* Scenarios Section */
@@ -891,6 +889,18 @@
 
         .score-inline { font-weight: 700; font-variant-numeric: tabular-nums; }
         .category-inline { font-style: italic; }
+
+        /* Semantic tier colors — theme-aware via tokens */
+        .sem-good { color: var(--accent-green-text); }
+        .sem-neutral { color: var(--accent-yellow-text); }
+        .sem-caution { color: var(--accent-orange-text); }
+        .sem-bad { color: var(--accent-red-text); }
+
+        .narrative-interpretation.border-good { border-left-color: var(--accent-green); }
+        .narrative-interpretation.border-neutral { border-left-color: var(--accent-yellow); }
+        .narrative-interpretation.border-caution { border-left-color: var(--accent-orange); }
+        .narrative-interpretation.border-bad { border-left-color: var(--accent-red); }
+        .narrative-interpretation.border-info { border-left-color: var(--accent-blue); }
 
         .narrative-interpretation.fading { opacity: 0; transition: opacity 0.2s var(--ease-out-quart); }
         .narrative-interpretation:not(.fading) { opacity: 1; transition: opacity 0.25s var(--ease-out-quart) 0.05s; }
@@ -1652,6 +1662,7 @@
         let sparklineInstances = {};
         let scenarioChart = null;
         let annotationsVisible = false;
+        let scenarioThemeRepaint = null; // assigned in initDashboard; recolors static scenario colors on theme switch
 
         // Historical event annotations for main chart
         const historicalAnnotations = {
@@ -1661,7 +1672,7 @@
                 yValue: 95,
                 content: ['COVID'],
                 backgroundColor: 'rgba(255, 77, 106, 0.9)',
-                color: '#fff',
+                color: '#0a0a0f',
                 font: { size: 10, weight: 600 },
                 padding: { top: 4, bottom: 4, left: 8, right: 8 },
                 borderRadius: 4,
@@ -1679,7 +1690,7 @@
                 yValue: 95,
                 content: ['Peak'],
                 backgroundColor: 'rgba(0, 180, 130, 0.9)',
-                color: '#fff',
+                color: '#0a0a0f',
                 font: { size: 10, weight: 600 },
                 padding: { top: 4, bottom: 4, left: 8, right: 8 },
                 borderRadius: 4,
@@ -1697,7 +1708,7 @@
                 yValue: 95,
                 content: ['Fed Cuts'],
                 backgroundColor: 'rgba(200, 160, 40, 0.9)',
-                color: '#fff',
+                color: '#0a0a0f',
                 font: { size: 10, weight: 600 },
                 padding: { top: 4, bottom: 4, left: 8, right: 8 },
                 borderRadius: 4,
@@ -1728,16 +1739,23 @@
                 tooltipBorder: isDark ? '#28283a' : '#d8dae0',
                 tooltipText: isDark ? '#e8e8ed' : '#1a1a2e',
                 tooltipSecondary: isDark ? '#9898a8' : '#5a5a6e',
-                textMuted: isDark ? '#606070' : '#8888a0',
-                sparklineGood: isDark ? '#00d9a0' : '#00a070',
-                sparklineNeutral: isDark ? '#ffc940' : '#b48c00',
-                sparklineBad: isDark ? '#ff4d6a' : '#dc3545',
+                textMuted: isDark ? '#82829a' : '#62627a',
+                // Semantic palette: graphics (lines, dots — >=3:1) vs text (labels — >=4.5:1)
+                semGood: isDark ? '#00d9a0' : '#00a070',
+                semNeutral: isDark ? '#ffc940' : '#b48c00',
+                semCaution: isDark ? '#ff8c40' : '#d2691e',
+                semBad: isDark ? '#ff4d6a' : '#dc3545',
+                semGoodText: isDark ? '#00d9a0' : '#00785a',
+                semNeutralText: isDark ? '#ffc940' : '#856300',
+                semCautionText: isDark ? '#ff8c40' : '#a85000',
+                semBadText: isDark ? '#ff4d6a' : '#c92a3e',
             };
         }
         
         function updateChartsForTheme() {
             const colors = getThemeColors();
             const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+            if (typeof Chart !== 'undefined') Chart.defaults.color = colors.textMuted;
             if (mainChartInstance) {
                 mainChartInstance.options.scales.x.grid.color = colors.grid;
                 mainChartInstance.options.scales.y.grid.color = colors.grid;
@@ -1748,6 +1766,11 @@
                 mainChartInstance.options.plugins.tooltip.titleColor = colors.tooltipText;
                 mainChartInstance.options.plugins.tooltip.bodyColor = colors.tooltipSecondary;
                 mainChartInstance.data.datasets[0].pointHoverBackgroundColor = isDark ? '#fff' : '#1a1a2e';
+                mainChartInstance.data.datasets[0].borderColor = colors.semNeutral;
+                var mAnn = mainChartInstance.options.plugins.annotation.annotations;
+                if (mAnn.line70) mAnn.line70.borderColor = isDark ? 'rgba(0,217,160,0.3)' : 'rgba(0,160,112,0.45)';
+                if (mAnn.line55) mAnn.line55.borderColor = isDark ? 'rgba(255,201,64,0.3)' : 'rgba(180,140,0,0.45)';
+                if (mAnn.line40) mAnn.line40.borderColor = isDark ? 'rgba(255,140,64,0.3)' : 'rgba(210,105,30,0.45)';
                 mainChartInstance.update('none');
             }
             var sparkBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)';
@@ -1771,9 +1794,10 @@
                 if (ann.projZone) ann.projZone.backgroundColor = isDark ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.02)';
                 if (ann.projLabel) ann.projLabel.color = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.15)';
                 // Threshold lines
-                if (ann.scLine70) ann.scLine70.borderColor = isDark ? 'rgba(0,217,160,0.35)' : 'rgba(0,180,130,0.40)';
-                if (ann.scLine55) ann.scLine55.borderColor = isDark ? 'rgba(255,201,64,0.35)' : 'rgba(220,170,40,0.40)';
-                if (ann.scLine40) ann.scLine40.borderColor = isDark ? 'rgba(255,140,64,0.30)' : 'rgba(220,110,40,0.35)';
+                if (ann.scLine70) ann.scLine70.borderColor = isDark ? 'rgba(0,217,160,0.35)' : 'rgba(0,160,112,0.45)';
+                if (ann.scLine55) ann.scLine55.borderColor = isDark ? 'rgba(255,201,64,0.35)' : 'rgba(180,140,0,0.45)';
+                if (ann.scLine40) ann.scLine40.borderColor = isDark ? 'rgba(255,140,64,0.30)' : 'rgba(210,105,30,0.45)';
+                if (scenarioThemeRepaint) scenarioThemeRepaint();
                 scenarioChart.data.datasets[0].pointHoverBackgroundColor = isDark ? '#fff' : '#1a1a2e';
                 var scBorderColor = isDark ? '#12121a' : '#ffffff';
                 for (var i = 1; i <= 5; i++) {
@@ -2341,9 +2365,12 @@
             var SCENARIO_SCORES = {};
             for (var k in SCENARIOS) SCENARIO_SCORES[k] = calcScenarioScore(SCENARIOS[k]);
 
-            function getScenarioRawColor(s) { return s >= 70 ? '#00d9a0' : s >= 55 ? '#ffc940' : s >= 40 ? '#ff8c40' : '#ff4d6a'; }
+            // Theme-aware semantic colors: lines (canvas strokes), text (canvas labels), class (DOM text via tokens)
+            function getScenarioLineColor(s) { var c = getThemeColors(); return s >= 70 ? c.semGood : s >= 55 ? c.semNeutral : s >= 40 ? c.semCaution : c.semBad; }
+            function getScenarioTextColor(s) { var c = getThemeColors(); return s >= 70 ? c.semGoodText : s >= 55 ? c.semNeutralText : s >= 40 ? c.semCautionText : c.semBadText; }
+            function getScenarioTierClass(s) { return s >= 70 ? 'good' : s >= 55 ? 'neutral' : s >= 40 ? 'caution' : 'bad'; }
             function getScenarioDimColor(s, a) {
-                var h = getScenarioRawColor(s);
+                var h = getScenarioLineColor(s);
                 var r = parseInt(h.slice(1,3),16), g = parseInt(h.slice(3,5),16), b = parseInt(h.slice(5,7),16);
                 return 'rgba(' + r + ',' + g + ',' + b + ',' + (a||0.3) + ')';
             }
@@ -2357,12 +2384,12 @@
             for (var i = scStartIdx; i < monthlyData.labels.length; i++) scHistScores.push(calculateCompositeScore(i));
 
             // Narratives
-            function ss(score) { return '<span class="score-inline" style="color:' + getScenarioRawColor(score) + '">' + score + '</span>'; }
-            function cs(score) { return '<span class="category-inline" style="color:' + getScenarioRawColor(score) + '">' + getScenarioCategory(score) + '</span>'; }
+            function ss(score) { return '<span class="score-inline sem-' + getScenarioTierClass(score) + '">' + score + '</span>'; }
+            function cs(score) { return '<span class="category-inline sem-' + getScenarioTierClass(score) + '">' + getScenarioCategory(score) + '</span>'; }
 
             var SC_NARRATIVES = {
-                _invitation: { border: 'var(--accent-blue)', html: '<strong>Four scenarios show the range of plausible futures</strong> \u2014 from continued stasis to genuine recovery. The most likely path is more of the same. Pick one to explore what it means, or build your own.' },
-                now: { get border() { return getScenarioRawColor(SCENARIO_SCORES.now); }, get html() {
+                _invitation: { tier: 'info', html: '<strong>Four scenarios show the range of plausible futures</strong> \u2014 from continued stasis to genuine recovery. The most likely path is more of the same. Pick one to explore what it means, or build your own.' },
+                now: { get tier() { return getScenarioTierClass(SCENARIO_SCORES.now); }, get html() {
                     var parts = ['<strong>Current conditions \u2192 ' + ss(SCENARIO_SCORES.now) + ', ' + cs(SCENARIO_SCORES.now) + '.</strong>'];
                     // Quit + hiring dynamics
                     if (CUR.quitRate < 2.2 && CUR.hiresRate < 3.5) parts.push('Workers staying put (quit rate ' + CUR.quitRate.toFixed(1) + '%), hiring slow (' + CUR.hiresRate.toFixed(1) + '%).');
@@ -2381,10 +2408,10 @@
                     else parts.push('Caution is warranted \u2014 focus on resilience.');
                     return parts.join(' ');
                 } },
-                frozen: { get border() { return getScenarioRawColor(SCENARIO_SCORES.frozen); }, get html() { return '<strong>Stays Frozen \u2192 ' + ss(SCENARIO_SCORES.frozen) + ', ' + cs(SCENARIO_SCORES.frozen) + '.</strong> Quit rate stuck near 1.9%, hiring flat, Fed pausing around 3.5%. Not a macro crash \u2014 but another year where the aggregate data stays flat while specific sectors keep bleeding. If you\'re in one of them, you already know.'; } },
-                thaw: { get border() { return getScenarioRawColor(SCENARIO_SCORES.thaw); }, get html() { return '<strong>Gradual Thaw \u2192 ' + ss(SCENARIO_SCORES.thaw) + ', ' + cs(SCENARIO_SCORES.thaw) + '.</strong> Fed cuts gain traction \u2014 quits climb to 2.4%, openings back above 1.0 per unemployed. Not a boom, but a functional market where active searching is rewarded. Plausible by late 2027 if policy headwinds ease.'; } },
-                boom: { get border() { return getScenarioRawColor(SCENARIO_SCORES.boom); }, get html() { return '<strong>Bets Pay Off \u2192 ' + ss(SCENARIO_SCORES.boom) + ', ' + cs(SCENARIO_SCORES.boom) + '.</strong> Aggressive Fed cuts spark hiring \u2014 quits climbing past 2.5%, openings ratio back to 1.4. Even in this optimistic case, you only just cross into Good Time to Move. That\u2019s how far below baseline the market currently sits. Expand the sliders to see what has to be true.'; } },
-                worse: { get border() { return getScenarioRawColor(SCENARIO_SCORES.worse); }, get html() { return '<strong>Gets Worse \u2192 ' + ss(SCENARIO_SCORES.worse) + ', ' + cs(SCENARIO_SCORES.worse) + '.</strong> Headwinds intensify \u2014 layoffs rise, hiring freezes deepen, the Fed pauses cuts. Even strong candidates face slow processes and lowball offers. Protecting your current position becomes the priority.'; } }
+                frozen: { get tier() { return getScenarioTierClass(SCENARIO_SCORES.frozen); }, get html() { return '<strong>Stays Frozen \u2192 ' + ss(SCENARIO_SCORES.frozen) + ', ' + cs(SCENARIO_SCORES.frozen) + '.</strong> Quit rate stuck near 1.9%, hiring flat, Fed pausing around 3.5%. Not a macro crash \u2014 but another year where the aggregate data stays flat while specific sectors keep bleeding. If you\'re in one of them, you already know.'; } },
+                thaw: { get tier() { return getScenarioTierClass(SCENARIO_SCORES.thaw); }, get html() { return '<strong>Gradual Thaw \u2192 ' + ss(SCENARIO_SCORES.thaw) + ', ' + cs(SCENARIO_SCORES.thaw) + '.</strong> Fed cuts gain traction \u2014 quits climb to 2.4%, openings back above 1.0 per unemployed. Not a boom, but a functional market where active searching is rewarded. Plausible by late 2027 if policy headwinds ease.'; } },
+                boom: { get tier() { return getScenarioTierClass(SCENARIO_SCORES.boom); }, get html() { return '<strong>Bets Pay Off \u2192 ' + ss(SCENARIO_SCORES.boom) + ', ' + cs(SCENARIO_SCORES.boom) + '.</strong> Aggressive Fed cuts spark hiring \u2014 quits climbing past 2.5%, openings ratio back to 1.4. Even in this optimistic case, you only just cross into Good Time to Move. That\u2019s how far below baseline the market currently sits. Expand the sliders to see what has to be true.'; } },
+                worse: { get tier() { return getScenarioTierClass(SCENARIO_SCORES.worse); }, get html() { return '<strong>Gets Worse \u2192 ' + ss(SCENARIO_SCORES.worse) + ', ' + cs(SCENARIO_SCORES.worse) + '.</strong> Headwinds intensify \u2014 layoffs rise, hiring freezes deepen, the Fed pauses cuts. Even strong candidates face slow processes and lowball offers. Protecting your current position becomes the priority.'; } }
             };
 
             function getCustomNarrative(score) {
@@ -2394,7 +2421,7 @@
                 else if (d >= -3 && d <= 3) text = '<strong>Your scenario \u2192 ' + ss(score) + '.</strong> Roughly current conditions \u2014 still ' + cs(score) + '. The holding pattern continues. Stability remains the primary asset worth protecting.';
                 else if (score >= 40) text = '<strong>Your scenario \u2192 ' + ss(score) + ', ' + cs(score) + '.</strong> Headwinds still present. Patience and positioning beat aggressive searching. Wait for sustained indicator movement before committing to a search.';
                 else text = '<strong>Your scenario \u2192 ' + ss(score) + ', ' + cs(score) + '.</strong> Employer-favorable market \u2014 searching is costly and slow. Focus on stability. Only move for truly exceptional opportunities.';
-                return { border: getScenarioRawColor(score), html: text };
+                return { tier: getScenarioTierClass(score), html: text };
             }
 
             // Sliders
@@ -2460,11 +2487,11 @@
                     data: {
                         labels: SC_ALL_LABELS,
                         datasets: [
-                            { label: 'Historical', data: histData, borderColor: '#9898a8', segment: { borderColor: function(ctx) { return getScenarioRawColor(ctx.p0.parsed.y); } }, backgroundColor: 'transparent', tension: 0.3, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: isDark ? '#fff' : '#1a1a2e', borderWidth: 2, spanGaps: true, order: 10 },
-                            makeScenarioDataset('\ud83e\udd76 Stays Frozen', SCENARIO_SCORES.frozen, getScenarioRawColor(SCENARIO_SCORES.frozen), 6),
-                            makeScenarioDataset('\ud83c\udf24\ufe0f Gradual Thaw', SCENARIO_SCORES.thaw, getScenarioRawColor(SCENARIO_SCORES.thaw), 5),
-                            makeScenarioDataset('\u26c8\ufe0f Gets Worse', SCENARIO_SCORES.worse, getScenarioRawColor(SCENARIO_SCORES.worse), 7),
-                            makeScenarioDataset('\ud83d\ude80 Bets Pay Off', SCENARIO_SCORES.boom, getScenarioRawColor(SCENARIO_SCORES.boom), 4),
+                            { label: 'Historical', data: histData, borderColor: '#9898a8', segment: { borderColor: function(ctx) { return getScenarioLineColor(ctx.p0.parsed.y); } }, backgroundColor: 'transparent', tension: 0.3, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: isDark ? '#fff' : '#1a1a2e', borderWidth: 2, spanGaps: true, order: 10 },
+                            makeScenarioDataset('\ud83e\udd76 Stays Frozen', SCENARIO_SCORES.frozen, getScenarioLineColor(SCENARIO_SCORES.frozen), 6),
+                            makeScenarioDataset('\ud83c\udf24\ufe0f Gradual Thaw', SCENARIO_SCORES.thaw, getScenarioLineColor(SCENARIO_SCORES.thaw), 5),
+                            makeScenarioDataset('\u26c8\ufe0f Gets Worse', SCENARIO_SCORES.worse, getScenarioLineColor(SCENARIO_SCORES.worse), 7),
+                            makeScenarioDataset('\ud83d\ude80 Bets Pay Off', SCENARIO_SCORES.boom, getScenarioLineColor(SCENARIO_SCORES.boom), 4),
                             { label: '\u2726 Your Scenario', data: new Array(SC_TOTAL).fill(null), borderColor: '#4d9fff', borderDash: [5, 3], tension: 0.3, pointRadius: endpointRadius(7), pointBackgroundColor: '#4d9fff', pointBorderColor: isDark ? '#12121a' : '#ffffff', pointBorderWidth: 2, borderWidth: 2.5, hidden: true, order: 1, spanGaps: false }
                         ]
                     },
@@ -2484,13 +2511,13 @@
                                     branchLine: { type: 'line', xMin: SC_LAST_HIST, xMax: SC_LAST_HIST, borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', borderWidth: 1, borderDash: [4,4] },
                                     projZone: { type: 'box', xMin: SC_LAST_HIST, xMax: SC_TOTAL - 1, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', borderWidth: 0 },
                                     projLabel: { type: 'label', xValue: SC_LAST_HIST + 3, yValue: 94, content: ['12-MONTH HORIZON'], font: { size: 8, weight: 600, family: "'JetBrains Mono'" }, color: isDark ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.25)' },
-                                    endFrozen: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.frozen, content: ['\ud83e\udd76 ' + SCENARIO_SCORES.frozen], font: { size: 9 }, color: getScenarioRawColor(SCENARIO_SCORES.frozen), position: { x: 'start' } },
-                                    endThaw: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.thaw, content: ['\ud83c\udf24\ufe0f ' + SCENARIO_SCORES.thaw], font: { size: 9 }, color: getScenarioRawColor(SCENARIO_SCORES.thaw), position: { x: 'start' } },
-                                    endWorse: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.worse, content: ['\u26c8\ufe0f ' + SCENARIO_SCORES.worse], font: { size: 9 }, color: getScenarioRawColor(SCENARIO_SCORES.worse), position: { x: 'start' } },
-                                    endBoom: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.boom, content: ['\ud83d\ude80 ' + SCENARIO_SCORES.boom], font: { size: 9 }, color: getScenarioRawColor(SCENARIO_SCORES.boom), position: { x: 'start' } },
-                                    scLine70: { type: 'line', yMin: 70, yMax: 70, borderColor: isDark ? 'rgba(0,217,160,0.35)' : 'rgba(0,180,130,0.40)', borderWidth: 1.5, borderDash: [6,4] },
-                                    scLine55: { type: 'line', yMin: 55, yMax: 55, borderColor: isDark ? 'rgba(255,201,64,0.35)' : 'rgba(220,170,40,0.40)', borderWidth: 1.5, borderDash: [6,4] },
-                                    scLine40: { type: 'line', yMin: 40, yMax: 40, borderColor: isDark ? 'rgba(255,140,64,0.30)' : 'rgba(220,110,40,0.35)', borderWidth: 1.5, borderDash: [6,4] }
+                                    endFrozen: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.frozen, content: ['\ud83e\udd76 ' + SCENARIO_SCORES.frozen], font: { size: 9 }, color: getScenarioTextColor(SCENARIO_SCORES.frozen), position: { x: 'start' } },
+                                    endThaw: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.thaw, content: ['\ud83c\udf24\ufe0f ' + SCENARIO_SCORES.thaw], font: { size: 9 }, color: getScenarioTextColor(SCENARIO_SCORES.thaw), position: { x: 'start' } },
+                                    endWorse: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.worse, content: ['\u26c8\ufe0f ' + SCENARIO_SCORES.worse], font: { size: 9 }, color: getScenarioTextColor(SCENARIO_SCORES.worse), position: { x: 'start' } },
+                                    endBoom: { type: 'label', xValue: SC_TOTAL - 0.2, yValue: SCENARIO_SCORES.boom, content: ['\ud83d\ude80 ' + SCENARIO_SCORES.boom], font: { size: 9 }, color: getScenarioTextColor(SCENARIO_SCORES.boom), position: { x: 'start' } },
+                                    scLine70: { type: 'line', yMin: 70, yMax: 70, borderColor: isDark ? 'rgba(0,217,160,0.35)' : 'rgba(0,160,112,0.45)', borderWidth: 1.5, borderDash: [6,4] },
+                                    scLine55: { type: 'line', yMin: 55, yMax: 55, borderColor: isDark ? 'rgba(255,201,64,0.35)' : 'rgba(180,140,0,0.45)', borderWidth: 1.5, borderDash: [6,4] },
+                                    scLine40: { type: 'line', yMin: 40, yMax: 40, borderColor: isDark ? 'rgba(255,140,64,0.30)' : 'rgba(210,105,30,0.45)', borderWidth: 1.5, borderDash: [6,4] }
                                 }
                             }
                         },
@@ -2504,6 +2531,7 @@
 
             // Scenario state management
             var activePreset = null;
+            var customScore = null;
 
             function selectPreset(key) {
                 activePreset = key;
@@ -2519,9 +2547,9 @@
                 scenarioChart.data.datasets[5].hidden = true;
                 delete scenarioChart.options.plugins.annotation.annotations.endCustom;
                 if (key === 'now') {
-                    PRESET_LINES.forEach(function(sk) { var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]]; ds.borderWidth = 2; ds.borderDash = [8, 4]; ds.borderColor = getScenarioRawColor(SCENARIO_SCORES[sk]); });
+                    PRESET_LINES.forEach(function(sk) { var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]]; ds.borderWidth = 2; ds.borderDash = [8, 4]; ds.borderColor = getScenarioLineColor(SCENARIO_SCORES[sk]); });
                 } else if (PRESET_LINES.indexOf(key) >= 0) {
-                    PRESET_LINES.forEach(function(sk) { var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]]; if (sk === key) { ds.borderWidth = 3; ds.borderDash = [10, 3]; ds.borderColor = getScenarioRawColor(SCENARIO_SCORES[sk]); } else { ds.borderWidth = 1.5; ds.borderDash = [8, 4]; ds.borderColor = getScenarioDimColor(SCENARIO_SCORES[sk]); } });
+                    PRESET_LINES.forEach(function(sk) { var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]]; if (sk === key) { ds.borderWidth = 3; ds.borderDash = [10, 3]; ds.borderColor = getScenarioLineColor(SCENARIO_SCORES[sk]); } else { ds.borderWidth = 1.5; ds.borderDash = [8, 4]; ds.borderColor = getScenarioDimColor(SCENARIO_SCORES[sk]); } });
                 }
                 scenarioChart.update();
             }
@@ -2530,10 +2558,11 @@
                 activePreset = 'custom';
                 document.querySelectorAll('.preset-pill').forEach(function(p) { p.classList.remove('active'); p.setAttribute('aria-pressed', 'false'); });
                 var m = readSliders(); updateSliderLabels(m); var score = calcScenarioScore(m);
+                customScore = score;
                 scenarioChart.data.datasets[5].data = buildPath(score); scenarioChart.data.datasets[5].hidden = false;
-                scenarioChart.data.datasets[5].borderColor = getScenarioRawColor(score); scenarioChart.data.datasets[5].pointBackgroundColor = getScenarioRawColor(score); scenarioChart.data.datasets[5].borderWidth = 3;
+                scenarioChart.data.datasets[5].borderColor = getScenarioLineColor(score); scenarioChart.data.datasets[5].pointBackgroundColor = getScenarioLineColor(score); scenarioChart.data.datasets[5].borderWidth = 3;
                 PRESET_LINES.forEach(function(sk) { var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]]; ds.borderWidth = 1.5; ds.borderColor = getScenarioDimColor(SCENARIO_SCORES[sk]); });
-                scenarioChart.options.plugins.annotation.annotations.endCustom = { type: 'label', xValue: SC_TOTAL - 0.2, yValue: score, content: ['\u2726 ' + score], font: { size: 10, weight: 700, family: "'JetBrains Mono'" }, color: getScenarioRawColor(score), position: { x: 'start' } };
+                scenarioChart.options.plugins.annotation.annotations.endCustom = { type: 'label', xValue: SC_TOTAL - 0.2, yValue: score, content: ['\u2726 ' + score], font: { size: 10, weight: 700, family: "'JetBrains Mono'" }, color: getScenarioTextColor(score), position: { x: 'start' } };
                 scenarioChart.update();
                 setNarrative(getCustomNarrative(score));
             }
@@ -2543,7 +2572,12 @@
                 var wrap = document.getElementById('recoveryInterpretation'), text = document.getElementById('interp-text'), btn = document.getElementById('interp-more');
                 text.classList.remove('expanded'); btn.classList.remove('visible'); btn.textContent = 'more \u25be';
                 wrap.classList.add('fading');
-                setTimeout(function() { text.innerHTML = n.html; wrap.style.borderLeftColor = n.border; requestAnimationFrame(function() { wrap.classList.remove('fading'); checkMobileTruncation(); }); }, 200);
+                setTimeout(function() {
+                    text.innerHTML = n.html;
+                    wrap.classList.remove('border-good', 'border-neutral', 'border-caution', 'border-bad', 'border-info');
+                    wrap.classList.add('border-' + n.tier);
+                    requestAnimationFrame(function() { wrap.classList.remove('fading'); checkMobileTruncation(); });
+                }, 200);
             }
 
             function checkMobileTruncation() {
@@ -2553,9 +2587,10 @@
 
             function resetScenarios() {
                 activePreset = null;
+                customScore = null;
                 document.querySelectorAll('.preset-pill').forEach(function(p) { p.classList.remove('active'); p.setAttribute('aria-pressed', 'false'); });
                 setSliders(CUR);
-                PRESET_LINES.forEach(function(sk) { var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]]; ds.borderWidth = 2; ds.borderDash = [8, 4]; ds.borderColor = getScenarioRawColor(SCENARIO_SCORES[sk]); });
+                PRESET_LINES.forEach(function(sk) { var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]]; ds.borderWidth = 2; ds.borderDash = [8, 4]; ds.borderColor = getScenarioLineColor(SCENARIO_SCORES[sk]); });
                 scenarioChart.data.datasets[5].hidden = true; scenarioChart.data.datasets[5].data = new Array(SC_TOTAL).fill(null);
                 delete scenarioChart.options.plugins.annotation.annotations.endCustom;
                 scenarioChart.update();
@@ -2564,11 +2599,32 @@
                 panel.classList.add('collapsed'); toggle.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false');
             }
 
-            // Populate pill scores
-            for (var key in SCENARIO_SCORES) { var el = document.querySelector('[data-pill="' + key + '"]'); if (el) { el.textContent = SCENARIO_SCORES[key]; el.style.color = getScenarioRawColor(SCENARIO_SCORES[key]); } }
+            // Populate pill scores — semantic classes keep colors theme-aware
+            for (var key in SCENARIO_SCORES) { var el = document.querySelector('[data-pill="' + key + '"]'); if (el) { el.textContent = SCENARIO_SCORES[key]; el.className = 'pill-score sem-' + getScenarioTierClass(SCENARIO_SCORES[key]); } }
 
             renderSliders();
             initScenarioChart();
+
+            // Recolor static scenario chart colors for the active theme, preserving emphasis state
+            scenarioThemeRepaint = function() {
+                PRESET_LINES.forEach(function(sk) {
+                    var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]];
+                    var dimmed = ds.borderWidth < 2; // dim state is encoded as 1.5px width
+                    ds.borderColor = dimmed ? getScenarioDimColor(SCENARIO_SCORES[sk]) : getScenarioLineColor(SCENARIO_SCORES[sk]);
+                    ds.pointBackgroundColor = getScenarioLineColor(SCENARIO_SCORES[sk]);
+                });
+                var cds = scenarioChart.data.datasets[5];
+                if (!cds.hidden && customScore != null) {
+                    cds.borderColor = getScenarioLineColor(customScore);
+                    cds.pointBackgroundColor = getScenarioLineColor(customScore);
+                }
+                var ann = scenarioChart.options.plugins.annotation.annotations;
+                if (ann.endFrozen) ann.endFrozen.color = getScenarioTextColor(SCENARIO_SCORES.frozen);
+                if (ann.endThaw) ann.endThaw.color = getScenarioTextColor(SCENARIO_SCORES.thaw);
+                if (ann.endWorse) ann.endWorse.color = getScenarioTextColor(SCENARIO_SCORES.worse);
+                if (ann.endBoom) ann.endBoom.color = getScenarioTextColor(SCENARIO_SCORES.boom);
+                if (ann.endCustom && customScore != null) ann.endCustom.color = getScenarioTextColor(customScore);
+            };
 
             document.querySelectorAll('.preset-pill').forEach(function(p) {
                 p.addEventListener('click', function() { if (p.dataset.key === 'now' && activePreset === 'now') resetScenarios(); else selectPreset(p.dataset.key); });
@@ -2591,11 +2647,12 @@
             // ========================================
             // CHARTS
             // ========================================
-            Chart.defaults.color = '#9898a8';
             Chart.defaults.font.family = "'JetBrains Mono', monospace";
             Chart.defaults.font.size = 10;
 
             var tc = getThemeColors();
+            var isDarkInit = document.documentElement.getAttribute('data-theme') !== 'light';
+            Chart.defaults.color = tc.textMuted;
 
             // Main chart
             mainChartInstance = new Chart(document.getElementById('mainChart').getContext('2d'), {
@@ -2604,8 +2661,8 @@
                     labels: monthlyData.labels,
                     datasets: [{
                         label: 'Score', data: compositeScores,
-                        borderColor: 'rgba(255, 201, 64, 1)', spanGaps: true,
-                        segment: { borderColor: function(ctx) { var v = ctx.p0.parsed.y; return v >= 70 ? 'rgba(0, 217, 160, 1)' : v >= 55 ? 'rgba(255, 201, 64, 1)' : v >= 40 ? 'rgba(255, 140, 64, 1)' : 'rgba(255, 77, 106, 1)'; } },
+                        borderColor: tc.semNeutral, spanGaps: true,
+                        segment: { borderColor: function(ctx) { var v = ctx.p0.parsed.y, c = getThemeColors(); return v >= 70 ? c.semGood : v >= 55 ? c.semNeutral : v >= 40 ? c.semCaution : c.semBad; } },
                         backgroundColor: function(context) {
                             var chart = context.chart, area = chart.chartArea;
                             if (!area) return 'rgba(255, 201, 64, 0.05)';
@@ -2627,9 +2684,9 @@
                             callbacks: { title: function(items) { return items[0].label; }, label: function(item) { var s = item.raw, st = s >= 70 ? 'Good Time to Move' : s >= 55 ? 'Worth Exploring' : s >= 40 ? 'Build Your Position' : 'Get Creative'; return ['Score: ~' + s, st]; } }
                         },
                         annotation: { annotations: {
-                            line70: { type: 'line', yMin: 70, yMax: 70, borderColor: 'rgba(0, 217, 160, 0.3)', borderWidth: 1, borderDash: [5, 5] },
-                            line55: { type: 'line', yMin: 55, yMax: 55, borderColor: 'rgba(255, 201, 64, 0.3)', borderWidth: 1, borderDash: [5, 5] },
-                            line40: { type: 'line', yMin: 40, yMax: 40, borderColor: 'rgba(255, 140, 64, 0.3)', borderWidth: 1, borderDash: [5, 5] }
+                            line70: { type: 'line', yMin: 70, yMax: 70, borderColor: isDarkInit ? 'rgba(0,217,160,0.3)' : 'rgba(0,160,112,0.45)', borderWidth: 1, borderDash: [5, 5] },
+                            line55: { type: 'line', yMin: 55, yMax: 55, borderColor: isDarkInit ? 'rgba(255,201,64,0.3)' : 'rgba(180,140,0,0.45)', borderWidth: 1, borderDash: [5, 5] },
+                            line40: { type: 'line', yMin: 40, yMax: 40, borderColor: isDarkInit ? 'rgba(255,140,64,0.3)' : 'rgba(210,105,30,0.45)', borderWidth: 1, borderDash: [5, 5] }
                             // Historical annotations added dynamically via toggle
                         } }
                     },
@@ -2655,12 +2712,12 @@
                 var minVal = Math.min.apply(null, validData), maxVal = Math.max.apply(null, validData);
                 var formatValue = function(val) { return metric === 'openingsRatio' ? val.toFixed(1) : metric === 'lfpr' ? val.toFixed(0) : val.toFixed(1); };
                 if (rangeId) { var rangeEl = document.getElementById(rangeId); if (rangeEl) { rangeEl.querySelector('.max').textContent = formatValue(maxVal); rangeEl.querySelector('.min').textContent = formatValue(minVal); } }
-                var getColor = function(val) { var t = thresholds[metric], c = getThemeColors(); if (!t) return c.sparklineNeutral; if (t.inverted) return val <= t.good ? c.sparklineGood : val <= t.neutral ? c.sparklineNeutral : c.sparklineBad; return val >= t.good ? c.sparklineGood : val >= t.neutral ? c.sparklineNeutral : c.sparklineBad; };
+                var getColor = function(val) { var t = thresholds[metric], c = getThemeColors(); if (!t) return c.semNeutral; if (t.inverted) return val <= t.good ? c.semGood : val <= t.neutral ? c.semNeutral : c.semBad; return val >= t.good ? c.semGood : val >= t.neutral ? c.semNeutral : c.semBad; };
                 var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
                 var tc = getThemeColors();
                 sparklineInstances[canvasId] = new Chart(ctx, {
                     type: 'line',
-                    data: { labels: monthlyData.labels, datasets: [{ data: dataArray, borderColor: getThemeColors().sparklineNeutral, segment: { borderColor: function(ctx) { return getColor(ctx.p0.parsed.y); } }, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 3, borderWidth: 1.5 }] },
+                    data: { labels: monthlyData.labels, datasets: [{ data: dataArray, borderColor: getThemeColors().semNeutral, segment: { borderColor: function(ctx) { return getColor(ctx.p0.parsed.y); } }, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 3, borderWidth: 1.5 }] },
                     options: { responsive: true, maintainAspectRatio: false, interaction: { intersect: false, mode: 'index' }, plugins: { legend: { display: false }, tooltip: { backgroundColor: tc.tooltipBg, borderColor: tc.tooltipBorder, borderWidth: 1, titleColor: tc.tooltipText, bodyColor: tc.tooltipSecondary, padding: 8, displayColors: false, callbacks: { title: function(items) { return items[0].label; }, label: function(item) { return item.raw != null ? formatValue(item.raw) : ''; } } } }, scales: { x: { display: false }, y: { display: false } } }
                 });
             }
