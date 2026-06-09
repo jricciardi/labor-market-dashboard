@@ -778,14 +778,6 @@
         .mover-name { color: var(--text-secondary); transition: color var(--theme-transition); }
 
         /* Metrics summary strip — mobile/tablet affordance; desktop shows the cards directly */
-        @media (min-width: 900px) {
-            .metrics-summary { display: none; }
-            .metrics-grid-wrapper, .metrics-grid-wrapper.grid-collapsed {
-                grid-template-rows: 1fr;
-                opacity: 1;
-            }
-        }
-
         .metrics-summary {
             display: block;
             padding: 12px 16px;
@@ -808,6 +800,15 @@
         .metrics-grid-wrapper.grid-collapsed {
             grid-template-rows: 0fr;
             opacity: 0;
+        }
+
+        /* Desktop shows the evidence by default: summary strip is mobile/tablet only */
+        @media (min-width: 900px) {
+            .metrics-summary { display: none; }
+            .metrics-grid-wrapper, .metrics-grid-wrapper.grid-collapsed {
+                grid-template-rows: 1fr;
+                opacity: 1;
+            }
         }
 
         .summary-items { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 10px; }
