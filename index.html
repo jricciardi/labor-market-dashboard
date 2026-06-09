@@ -833,7 +833,11 @@
         .metric-delta.up { color: var(--accent-green-text); background: var(--accent-green-dim); }
         .metric-delta.down { color: var(--accent-red-text); background: var(--accent-red-dim); }
         .metric-delta.flat { color: var(--text-muted); background: var(--bg-tertiary); }
-        .metric-lag { font-size: 0.55rem; color: var(--text-muted); margin-left: 4px; font-weight: 400; }
+        .tier-lag-note {
+            font-size: 0.7rem; color: var(--text-muted);
+            margin-left: auto; white-space: nowrap;
+            transition: color var(--theme-transition);
+        }
         .metric-delta.up.inverted { color: var(--accent-red-text); background: var(--accent-red-dim); }
         .metric-delta.down.inverted { color: var(--accent-green-text); background: var(--accent-green-dim); }
 
@@ -1065,6 +1069,31 @@
             margin-bottom: 24px;
         }
 
+        .load-error .retry-btn {
+            margin-top: 14px;
+            padding: 10px 24px;
+            min-height: 44px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .load-error .retry-btn:hover { background: var(--bg-hover); border-color: var(--text-muted); }
+        .load-error .retry-btn:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; }
+
+        .chart-fallback {
+            display: flex; align-items: center; justify-content: center;
+            height: 100%; min-height: 120px;
+            color: var(--text-muted); font-size: 0.75rem;
+            border: 1px dashed var(--border-color); border-radius: 6px;
+            text-align: center; padding: 16px;
+        }
+
         /* Footer */
         footer {
             text-align: left; padding: 28px 0; font-size: 0.7rem; color: var(--text-muted);
@@ -1224,6 +1253,10 @@
     </nav>
     
     <div class="container">
+        <noscript>
+            <style>.skeleton { animation: none; visibility: hidden; }</style>
+            <div class="load-error">This dashboard needs JavaScript to calculate and display the market score from the latest government data. Please enable JavaScript and reload.</div>
+        </noscript>
         <header>
             <div class="header-top">
                 <h1>Is Now a Good Time?</h1>
@@ -1370,6 +1403,7 @@
                 <span class="tier-badge">Core</span>
                 <span class="tier-title">The Core Metrics</span>
                 <span class="tier-subtitle">— How much leverage do workers have right now?</span>
+                <span class="tier-lag-note" id="coreLagNote" hidden></span>
             </div>
             <!-- PHASE 8: Mobile summary -->
             <div class="metrics-summary" id="coreSummary">
@@ -1963,7 +1997,16 @@
         // MAIN DASHBOARD INITIALIZATION
         // ========================================
         async function initDashboard() {
+            // Idempotent: destroy any chart instances from a previous (failed) attempt
+            if (mainChartInstance) { mainChartInstance.destroy(); mainChartInstance = null; }
+            if (scenarioChart) { scenarioChart.destroy(); scenarioChart = null; }
+            Object.keys(sparklineInstances).forEach(function(k) { if (sparklineInstances[k]) sparklineInstances[k].destroy(); });
+            sparklineInstances = {};
+
+            var chartsAvailable = typeof Chart !== 'undefined';
+
             const response = await fetch('data.json');
+            if (!response.ok) throw new Error('HTTP ' + response.status);
             const data = await response.json();
             
             const monthlyData = {
@@ -2138,19 +2181,58 @@
                 '<span class="context-chip"><span class="context-chip-label">Similar to</span> <span class="context-chip-value">' + analogText + '</span></span>';
 
             // ========================================
+            // CURRENT METRICS (carry-forward aware)
+            // ========================================
+            var currentMetrics = {
+                quitRate: monthlyData.quitRate[currentIdx],
+                openingsRatio: monthlyData.openingsRatio[currentIdx],
+                hiresRate: monthlyData.hiresRate[currentIdx],
+                layoffsRate: monthlyData.layoffsRate[currentIdx],
+                unempRate: monthlyData.unempRate[currentIdx],
+                fedRate: monthlyData.fedRate[currentIdx],
+                wageGrowth: monthlyData.wageGrowth[currentIdx],
+                lfpr: monthlyData.lfpr[currentIdx]
+            };
+
+            // Carry forward JOLTS if null for current month (JOLTS data lags ~1 month),
+            // remembering each metric's source month for honest deltas and lag labeling
+            var joltsCarried = {};
+            var joltsSourceIdx = {};
+            ['quitRate', 'openingsRatio', 'hiresRate', 'layoffsRate'].forEach(function(k) {
+                if (currentMetrics[k] == null) {
+                    for (var p = currentIdx - 1; p >= 0; p--) {
+                        if (monthlyData[k][p] != null) { currentMetrics[k] = monthlyData[k][p]; joltsCarried[k] = true; joltsSourceIdx[k] = p; break; }
+                    }
+                }
+            });
+
+            // Surface the lag: header gets a precise claim, core tier gets one consolidated note
+            var carriedKeys = Object.keys(joltsCarried);
+            if (carriedKeys.length) {
+                var srcLabel = monthlyData.labels[joltsSourceIdx[carriedKeys[0]]]; // e.g. "Apr-26"
+                var srcParts = srcLabel.split('-');
+                document.getElementById('lastUpdated').textContent += ' · core metrics ' + srcParts[0];
+                var lagNote = document.getElementById('coreLagNote');
+                if (lagNote) {
+                    lagNote.textContent = 'Data through ' + srcParts[0] + ' 20' + srcParts[1] + ' — JOLTS lags a month behind';
+                    lagNote.hidden = false;
+                }
+            }
+
+            // ========================================
             // DYNAMIC NARRATIVE ASSESSMENT
             // ========================================
             (function generateNarrativeAssessment() {
                 var el = document.getElementById('narrativeAssessment');
                 if (!el) return;
 
-                // Gather current values from the score index (last valid JOLTS month)
-                var quit = monthlyData.quitRate[currentIdx];
-                var ratio = monthlyData.openingsRatio[currentIdx];
-                var hires = monthlyData.hiresRate[currentIdx];
-                var layoffs = monthlyData.layoffsRate[currentIdx];
-                var unemp = monthlyData.unempRate[currentIdx];
-                var fed = monthlyData.fedRate[currentIdx];
+                // Use carry-forward-aware values so core sentences survive the JOLTS lag window
+                var quit = currentMetrics.quitRate;
+                var ratio = currentMetrics.openingsRatio;
+                var hires = currentMetrics.hiresRate;
+                var layoffs = currentMetrics.layoffsRate;
+                var unemp = currentMetrics.unempRate;
+                var fed = currentMetrics.fedRate;
 
                 // Determine 6-month score trend
                 var trendStart = Math.max(0, currentIdx - 5);
@@ -2229,37 +2311,24 @@
             // ========================================
             // METRIC VALUES
             // ========================================
-            var currentMetrics = {
-                quitRate: monthlyData.quitRate[currentIdx],
-                openingsRatio: monthlyData.openingsRatio[currentIdx],
-                hiresRate: monthlyData.hiresRate[currentIdx],
-                layoffsRate: monthlyData.layoffsRate[currentIdx],
-                unempRate: monthlyData.unempRate[currentIdx],
-                fedRate: monthlyData.fedRate[currentIdx],
-                wageGrowth: monthlyData.wageGrowth[currentIdx],
-                lfpr: monthlyData.lfpr[currentIdx]
-            };
-
-            // Carry forward JOLTS if null for current month (JOLTS data lags ~1 month)
-            var joltsCarried = {};
-            ['quitRate', 'openingsRatio', 'hiresRate', 'layoffsRate'].forEach(function(k) {
-                if (currentMetrics[k] == null) {
-                    for (var p = currentIdx - 1; p >= 0; p--) {
-                        if (monthlyData[k][p] != null) { currentMetrics[k] = monthlyData[k][p]; joltsCarried[k] = true; break; }
-                    }
+            // Honest deltas: compare each metric against the month before its own source.
+            // A carried April value compares to March, not to itself (which would fake a flat "—").
+            function prevValueFor(k) {
+                var srcIdx = joltsCarried[k] ? joltsSourceIdx[k] : currentIdx;
+                for (var p = srcIdx - 1; p >= 0; p--) {
+                    if (monthlyData[k][p] != null) return monthlyData[k][p];
                 }
-            });
-
-            var prevIdx = currentIdx > 0 ? currentIdx - 1 : currentIdx;
+                return null;
+            }
             var prevMetrics = {
-                quitRate: monthlyData.quitRate[prevIdx],
-                openingsRatio: monthlyData.openingsRatio[prevIdx],
-                hiresRate: monthlyData.hiresRate[prevIdx],
-                layoffsRate: monthlyData.layoffsRate[prevIdx],
-                unempRate: monthlyData.unempRate[prevIdx],
-                fedRate: monthlyData.fedRate[prevIdx],
-                wageGrowth: monthlyData.wageGrowth[prevIdx],
-                lfpr: monthlyData.lfpr[prevIdx]
+                quitRate: prevValueFor('quitRate'),
+                openingsRatio: prevValueFor('openingsRatio'),
+                hiresRate: prevValueFor('hiresRate'),
+                layoffsRate: prevValueFor('layoffsRate'),
+                unempRate: prevValueFor('unempRate'),
+                fedRate: prevValueFor('fedRate'),
+                wageGrowth: prevValueFor('wageGrowth'),
+                lfpr: prevValueFor('lfpr')
             };
             
             function getMetricClass(value, metric) {
@@ -2289,14 +2358,13 @@
                 return '<span class="metric-delta ' + dir + inv + '">' + sign + d.toFixed(decimals) + '</span>';
             }
             
-            var lagTag = '<span class="metric-lag">(prior mo.)</span>';
-            document.getElementById('quitValue').innerHTML = currentMetrics.quitRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.quitRate, prevMetrics.quitRate, 1) + (joltsCarried.quitRate ? lagTag : '');
+            document.getElementById('quitValue').innerHTML = currentMetrics.quitRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.quitRate, prevMetrics.quitRate, 1);
             document.getElementById('quitValue').className = 'metric-value ' + getMetricClass(currentMetrics.quitRate, 'quitRate');
-            document.getElementById('ratioValue').innerHTML = currentMetrics.openingsRatio.toFixed(2) + getDeltaHTML(currentMetrics.openingsRatio, prevMetrics.openingsRatio, 2) + (joltsCarried.openingsRatio ? lagTag : '');
+            document.getElementById('ratioValue').innerHTML = currentMetrics.openingsRatio.toFixed(2) + getDeltaHTML(currentMetrics.openingsRatio, prevMetrics.openingsRatio, 2);
             document.getElementById('ratioValue').className = 'metric-value ' + getMetricClass(currentMetrics.openingsRatio, 'openingsRatio');
-            document.getElementById('hiresValue').innerHTML = currentMetrics.hiresRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.hiresRate, prevMetrics.hiresRate, 1) + (joltsCarried.hiresRate ? lagTag : '');
+            document.getElementById('hiresValue').innerHTML = currentMetrics.hiresRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.hiresRate, prevMetrics.hiresRate, 1);
             document.getElementById('hiresValue').className = 'metric-value ' + getMetricClass(currentMetrics.hiresRate, 'hiresRate');
-            document.getElementById('layoffsValue').innerHTML = currentMetrics.layoffsRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.layoffsRate, prevMetrics.layoffsRate, 1, true) + (joltsCarried.layoffsRate ? lagTag : '');
+            document.getElementById('layoffsValue').innerHTML = currentMetrics.layoffsRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.layoffsRate, prevMetrics.layoffsRate, 1, true);
             document.getElementById('layoffsValue').className = 'metric-value ' + getMetricClass(currentMetrics.layoffsRate, 'layoffsRate');
             document.getElementById('unempValue').innerHTML = (currentMetrics.unempRate || 0).toFixed(1) + '%' + getDeltaHTML(currentMetrics.unempRate, prevMetrics.unempRate, 1, true);
             document.getElementById('unempValue').className = 'metric-value ' + getMetricClass(currentMetrics.unempRate || 5, 'unempRate');
@@ -2544,6 +2612,7 @@
             }
 
             function updateChartEmphasis(key) {
+                if (!scenarioChart) return;
                 scenarioChart.data.datasets[5].hidden = true;
                 delete scenarioChart.options.plugins.annotation.annotations.endCustom;
                 if (key === 'now') {
@@ -2559,11 +2628,13 @@
                 document.querySelectorAll('.preset-pill').forEach(function(p) { p.classList.remove('active'); p.setAttribute('aria-pressed', 'false'); });
                 var m = readSliders(); updateSliderLabels(m); var score = calcScenarioScore(m);
                 customScore = score;
-                scenarioChart.data.datasets[5].data = buildPath(score); scenarioChart.data.datasets[5].hidden = false;
-                scenarioChart.data.datasets[5].borderColor = getScenarioLineColor(score); scenarioChart.data.datasets[5].pointBackgroundColor = getScenarioLineColor(score); scenarioChart.data.datasets[5].borderWidth = 3;
-                PRESET_LINES.forEach(function(sk) { var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]]; ds.borderWidth = 1.5; ds.borderColor = getScenarioDimColor(SCENARIO_SCORES[sk]); });
-                scenarioChart.options.plugins.annotation.annotations.endCustom = { type: 'label', xValue: SC_TOTAL - 0.2, yValue: score, content: ['\u2726 ' + score], font: { size: 10, weight: 700, family: "'JetBrains Mono'" }, color: getScenarioTextColor(score), position: { x: 'start' } };
-                scenarioChart.update();
+                if (scenarioChart) {
+                    scenarioChart.data.datasets[5].data = buildPath(score); scenarioChart.data.datasets[5].hidden = false;
+                    scenarioChart.data.datasets[5].borderColor = getScenarioLineColor(score); scenarioChart.data.datasets[5].pointBackgroundColor = getScenarioLineColor(score); scenarioChart.data.datasets[5].borderWidth = 3;
+                    PRESET_LINES.forEach(function(sk) { var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]]; ds.borderWidth = 1.5; ds.borderColor = getScenarioDimColor(SCENARIO_SCORES[sk]); });
+                    scenarioChart.options.plugins.annotation.annotations.endCustom = { type: 'label', xValue: SC_TOTAL - 0.2, yValue: score, content: ['\u2726 ' + score], font: { size: 10, weight: 700, family: "'JetBrains Mono'" }, color: getScenarioTextColor(score), position: { x: 'start' } };
+                    scenarioChart.update();
+                }
                 setNarrative(getCustomNarrative(score));
             }
 
@@ -2590,10 +2661,12 @@
                 customScore = null;
                 document.querySelectorAll('.preset-pill').forEach(function(p) { p.classList.remove('active'); p.setAttribute('aria-pressed', 'false'); });
                 setSliders(CUR);
-                PRESET_LINES.forEach(function(sk) { var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]]; ds.borderWidth = 2; ds.borderDash = [8, 4]; ds.borderColor = getScenarioLineColor(SCENARIO_SCORES[sk]); });
-                scenarioChart.data.datasets[5].hidden = true; scenarioChart.data.datasets[5].data = new Array(SC_TOTAL).fill(null);
-                delete scenarioChart.options.plugins.annotation.annotations.endCustom;
-                scenarioChart.update();
+                if (scenarioChart) {
+                    PRESET_LINES.forEach(function(sk) { var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]]; ds.borderWidth = 2; ds.borderDash = [8, 4]; ds.borderColor = getScenarioLineColor(SCENARIO_SCORES[sk]); });
+                    scenarioChart.data.datasets[5].hidden = true; scenarioChart.data.datasets[5].data = new Array(SC_TOTAL).fill(null);
+                    delete scenarioChart.options.plugins.annotation.annotations.endCustom;
+                    scenarioChart.update();
+                }
                 setNarrative(SC_NARRATIVES._invitation);
                 var panel = document.getElementById('slider-panel'), toggle = document.getElementById('slider-toggle');
                 panel.classList.add('collapsed'); toggle.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false');
@@ -2603,10 +2676,11 @@
             for (var key in SCENARIO_SCORES) { var el = document.querySelector('[data-pill="' + key + '"]'); if (el) { el.textContent = SCENARIO_SCORES[key]; el.className = 'pill-score sem-' + getScenarioTierClass(SCENARIO_SCORES[key]); } }
 
             renderSliders();
-            initScenarioChart();
+            if (chartsAvailable) initScenarioChart();
 
             // Recolor static scenario chart colors for the active theme, preserving emphasis state
             scenarioThemeRepaint = function() {
+                if (!scenarioChart) return;
                 PRESET_LINES.forEach(function(sk) {
                     var ds = scenarioChart.data.datasets[SCENARIO_DS[sk]];
                     var dimmed = ds.borderWidth < 2; // dim state is encoded as 1.5px width
@@ -2645,8 +2719,23 @@
             window.addEventListener('resize', checkMobileTruncation);
 
             // ========================================
-            // CHARTS
+            // CHARTS (progressive enhancement — the score works without them)
             // ========================================
+            if (!chartsAvailable) {
+                [['.chart-container', 'Score history chart unavailable — the charting library could not load.'],
+                 ['.scenario-chart-area', 'Scenario chart unavailable — the charting library could not load.']].forEach(function(pair) {
+                    var area = document.querySelector(pair[0]);
+                    if (area) {
+                        var canvas = area.querySelector('canvas');
+                        if (canvas) canvas.style.display = 'none';
+                        var note = document.createElement('div');
+                        note.className = 'chart-fallback';
+                        note.textContent = pair[1];
+                        area.appendChild(note);
+                    }
+                });
+            } else {
+
             Chart.defaults.font.family = "'JetBrains Mono', monospace";
             Chart.defaults.font.size = 10;
 
@@ -2731,6 +2820,8 @@
             createSparkline('wageChart', monthlyData.wageGrowth.map(function(v) { return v || 0; }), 'wageGrowth', 'wageRange');
             createSparkline('lfprChart', monthlyData.lfpr.map(function(v) { return v || 0; }), 'lfpr', 'lfprRange');
 
+            } // end chartsAvailable
+
             // ========================================
             // PHASE 8: Collapse metrics on mobile (after charts render)
             // ========================================
@@ -2791,17 +2882,29 @@
             });
         }
 
-        // Initialize everything
-        initDashboard().catch(function() {
-            document.body.classList.remove('js-loading');
-            var container = document.querySelector('.container');
-            if (container) {
+        // Initialize everything — with retry on data load failure
+        function startDashboard() {
+            var existing = document.querySelector('.load-error');
+            if (existing) existing.remove();
+            document.body.classList.add('js-loading');
+            initDashboard().catch(function() {
+                document.body.classList.remove('js-loading');
+                var container = document.querySelector('.container');
+                if (!container) return;
                 var errEl = document.createElement('div');
                 errEl.className = 'load-error';
-                errEl.textContent = 'Unable to load data. Please refresh the page.';
+                var msg = document.createElement('p');
+                msg.textContent = 'Couldn’t load the latest market data. Check your connection and try again.';
+                var btn = document.createElement('button');
+                btn.className = 'retry-btn';
+                btn.textContent = 'Retry';
+                btn.addEventListener('click', startDashboard);
+                errEl.appendChild(msg);
+                errEl.appendChild(btn);
                 container.insertBefore(errEl, container.firstChild);
-            }
-        });
+            });
+        }
+        startDashboard();
         initStickyNav();
     </script>
 </body>
