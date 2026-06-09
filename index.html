@@ -67,6 +67,9 @@
 
             --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
             --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+            /* Spacing rhythm: tight pairings inside a story beat, generous breaks between beats */
+            --space-section: clamp(44px, 6vw, 72px);
         }
 
         /* ========================================
@@ -152,14 +155,14 @@
         }
 
         .skeleton-text { height: 1em; display: inline-block; min-width: 60px; }
-        .skeleton-score { width: 80px; height: 4.5rem; display: inline-block; }
-        .skeleton-badge { width: 120px; height: 32px; border-radius: 20px; }
+        .skeleton-score { width: 64px; height: 3rem; display: inline-block; }
 
         .js-loading .metric-value,
         .js-loading .score-value,
         .js-loading .score-verdict,
         .js-loading .score-change,
         .js-loading .score-context,
+        .js-loading .scale-marker,
         .js-loading .action-content,
         .js-loading .scenarios-section .narrative-assessment,
         .js-loading .scenarios-section .narrative-interpretation,
@@ -415,46 +418,58 @@
         .about-main em { color: var(--accent-yellow-text); font-style: normal; }
         .about-note { font-size: 0.7rem !important; color: var(--text-muted) !important; margin-top: 12px !important; }
 
-        /* Hero Score Section */
+        /* Hero Score Section — the verdict is the headline, the score supports it */
         .hero-score {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 28px 32px;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             position: relative;
-            overflow: hidden;
             transition: background var(--theme-transition), border-color var(--theme-transition);
-        }
-
-        .hero-score::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-red), var(--accent-orange) 33%, var(--accent-yellow) 66%, var(--accent-green));
         }
 
         .score-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
+            align-items: flex-end;
+            gap: 24px;
+            margin-bottom: 4px;
         }
+
+        .verdict-block { min-width: 0; }
 
         .score-label {
             font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.15em;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             transition: color var(--theme-transition);
         }
 
-        .score-display { display: flex; align-items: baseline; gap: 8px; }
+        .score-verdict {
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: clamp(2.1rem, 4.5vw, 2.9rem);
+            line-height: 1.08;
+            letter-spacing: -0.015em;
+            margin: 0 0 10px;
+            transition: color var(--theme-transition);
+        }
+
+        .score-verdict.good-time { color: var(--accent-green-text); }
+        .score-verdict.worth-exploring { color: var(--accent-yellow-text); }
+        .score-verdict.build-your-position { color: var(--accent-orange-text); }
+        .score-verdict.tough-market { color: var(--accent-red-text); }
+
+        .score-change { font-size: 0.75rem; color: var(--text-muted); transition: color var(--theme-transition); }
+
+        .score-display { display: flex; align-items: baseline; gap: 6px; flex-shrink: 0; padding-bottom: 2px; }
 
         .score-value {
-            font-size: 4.5rem;
+            font-size: 3rem;
             font-weight: 700;
             line-height: 1;
             font-variant-numeric: tabular-nums;
@@ -462,10 +477,10 @@
         }
 
         .score-approx {
-            font-size: 1.5rem;
+            font-size: 1.1rem;
             font-weight: 400;
             color: var(--text-muted);
-            margin-right: -4px;
+            margin-right: -2px;
             cursor: help;
             transition: color var(--theme-transition);
         }
@@ -475,37 +490,32 @@
         .score-value.build-your-position { color: var(--accent-orange-text); }
         .score-value.tough-market { color: var(--accent-red-text); }
 
-        .score-max { font-size: 1.2rem; color: var(--text-muted); transition: color var(--theme-transition); }
-        .score-meta { text-align: right; }
+        .score-max { font-size: 0.9rem; color: var(--text-muted); transition: color var(--theme-transition); }
 
-        .score-verdict {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 8px;
-            transition: background var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition);
+        /* Score scale — the semantic spectrum, anchored by a "you are here" marker */
+        .score-scale {
+            position: relative;
+            height: 6px;
+            border-radius: 3px;
+            margin: 18px 0 12px;
+            background: linear-gradient(90deg,
+                var(--accent-red) 0 40%,
+                var(--accent-orange) 40% 55%,
+                var(--accent-yellow) 55% 70%,
+                var(--accent-green) 70% 100%);
         }
 
-        .score-verdict.good-time { background: var(--accent-green-dim); color: var(--accent-green-text); border: 1px solid var(--accent-green); }
-        .score-verdict.worth-exploring { background: var(--accent-yellow-dim); color: var(--accent-yellow-text); border: 1px solid var(--accent-yellow); }
-        .score-verdict.build-your-position { background: var(--accent-orange-dim); color: var(--accent-orange-text); border: 1px solid var(--accent-orange); }
-        .score-verdict.tough-market { background: var(--accent-red-dim); color: var(--accent-red-text); border: 1px solid var(--accent-red); }
-
-        .verdict-icon { width: 8px; height: 8px; border-radius: 50%; animation: pulse 2s infinite; }
-        .verdict-icon.good-time { background: var(--accent-green); }
-        .verdict-icon.worth-exploring { background: var(--accent-yellow); }
-        .verdict-icon.build-your-position { background: var(--accent-orange); }
-        .verdict-icon.tough-market { background: var(--accent-red); }
-
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-
-        .score-change { font-size: 0.75rem; color: var(--text-muted); transition: color var(--theme-transition); }
+        .scale-marker {
+            position: absolute;
+            top: -4px;
+            bottom: -4px;
+            left: 50%;
+            width: 3px;
+            border-radius: 2px;
+            background: var(--text-primary);
+            box-shadow: 0 0 0 2px var(--bg-secondary);
+            transform: translateX(-50%);
+        }
 
         /* PHASE 8: Inline Score Context */
         .score-context {
@@ -513,7 +523,7 @@
             flex-wrap: wrap;
             align-items: center;
             gap: 4px 14px;
-            margin-top: 10px;
+            margin-top: 0;
             font-size: 0.7rem;
         }
 
@@ -525,7 +535,7 @@
         /* Action Section — flattened: the tier-colored left border carries the meaning */
         .action-section {
             padding: 4px 0 4px 20px;
-            margin-top: 4px;
+            margin-top: 24px;
         }
 
         .action-header {
@@ -633,13 +643,13 @@
         .score-guide-range { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; transition: color var(--theme-transition); }
         .score-guide-feel { font-size: 0.7rem; color: var(--text-muted); line-height: 1.4; transition: color var(--theme-transition); }
 
-        /* Main Chart */
+        /* Main Chart — paired tightly with the hero it substantiates */
         .main-chart {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 24px;
-            margin-bottom: 24px;
+            margin-bottom: var(--space-section);
             transition: background var(--theme-transition), border-color var(--theme-transition);
         }
 
@@ -701,7 +711,7 @@
         .chart-container { position: relative; height: 320px; }
 
         /* Tier Sections */
-        .tier-section { margin-bottom: 32px; }
+        .tier-section { margin-bottom: 40px; }
 
         .tier-header {
             display: flex;
@@ -746,7 +756,15 @@
         .mover { display: inline-flex; align-items: center; gap: 2px; }
         .mover-name { color: var(--text-secondary); transition: color var(--theme-transition); }
 
-        /* Metrics summary strip — all viewports; card grids expand on demand */
+        /* Metrics summary strip — mobile/tablet affordance; desktop shows the cards directly */
+        @media (min-width: 900px) {
+            .metrics-summary { display: none; }
+            .metrics-grid-wrapper, .metrics-grid-wrapper.grid-collapsed {
+                grid-template-rows: 1fr;
+                opacity: 1;
+            }
+        }
+
         .metrics-summary {
             display: block;
             padding: 12px 16px;
@@ -865,7 +883,7 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 24px;
-            margin-bottom: 24px;
+            margin: var(--space-section) 0;
             transition: background var(--theme-transition), border-color var(--theme-transition);
         }
 
@@ -1120,16 +1138,15 @@
         @media (max-width: 768px) {
             .container { padding: 16px; }
             h1 { font-size: 1.6rem; }
-            .score-value { font-size: 3rem; }
-            .score-approx { font-size: 1.2rem; }
+            .score-value { font-size: 2.4rem; }
+            .score-approx { font-size: 1rem; }
             .metrics-grid { grid-template-columns: 1fr; }
             .header-top { flex-direction: column; gap: 12px; }
             .header-meta { text-align: left; }
             .chart-legend { gap: 8px; font-size: 0.65rem; }
             .legend-item { gap: 4px; }
             .legend-dot { width: 8px; height: 8px; }
-            .score-header { flex-direction: column; gap: 16px; }
-            .score-meta { text-align: left; }
+            .score-header { flex-direction: column; align-items: flex-start; gap: 16px; }
             .tier-header { flex-wrap: wrap; }
             .tier-subtitle { width: 100%; margin-left: 0; margin-top: 4px; }
             .accordion-trigger { padding: 14px 0; font-size: 0.75rem; }
@@ -1181,9 +1198,9 @@
             .last-updated { background: none !important; padding: 0; color: #666 !important; display: inline; }
             .next-update, .data-freshness { display: none; }
             .hero-score { background: #f5f5f5 !important; border: 1px solid #ccc !important; page-break-inside: avoid; }
-            .hero-score::before { display: none; }
             .score-value { color: #1a1a1a !important; }
-            .score-verdict { background: none !important; border: 1px solid currentColor !important; }
+            .score-verdict { color: #1a1a1a !important; }
+            .scale-marker { background: #1a1a1a !important; box-shadow: 0 0 0 2px #f5f5f5 !important; }
             .action-section { background: #f9f9f9 !important; border-color: #999 !important; }
             .metric-chart-wrapper, .sparkline-time, .sparkline-range { display: none !important; }
             .metrics-grid-wrapper { display: contents !important; }
@@ -1269,28 +1286,26 @@
             </div>
         </section>
 
-        <!-- Hero Score -->
+        <!-- Hero Score — verdict-first editorial headline -->
         <section class="hero-score" data-nav-section="score">
             <div class="score-header">
-                <div>
-                    <div class="score-label">The Score</div>
-                    <div class="score-display">
-                        <span class="score-approx" title="Approximate — read it as ±3 points">~</span>
-                        <span class="score-value" id="currentScore"><span class="skeleton skeleton-score"></span></span>
-                        <span class="score-max">/ 100</span>
-                    </div>
-                </div>
-                <div class="score-meta">
-                    <div class="score-verdict" id="scoreVerdict">
-                        <span class="verdict-icon" id="verdictIcon"></span>
-                        <span id="verdictText"><span class="skeleton skeleton-text" style="width: 100px;"></span></span>
-                    </div>
+                <div class="verdict-block">
+                    <div class="score-label">The market right now</div>
+                    <h2 class="score-verdict" id="scoreVerdict"><span id="verdictText"><span class="skeleton skeleton-text" style="width: 220px;"></span></span></h2>
                     <div class="score-change" id="scoreChange"><span class="skeleton skeleton-text" style="width: 140px;"></span></div>
-                    <!-- PHASE 8: Inline context replacing standalone section -->
-                    <div class="score-context" id="scoreContext"></div>
+                </div>
+                <div class="score-display">
+                    <span class="score-approx" title="Approximate — read it as ±3 points">~</span>
+                    <span class="score-value" id="currentScore"><span class="skeleton skeleton-score"></span></span>
+                    <span class="score-max">/ 100</span>
                 </div>
             </div>
-            
+
+            <div class="score-scale" aria-hidden="true">
+                <div class="scale-marker" id="scoreMarker"></div>
+            </div>
+            <div class="score-context" id="scoreContext"></div>
+
             <div class="action-section" id="actionSection">
                 <div class="action-header">
                     <span>What does this mean?</span>
@@ -1900,12 +1915,14 @@
 
         // Restore UI state on load
         document.addEventListener('DOMContentLoaded', function() {
-            // PHASE 8: About section defaults to collapsed; expand only if user chose
+            // About opens automatically on the first visit only; afterwards it
+            // follows the visitor's last explicit choice (toggleAbout overwrites this)
             var aboutCollapsed = localStorage.getItem('aboutCollapsed');
-            if (aboutCollapsed === 'false') {
+            if (aboutCollapsed === 'false' || aboutCollapsed === null) {
                 document.getElementById('aboutSection').classList.remove('collapsed');
                 document.getElementById('aboutToggleText').textContent = 'Hide';
                 document.getElementById('aboutHeader').setAttribute('aria-expanded', 'true');
+                if (aboutCollapsed === null) localStorage.setItem('aboutCollapsed', 'true');
             }
             
             var scoreGuideOpen = localStorage.getItem('scoreGuideOpen');
@@ -2083,9 +2100,12 @@
             document.getElementById('currentScore').textContent = currentScore;
             document.getElementById('currentScore').className = 'score-value ' + tierClass;
             document.getElementById('scoreVerdict').className = 'score-verdict ' + tierClass;
-            document.getElementById('verdictIcon').className = 'verdict-icon ' + tierClass;
             document.getElementById('verdictText').textContent = tierNames[tierKey];
             document.getElementById('actionSection').className = 'action-section ' + tierClass;
+
+            // Anchor the spectrum marker at the current score — the scale is signal, not decoration
+            var scoreMarker = document.getElementById('scoreMarker');
+            if (scoreMarker) scoreMarker.style.left = Math.min(100, Math.max(0, currentScore)) + '%';
             
             var accentColors = { 'good-time': 'var(--accent-green)', 'worth-exploring': 'var(--accent-yellow)', 'build-your-position': 'var(--accent-orange)', 'tough-market': 'var(--accent-red)' };
             document.getElementById('actionSection').style.borderLeft = '3px solid ' + accentColors[tierKey];
