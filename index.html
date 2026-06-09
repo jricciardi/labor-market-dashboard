@@ -826,6 +826,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            min-height: 44px;
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.65rem;
             color: var(--text-muted);
@@ -954,7 +955,7 @@
 
         .interp-more {
             display: none; font-family: inherit; font-size: 0.65rem; color: var(--accent-blue);
-            background: none; border: none; cursor: pointer; padding: 6px 0 0; margin: 0;
+            background: none; border: none; cursor: pointer; min-height: 44px; padding: 6px 12px 0 0; margin: 0;
         }
         .interp-more:hover { text-decoration: underline; }
 
@@ -1395,7 +1396,7 @@
         <section class="main-chart" data-nav-section="chart">
             <div class="chart-header">
                 <div class="chart-title-row">
-                    <div class="chart-title">How has the market shifted?</div>
+                    <h2 class="chart-title">How has the market shifted?</h2>
                     <span class="chart-range" id="chartRange"></span>
                     <label class="chart-toggle">
                         <input type="checkbox" id="annotationsToggle" onchange="toggleChartAnnotations()">
@@ -1425,7 +1426,7 @@
         <section class="tier-section" id="coreSection" data-nav-section="metrics">
             <div class="tier-header">
                 <span class="tier-badge">Core</span>
-                <span class="tier-title">The Core Metrics</span>
+                <h2 class="tier-title">The Core Metrics</h2>
                 <span class="tier-subtitle">— How much leverage do workers have right now?</span>
                 <span class="tier-lag-note" id="coreLagNote" hidden></span>
             </div>
@@ -1500,10 +1501,10 @@
         </section>
 
         <!-- Bigger Picture -->
-        <section class="tier-section" id="contextSection">
+        <section class="tier-section" id="contextSection" data-nav-section="metrics">
             <div class="tier-header">
                 <span class="tier-badge">Context</span>
-                <span class="tier-title">The Bigger Picture</span>
+                <h2 class="tier-title">The Bigger Picture</h2>
                 <span class="tier-subtitle">— Economic forces shaping the job market</span>
             </div>
             <!-- PHASE 8: Mobile summary -->
@@ -1581,7 +1582,7 @@
         <!-- Scenarios Section -->
         <section class="scenarios-section" data-nav-section="scenarios">
             <div class="scenarios-header">
-                <span class="scenarios-title">Where Things Could Go</span>
+                <h2 class="scenarios-title">Where Things Could Go</h2>
             </div>
 
             <div class="narrative-assessment" id="narrativeAssessment">
@@ -1590,7 +1591,7 @@
             </div>
 
             <div class="scenario-chart-area">
-                <canvas id="scenarioChart"></canvas>
+                <canvas id="scenarioChart" role="img" aria-label="Scenario chart showing the score's recent history and four possible 12-month paths, from market deterioration to recovery"></canvas>
             </div>
 
             <div class="narrative-interpretation" id="recoveryInterpretation" aria-live="polite">
@@ -1631,7 +1632,7 @@
 
         <!-- Understanding the Score -->
         <section class="accordion-section" data-nav-section="method">
-            <div class="accordion-header">Understanding the Score</div>
+            <h2 class="accordion-header">Understanding the Score</h2>
             
             <div class="accordion-item" id="accordion-calc">
                 <button class="accordion-trigger"
