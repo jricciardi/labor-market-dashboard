@@ -15,8 +15,13 @@
         })();
     </script>
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="data.json" as="fetch" crossorigin="anonymous">
+    <!-- Charts are progressive enhancement: defer keeps them off the critical path; the score renders without them -->
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
     <style>
         /* ========================================
@@ -1703,6 +1708,17 @@
         let annotationsVisible = false;
         let scenarioThemeRepaint = null; // assigned in initDashboard; recolors static scenario colors on theme switch
 
+        // Charts load via deferred CDN scripts, which finish before DOMContentLoaded.
+        // The score never waits for them; charts render when the library arrives, or onFail runs if it never does.
+        function whenChartLibReady(onReady, onFail) {
+            if (typeof Chart !== 'undefined') return onReady();
+            var settle = function() {
+                if (typeof Chart !== 'undefined') onReady(); else onFail();
+            };
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', settle);
+            else settle();
+        }
+
         // Historical event annotations for main chart
         const historicalAnnotations = {
             covidCrash: {
@@ -2007,8 +2023,6 @@
             if (scenarioChart) { scenarioChart.destroy(); scenarioChart = null; }
             Object.keys(sparklineInstances).forEach(function(k) { if (sparklineInstances[k]) sparklineInstances[k].destroy(); });
             sparklineInstances = {};
-
-            var chartsAvailable = typeof Chart !== 'undefined';
 
             const response = await fetch('data.json');
             if (!response.ok) throw new Error('HTTP ' + response.status);
@@ -2698,7 +2712,6 @@
             for (var key in SCENARIO_SCORES) { var el = document.querySelector('[data-pill="' + key + '"]'); if (el) { el.textContent = SCENARIO_SCORES[key]; el.className = 'pill-score sem-' + getScenarioTierClass(SCENARIO_SCORES[key]); } }
 
             renderSliders();
-            if (chartsAvailable) initScenarioChart();
 
             // Recolor static scenario chart colors for the active theme, preserving emphasis state
             scenarioThemeRepaint = function() {
@@ -2743,20 +2756,10 @@
             // ========================================
             // CHARTS (progressive enhancement — the score works without them)
             // ========================================
-            if (!chartsAvailable) {
-                [['.chart-container', 'Score history chart unavailable — the charting library could not load.'],
-                 ['.scenario-chart-area', 'Scenario chart unavailable — the charting library could not load.']].forEach(function(pair) {
-                    var area = document.querySelector(pair[0]);
-                    if (area) {
-                        var canvas = area.querySelector('canvas');
-                        if (canvas) canvas.style.display = 'none';
-                        var note = document.createElement('div');
-                        note.className = 'chart-fallback';
-                        note.textContent = pair[1];
-                        area.appendChild(note);
-                    }
-                });
-            } else {
+            whenChartLibReady(function() {
+
+            initScenarioChart();
+            if (activePreset) updateChartEmphasis(activePreset);
 
             Chart.defaults.font.family = "'JetBrains Mono', monospace";
             Chart.defaults.font.size = 10;
@@ -2842,7 +2845,21 @@
             createSparkline('wageChart', monthlyData.wageGrowth.map(function(v) { return v || 0; }), 'wageGrowth', 'wageRange');
             createSparkline('lfprChart', monthlyData.lfpr.map(function(v) { return v || 0; }), 'lfpr', 'lfprRange');
 
-            } // end chartsAvailable
+            }, function() {
+                // Chart library never arrived (blocked CDN, offline) — say so where the charts would be
+                [['.chart-container', 'Score history chart unavailable — the charting library could not load.'],
+                 ['.scenario-chart-area', 'Scenario chart unavailable — the charting library could not load.']].forEach(function(pair) {
+                    var area = document.querySelector(pair[0]);
+                    if (area) {
+                        var canvas = area.querySelector('canvas');
+                        if (canvas) canvas.style.display = 'none';
+                        var note = document.createElement('div');
+                        note.className = 'chart-fallback';
+                        note.textContent = pair[1];
+                        area.appendChild(note);
+                    }
+                });
+            });
 
             // ========================================
             // PHASE 8: Collapse metrics on mobile (after charts render)
