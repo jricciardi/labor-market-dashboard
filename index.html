@@ -350,14 +350,9 @@
             max-width: 700px;
         }
 
-        /* About Section */
+        /* About Section — plain prose on the page, no card chrome */
         .about-section {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
             margin-bottom: 24px;
-            overflow: hidden;
-            transition: background var(--theme-transition), border-color var(--theme-transition);
         }
 
         .about-header {
@@ -365,7 +360,7 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            padding: 16px 24px;
+            padding: 12px 0;
             cursor: pointer;
             user-select: none;
             border: none;
@@ -373,10 +368,9 @@
             font-family: inherit;
             text-align: left;
             color: inherit;
-            transition: background var(--theme-transition);
         }
 
-        .about-header:hover { background: var(--bg-tertiary); border-radius: 8px; }
+        .about-header:hover .about-toggle { color: var(--text-secondary); }
 
         .about-header h2 {
             font-family: 'Instrument Serif', serif;
@@ -402,10 +396,8 @@
         .about-section.collapsed .about-toggle .icon { transform: rotate(-90deg); }
 
         .about-content {
-            padding: 0 24px 24px 24px;
-            display: grid;
-            grid-template-columns: 1.4fr 1fr;
-            gap: 32px;
+            padding: 0 0 24px;
+            max-width: 720px;
         }
 
         .about-section.collapsed .about-content { display: none; }
@@ -422,34 +414,6 @@
         .about-main strong { color: var(--text-primary); }
         .about-main em { color: var(--accent-yellow-text); font-style: normal; }
         .about-note { font-size: 0.7rem !important; color: var(--text-muted) !important; margin-top: 12px !important; }
-
-        .about-how {
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            padding: 16px 20px;
-            transition: background var(--theme-transition);
-        }
-
-        .about-how h3 {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            transition: color var(--theme-transition);
-        }
-
-        .about-how ul { list-style: none; padding: 0; margin: 0; }
-
-        .about-how li {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            padding-left: 0;
-            transition: color var(--theme-transition);
-        }
-
-        .about-how li strong { color: var(--text-primary); }
 
         /* Hero Score Section */
         .hero-score {
@@ -558,12 +522,10 @@
         .context-chip-value { color: var(--text-secondary); font-weight: 500; font-variant-numeric: tabular-nums; transition: color var(--theme-transition); }
         .context-sep { color: var(--text-muted); opacity: 0.4; transition: color var(--theme-transition); }
 
-        /* Action Section */
+        /* Action Section — flattened: the tier-colored left border carries the meaning */
         .action-section {
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            padding: 20px 24px;
-            transition: background var(--theme-transition);
+            padding: 4px 0 4px 20px;
+            margin-top: 4px;
         }
 
         .action-header {
@@ -657,9 +619,7 @@
 
         .score-guide-item {
             text-align: center;
-            padding: 12px 10px;
-            background: var(--bg-tertiary);
-            border-radius: 6px;
+            padding: 10px 8px;
             border-top: 2px solid;
             transition: background var(--theme-transition);
         }
@@ -668,7 +628,7 @@
         .score-guide-item.yellow { border-top-color: var(--accent-yellow); }
         .score-guide-item.orange { border-top-color: var(--accent-orange); }
         .score-guide-item.red { border-top-color: var(--accent-red); }
-        .score-guide-item.current { background: var(--bg-primary); box-shadow: inset 0 0 0 1px var(--border-color); }
+        .score-guide-item.current { background: var(--bg-tertiary); border-radius: 0 0 6px 6px; }
 
         .score-guide-range { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; transition: color var(--theme-transition); }
         .score-guide-feel { font-size: 0.7rem; color: var(--text-muted); line-height: 1.4; transition: color var(--theme-transition); }
@@ -774,14 +734,13 @@
             gap: 16px;
         }
 
-        /* Movers strip — which metrics drove the score this month */
+        /* Movers strip — which metrics drove the score this month (quiet row, no card) */
         .metric-movers {
             display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px;
-            padding: 12px 16px; margin-bottom: 24px;
-            background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 0 4px; margin-bottom: 24px;
             font-size: 0.75rem;
-            transition: background var(--theme-transition), border-color var(--theme-transition);
         }
+        .metric-movers[hidden] { display: none; }
         .movers-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); white-space: nowrap; }
         .movers-items { display: inline-flex; flex-wrap: wrap; gap: 6px 14px; }
         .mover { display: inline-flex; align-items: center; gap: 2px; }
@@ -921,17 +880,16 @@
 
         .narrative-assessment {
             font-size: 0.85rem; color: var(--text-secondary); line-height: 1.75;
-            padding: 14px 16px; background: var(--bg-tertiary); border-radius: 8px;
-            border: 1px solid var(--border-color); margin-bottom: 16px;
-            transition: background var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition);
+            margin-bottom: 16px; max-width: 78ch;
+            transition: color var(--theme-transition);
         }
         .narrative-assessment strong { color: var(--text-primary); }
 
         .narrative-interpretation {
             font-size: 0.85rem; color: var(--text-secondary); line-height: 1.75;
-            padding: 14px 16px; background: var(--bg-tertiary); border-radius: 8px;
+            padding: 4px 0 4px 16px;
             border-left: 3px solid var(--accent-blue);
-            transition: border-color 0.3s ease, background var(--theme-transition), color var(--theme-transition);
+            transition: border-color 0.3s ease, color var(--theme-transition);
         }
         .narrative-interpretation strong { color: var(--text-primary); }
 
@@ -1035,30 +993,28 @@
         }
         input[type="range"]:focus::-moz-range-thumb { background: var(--accent-blue); }
 
-        /* Accordion */
+        /* Accordion — plain typographic section, hairline separators only */
         .accordion-section {
-            background: var(--bg-secondary); border: 1px solid var(--border-color);
-            border-radius: 8px; margin-bottom: 24px; overflow: hidden;
+            margin-bottom: 24px;
         }
 
         .accordion-header {
             font-family: 'Instrument Serif', serif;
             font-size: 1.3rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em;
             color: var(--text-primary);
-            padding: 20px 24px; border-bottom: 1px solid var(--border-color);
+            padding: 0 0 12px; border-bottom: 1px solid var(--border-color);
         }
 
         .accordion-item { border-bottom: 1px solid var(--border-color); }
-        .accordion-item:last-child { border-bottom: none; }
 
         .accordion-trigger {
             display: flex; justify-content: space-between; align-items: center;
-            width: 100%; padding: 16px 24px; background: none; border: none;
+            width: 100%; padding: 16px 0; background: none; border: none;
             color: var(--text-primary); font-family: inherit; font-size: 0.8rem;
             font-weight: 500; cursor: pointer; text-align: left;
         }
 
-        .accordion-trigger:hover { background: var(--bg-tertiary); }
+        .accordion-trigger:hover { color: var(--accent-blue); }
         .accordion-trigger .icon { color: var(--text-muted); transition: transform 0.25s var(--ease-out-quart); font-size: 0.6rem; }
 
         .chevron {
@@ -1082,8 +1038,8 @@
         }
         .accordion-panel-inner {
             overflow: hidden;
-            padding: 0 24px;
-            padding-bottom: 0;
+            padding: 0;
+            max-width: 720px;
             transition: padding-bottom 0.3s var(--ease-out-quart);
         }
         .accordion-item.open .accordion-panel { grid-template-rows: 1fr; }
@@ -1097,7 +1053,7 @@
         .accordion-panel a { color: var(--accent-blue); text-decoration: none; }
         .accordion-panel a:hover { text-decoration: underline; }
 
-        .formula-block { margin-top: 16px; padding: 14px 16px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-color); }
+        .formula-block { margin-top: 16px; }
         .formula-block strong { display: block; margin-bottom: 8px; font-size: 0.7rem; }
         .formula-block code { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--accent-yellow-text); background: var(--bg-tertiary); padding: 10px 12px; border-radius: 4px; margin-bottom: 10px; overflow-x: auto; }
         .formula-block p { font-size: 0.65rem; margin-bottom: 8px; }
@@ -1151,16 +1107,12 @@
         .footer-content a { color: var(--accent-blue); text-decoration: none; }
         .footer-content a:hover { text-decoration: underline; }
 
-        .footer-bottom {
-            padding-top: 16px; border-top: 1px solid var(--border-color);
-            text-align: center; color: var(--text-muted); font-size: 0.65rem;
-        }
+        .footer-bottom { margin-top: 12px; color: var(--text-muted); font-size: 0.65rem; }
 
         /* ========================================
            RESPONSIVE
            ======================================== */
         @media (max-width: 900px) {
-            .about-content { grid-template-columns: 1fr; gap: 20px; }
             .chart-legend { justify-content: flex-start; }
             .slider-grid { grid-template-columns: 1fr; }
         }
@@ -1180,8 +1132,7 @@
             .score-meta { text-align: left; }
             .tier-header { flex-wrap: wrap; }
             .tier-subtitle { width: 100%; margin-left: 0; margin-top: 4px; }
-            .accordion-trigger { padding: 14px 16px; font-size: 0.75rem; }
-            .accordion-panel-inner { padding: 0 16px; }
+            .accordion-trigger { padding: 14px 0; font-size: 0.75rem; }
             .accordion-item.open .accordion-panel-inner { padding-bottom: 16px; }
             .scenarios-section { padding: 16px; }
             .scenario-chart-area { height: 260px; }
@@ -1194,7 +1145,6 @@
 
         @media (max-width: 480px) {
             .chart-legend { flex-direction: column; align-items: flex-start; gap: 6px; }
-            .about-how ul { font-size: 0.7rem; }
             .action-list li { font-size: 0.75rem; }
             .metric-header { flex-direction: column; gap: 8px; }
             .metric-value { font-size: 1.5rem; }
@@ -1315,15 +1265,6 @@
                     <p>This dashboard uses eight economic indicators to cut through the noise and give job seekers a clearer, earlier read on conditions. The score runs from 0 to 100 — higher means better for workers. Data comes from the Bureau of Labor Statistics and Federal Reserve, updated monthly.</p>
                     <p>Start with the score, then explore what's driving it, then see what would need to change.</p>
                     <p class="about-note">This tracks the US labor market overall. Tech can freeze 18 months before it shows in national data; healthcare and government often move on different cycles entirely. If your sector feels worse than the score suggests, trust your network over the number.</p>
-                </div>
-                <div class="about-how">
-                    <h3>What the score means</h3>
-                    <ul>
-                        <li><strong>70+</strong> — Opportunities find you. Real leverage to negotiate.</li>
-                        <li><strong>55–69</strong> — Opportunities if you look. Some room to negotiate.</li>
-                        <li><strong>40–54</strong> — Slow going. Employers can afford to wait.</li>
-                        <li><strong>&lt;40</strong> — Hiring freezes. Little leverage.</li>
-                    </ul>
                 </div>
             </div>
         </section>
