@@ -307,9 +307,9 @@
         }
 
         .freshness-dot { width: 6px; height: 6px; border-radius: 50%; }
-        .freshness-dot.fresh { background: var(--accent-green); box-shadow: 0 0 4px var(--accent-green); }
-        .freshness-dot.stale { background: var(--accent-yellow); box-shadow: 0 0 4px var(--accent-yellow); }
-        .freshness-dot.old { background: var(--accent-orange); box-shadow: 0 0 4px var(--accent-orange); }
+        .freshness-dot.fresh { background: var(--accent-green); }
+        .freshness-dot.stale { background: var(--accent-yellow); }
+        .freshness-dot.old { background: var(--accent-orange); }
         .freshness-text { color: var(--text-muted); }
         .freshness-text.fresh { color: var(--accent-green-text); }
         .freshness-text.stale { color: var(--accent-yellow-text); }
@@ -544,12 +544,12 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 4px 12px;
+            gap: 4px 14px;
             margin-top: 10px;
-            font-size: 0.65rem;
+            font-size: 0.7rem;
         }
 
-        .context-chip { display: inline-flex; align-items: center; gap: 4px; }
+        .context-chip { display: inline-flex; align-items: center; gap: 5px; }
         .context-chip-label { color: var(--text-muted); transition: color var(--theme-transition); }
         .context-chip-value { color: var(--text-secondary); font-weight: 500; font-variant-numeric: tabular-nums; transition: color var(--theme-transition); }
         .context-sep { color: var(--text-muted); opacity: 0.4; transition: color var(--theme-transition); }
@@ -1062,17 +1062,9 @@
             transition: color var(--theme-transition), border-color var(--theme-transition);
         }
 
-        .footer-content { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 32px; margin-bottom: 20px; }
-
-        .footer-content strong {
-            color: var(--text-secondary); display: block; margin-bottom: 6px;
-            font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em;
-            transition: color var(--theme-transition);
-        }
-
-        .footer-about { line-height: 1.6; }
-        .footer-links a { color: var(--accent-blue); text-decoration: none; }
-        .footer-links a:hover { text-decoration: underline; }
+        .footer-content { line-height: 1.7; margin-bottom: 16px; }
+        .footer-content a { color: var(--accent-blue); text-decoration: none; }
+        .footer-content a:hover { text-decoration: underline; }
 
         .footer-bottom {
             padding-top: 16px; border-top: 1px solid var(--border-color);
@@ -1084,7 +1076,6 @@
            ======================================== */
         @media (max-width: 900px) {
             .about-content { grid-template-columns: 1fr; gap: 20px; }
-            .footer-content { grid-template-columns: 1fr; gap: 20px; }
             .chart-legend { justify-content: flex-start; }
             .slider-grid { grid-template-columns: 1fr; }
         }
@@ -1314,7 +1305,7 @@
                         aria-expanded="false"
                         aria-controls="scoreGuideContent"
                         id="scoreGuideTrigger">
-                    <span id="scoreGuideText">What does a different score feel like?</span>
+                    <span id="scoreGuideText">What the score ranges mean</span>
                     <span id="scoreGuideChevron" aria-hidden="true">▾</span>
                 </button>
                 <div class="score-guide-content" id="scoreGuideContent">
@@ -1645,21 +1636,7 @@
 
         <footer>
             <div class="footer-content">
-                <div class="footer-about">
-                    <strong>About this project</strong><br>
-                    Built to help workers make informed decisions about job search timing. The score synthesizes government data into an actionable signal—no spin, no narratives, just numbers.<br><br>
-                    This project is <a href="https://github.com/jricciardi/labor-market-dashboard">open source</a>. Fork it, adapt it for your industry, or suggest improvements. Built with AI assistance as an experiment in pro-worker tooling.
-                </div>
-                <div class="footer-links">
-                    <strong>Resources</strong><br>
-                    <a href="https://www.bls.gov/jlt/">BLS JOLTS</a> · 
-                    <a href="https://fred.stlouisfed.org/">FRED</a> · 
-                    <a href="https://github.com/jricciardi/labor-market-dashboard">Source Code</a>
-                </div>
-                <div class="footer-data">
-                    <strong>Data Sources</strong><br>
-                    BLS JOLTS, BLS Employment Situation, Federal Reserve
-                </div>
+                Built to help workers make informed decisions about job search timing. The score synthesizes government data into an actionable signal — no spin, no narratives, just numbers. This project is <a href="https://github.com/jricciardi/labor-market-dashboard">open source</a>. Data from <a href="https://www.bls.gov/jlt/">BLS JOLTS</a>, <a href="https://fred.stlouisfed.org/">FRED</a>, and the Federal Reserve.
             </div>
             <div class="footer-bottom">
                 Updated monthly after BLS data releases (usually first week of the month). Not financial or career advice.
@@ -1835,7 +1812,7 @@
             const isOpen = content.classList.contains('show');
             content.classList.toggle('show');
             trigger.setAttribute('aria-expanded', !isOpen);
-            text.textContent = isOpen ? 'What does a different score feel like?' : 'Hide score guide';
+            text.textContent = isOpen ? 'What the score ranges mean' : 'Hide score guide';
             chevron.textContent = isOpen ? '▾' : '▴';
             localStorage.setItem('scoreGuideOpen', !isOpen);
         }
@@ -2680,10 +2657,11 @@
                 if (rangeId) { var rangeEl = document.getElementById(rangeId); if (rangeEl) { rangeEl.querySelector('.max').textContent = formatValue(maxVal); rangeEl.querySelector('.min').textContent = formatValue(minVal); } }
                 var getColor = function(val) { var t = thresholds[metric], c = getThemeColors(); if (!t) return c.sparklineNeutral; if (t.inverted) return val <= t.good ? c.sparklineGood : val <= t.neutral ? c.sparklineNeutral : c.sparklineBad; return val >= t.good ? c.sparklineGood : val >= t.neutral ? c.sparklineNeutral : c.sparklineBad; };
                 var isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                var tc = getThemeColors();
                 sparklineInstances[canvasId] = new Chart(ctx, {
                     type: 'line',
-                    data: { labels: monthlyData.labels, datasets: [{ data: dataArray, borderColor: getThemeColors().sparklineNeutral, segment: { borderColor: function(ctx) { return getColor(ctx.p0.parsed.y); } }, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', fill: true, tension: 0.4, pointRadius: 0, borderWidth: 1.5 }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: false }, y: { display: false } } }
+                    data: { labels: monthlyData.labels, datasets: [{ data: dataArray, borderColor: getThemeColors().sparklineNeutral, segment: { borderColor: function(ctx) { return getColor(ctx.p0.parsed.y); } }, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 3, borderWidth: 1.5 }] },
+                    options: { responsive: true, maintainAspectRatio: false, interaction: { intersect: false, mode: 'index' }, plugins: { legend: { display: false }, tooltip: { backgroundColor: tc.tooltipBg, borderColor: tc.tooltipBorder, borderWidth: 1, titleColor: tc.tooltipText, bodyColor: tc.tooltipSecondary, padding: 8, displayColors: false, callbacks: { title: function(items) { return items[0].label; }, label: function(item) { return item.raw != null ? formatValue(item.raw) : ''; } } } }, scales: { x: { display: false }, y: { display: false } } }
                 });
             }
 
