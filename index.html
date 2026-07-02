@@ -4,7 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Is Now a Good Time? | Job Search Timing</title>
-    
+    <meta name="description" content="Eight government indicators distilled into one 0–100 score: does the US job market favor job seekers or employers right now? Updated monthly from BLS and Federal Reserve data.">
+    <meta name="theme-color" content="#0a0a0f" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)">
+    <link rel="canonical" href="https://jricciardi.github.io/labor-market-dashboard/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Is Now a Good Time?">
+    <meta property="og:title" content="Is Now a Good Time? — The US labor market, scored monthly">
+    <meta property="og:description" content="One 0–100 score for whether the job market favors you or employers, built from eight official indicators. No spin, just numbers.">
+    <meta property="og:url" content="https://jricciardi.github.io/labor-market-dashboard/">
+    <meta property="og:image" content="https://jricciardi.github.io/labor-market-dashboard/assets/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Is now a good time? A 0–100 labor market score for job seekers, shown on a red-to-green scale.">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Is Now a Good Time? — The US labor market, scored monthly">
+    <meta name="twitter:description" content="One 0–100 score for whether the job market favors you or employers, built from eight official indicators.">
+    <meta name="twitter:image" content="https://jricciardi.github.io/labor-market-dashboard/assets/og-image.png">
+
+
     <!-- FOIT Prevention: Apply theme BEFORE body renders -->
     <script>
         (function() {
@@ -67,6 +87,9 @@
 
             --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
             --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+            /* Spacing rhythm: tight pairings inside a story beat, generous breaks between beats */
+            --space-section: clamp(44px, 6vw, 72px);
         }
 
         /* ========================================
@@ -152,14 +175,14 @@
         }
 
         .skeleton-text { height: 1em; display: inline-block; min-width: 60px; }
-        .skeleton-score { width: 80px; height: 4.5rem; display: inline-block; }
-        .skeleton-badge { width: 120px; height: 32px; border-radius: 20px; }
+        .skeleton-score { width: 64px; height: 3rem; display: inline-block; }
 
         .js-loading .metric-value,
         .js-loading .score-value,
         .js-loading .score-verdict,
         .js-loading .score-change,
         .js-loading .score-context,
+        .js-loading .scale-marker,
         .js-loading .action-content,
         .js-loading .scenarios-section .narrative-assessment,
         .js-loading .scenarios-section .narrative-interpretation,
@@ -345,19 +368,14 @@
         [data-theme="light"] .theme-toggle .icon-moon { display: none; }
 
         .subtitle {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
-            max-width: 700px;
+            max-width: 72ch;
         }
 
-        /* About Section */
+        /* About Section — plain prose on the page, no card chrome */
         .about-section {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
             margin-bottom: 24px;
-            overflow: hidden;
-            transition: background var(--theme-transition), border-color var(--theme-transition);
         }
 
         .about-header {
@@ -365,7 +383,7 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            padding: 16px 24px;
+            padding: 12px 0;
             cursor: pointer;
             user-select: none;
             border: none;
@@ -373,14 +391,13 @@
             font-family: inherit;
             text-align: left;
             color: inherit;
-            transition: background var(--theme-transition);
         }
 
-        .about-header:hover { background: var(--bg-tertiary); border-radius: 8px; }
+        .about-header:hover .about-toggle { color: var(--text-secondary); }
 
         .about-header h2 {
             font-family: 'Instrument Serif', serif;
-            font-size: 1.3rem;
+            font-size: 1.6rem;
             font-weight: 400;
             color: var(--text-primary);
             display: flex;
@@ -402,19 +419,17 @@
         .about-section.collapsed .about-toggle .icon { transform: rotate(-90deg); }
 
         .about-content {
-            padding: 0 24px 24px 24px;
-            display: grid;
-            grid-template-columns: 1.4fr 1fr;
-            gap: 32px;
+            padding: 0 0 24px;
+            max-width: 720px;
         }
 
         .about-section.collapsed .about-content { display: none; }
 
         .about-main p {
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: var(--text-secondary);
-            line-height: 1.7;
-            margin-bottom: 10px;
+            line-height: 1.75;
+            margin-bottom: 12px;
             transition: color var(--theme-transition);
         }
 
@@ -423,74 +438,58 @@
         .about-main em { color: var(--accent-yellow-text); font-style: normal; }
         .about-note { font-size: 0.7rem !important; color: var(--text-muted) !important; margin-top: 12px !important; }
 
-        .about-how {
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            padding: 16px 20px;
-            transition: background var(--theme-transition);
-        }
-
-        .about-how h3 {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            transition: color var(--theme-transition);
-        }
-
-        .about-how ul { list-style: none; padding: 0; margin: 0; }
-
-        .about-how li {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            padding-left: 0;
-            transition: color var(--theme-transition);
-        }
-
-        .about-how li strong { color: var(--text-primary); }
-
-        /* Hero Score Section */
+        /* Hero Score Section — the verdict is the headline, the score supports it */
         .hero-score {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 28px 32px;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             position: relative;
-            overflow: hidden;
             transition: background var(--theme-transition), border-color var(--theme-transition);
-        }
-
-        .hero-score::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-red), var(--accent-orange) 33%, var(--accent-yellow) 66%, var(--accent-green));
         }
 
         .score-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
+            align-items: flex-end;
+            gap: 24px;
+            margin-bottom: 4px;
         }
+
+        .verdict-block { min-width: 0; }
 
         .score-label {
             font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.15em;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             transition: color var(--theme-transition);
         }
 
-        .score-display { display: flex; align-items: baseline; gap: 8px; }
+        .score-verdict {
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: clamp(2.1rem, 4.5vw, 2.9rem);
+            line-height: 1.08;
+            letter-spacing: -0.015em;
+            margin: 0 0 10px;
+            transition: color var(--theme-transition);
+        }
+
+        .score-verdict.good-time { color: var(--accent-green-text); }
+        .score-verdict.worth-exploring { color: var(--accent-yellow-text); }
+        .score-verdict.build-your-position { color: var(--accent-orange-text); }
+        .score-verdict.tough-market { color: var(--accent-red-text); }
+
+        .score-change { font-size: 0.75rem; color: var(--text-muted); transition: color var(--theme-transition); }
+
+        .score-display { display: flex; align-items: baseline; gap: 6px; flex-shrink: 0; padding-bottom: 2px; }
 
         .score-value {
-            font-size: 4.5rem;
+            font-size: 3rem;
             font-weight: 700;
             line-height: 1;
             font-variant-numeric: tabular-nums;
@@ -498,10 +497,10 @@
         }
 
         .score-approx {
-            font-size: 1.5rem;
+            font-size: 1.1rem;
             font-weight: 400;
             color: var(--text-muted);
-            margin-right: -4px;
+            margin-right: -2px;
             cursor: help;
             transition: color var(--theme-transition);
         }
@@ -511,37 +510,32 @@
         .score-value.build-your-position { color: var(--accent-orange-text); }
         .score-value.tough-market { color: var(--accent-red-text); }
 
-        .score-max { font-size: 1.2rem; color: var(--text-muted); transition: color var(--theme-transition); }
-        .score-meta { text-align: right; }
+        .score-max { font-size: 0.9rem; color: var(--text-muted); transition: color var(--theme-transition); }
 
-        .score-verdict {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 8px;
-            transition: background var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition);
+        /* Score scale — the semantic spectrum, anchored by a "you are here" marker */
+        .score-scale {
+            position: relative;
+            height: 6px;
+            border-radius: 3px;
+            margin: 18px 0 12px;
+            background: linear-gradient(90deg,
+                var(--accent-red) 0 40%,
+                var(--accent-orange) 40% 55%,
+                var(--accent-yellow) 55% 70%,
+                var(--accent-green) 70% 100%);
         }
 
-        .score-verdict.good-time { background: var(--accent-green-dim); color: var(--accent-green-text); border: 1px solid var(--accent-green); }
-        .score-verdict.worth-exploring { background: var(--accent-yellow-dim); color: var(--accent-yellow-text); border: 1px solid var(--accent-yellow); }
-        .score-verdict.build-your-position { background: var(--accent-orange-dim); color: var(--accent-orange-text); border: 1px solid var(--accent-orange); }
-        .score-verdict.tough-market { background: var(--accent-red-dim); color: var(--accent-red-text); border: 1px solid var(--accent-red); }
-
-        .verdict-icon { width: 8px; height: 8px; border-radius: 50%; animation: pulse 2s infinite; }
-        .verdict-icon.good-time { background: var(--accent-green); }
-        .verdict-icon.worth-exploring { background: var(--accent-yellow); }
-        .verdict-icon.build-your-position { background: var(--accent-orange); }
-        .verdict-icon.tough-market { background: var(--accent-red); }
-
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-
-        .score-change { font-size: 0.75rem; color: var(--text-muted); transition: color var(--theme-transition); }
+        .scale-marker {
+            position: absolute;
+            top: -4px;
+            bottom: -4px;
+            left: 50%;
+            width: 3px;
+            border-radius: 2px;
+            background: var(--text-primary);
+            box-shadow: 0 0 0 2px var(--bg-secondary);
+            transform: translateX(-50%);
+        }
 
         /* PHASE 8: Inline Score Context */
         .score-context {
@@ -549,7 +543,7 @@
             flex-wrap: wrap;
             align-items: center;
             gap: 4px 14px;
-            margin-top: 10px;
+            margin-top: 0;
             font-size: 0.7rem;
         }
 
@@ -558,12 +552,10 @@
         .context-chip-value { color: var(--text-secondary); font-weight: 500; font-variant-numeric: tabular-nums; transition: color var(--theme-transition); }
         .context-sep { color: var(--text-muted); opacity: 0.4; transition: color var(--theme-transition); }
 
-        /* Action Section */
+        /* Action Section — flattened: the tier-colored left border carries the meaning */
         .action-section {
-            background: var(--bg-tertiary);
-            border-radius: 8px;
-            padding: 20px 24px;
-            transition: background var(--theme-transition);
+            padding: 4px 0 4px 20px;
+            margin-top: 24px;
         }
 
         .action-header {
@@ -578,9 +570,10 @@
         }
 
         .action-content {
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: var(--text-secondary);
-            line-height: 1.7;
+            line-height: 1.75;
+            max-width: 72ch;
             transition: color var(--theme-transition);
         }
 
@@ -605,7 +598,7 @@
         }
 
         .vibe-validation {
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: var(--text-secondary);
             padding: 8px 0 8px 16px;
             margin: 12px 0;
@@ -657,9 +650,7 @@
 
         .score-guide-item {
             text-align: center;
-            padding: 12px 10px;
-            background: var(--bg-tertiary);
-            border-radius: 6px;
+            padding: 10px 8px;
             border-top: 2px solid;
             transition: background var(--theme-transition);
         }
@@ -668,18 +659,18 @@
         .score-guide-item.yellow { border-top-color: var(--accent-yellow); }
         .score-guide-item.orange { border-top-color: var(--accent-orange); }
         .score-guide-item.red { border-top-color: var(--accent-red); }
-        .score-guide-item.current { background: var(--bg-primary); box-shadow: inset 0 0 0 1px var(--border-color); }
+        .score-guide-item.current { background: var(--bg-tertiary); border-radius: 0 0 6px 6px; }
 
         .score-guide-range { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; transition: color var(--theme-transition); }
         .score-guide-feel { font-size: 0.7rem; color: var(--text-muted); line-height: 1.4; transition: color var(--theme-transition); }
 
-        /* Main Chart */
+        /* Main Chart — paired tightly with the hero it substantiates */
         .main-chart {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 24px;
-            margin-bottom: 24px;
+            margin-bottom: var(--space-section);
             transition: background var(--theme-transition), border-color var(--theme-transition);
         }
 
@@ -699,7 +690,7 @@
             flex-wrap: wrap;
         }
 
-        .chart-title { font-family: 'Instrument Serif', serif; font-size: 1.3rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; color: var(--text-primary); transition: color var(--theme-transition); }
+        .chart-title { font-family: 'Instrument Serif', serif; font-size: 1.6rem; font-weight: 400; line-height: 1.15; letter-spacing: -0.01em; color: var(--text-primary); transition: color var(--theme-transition); }
 
         .chart-range { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; transition: color var(--theme-transition); }
 
@@ -741,7 +732,7 @@
         .chart-container { position: relative; height: 320px; }
 
         /* Tier Sections */
-        .tier-section { margin-bottom: 32px; }
+        .tier-section { margin-bottom: 40px; }
 
         .tier-header {
             display: flex;
@@ -753,18 +744,18 @@
         }
 
         .tier-badge {
-            font-size: 0.6rem;
+            font-size: 0.7rem;
             font-weight: 700;
             padding: 4px 8px;
             border-radius: 4px;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.08em;
             background: var(--accent-blue-dim);
             color: var(--accent-blue);
             border: 1px solid var(--accent-blue-border);
         }
 
-        .tier-title { font-family: 'Instrument Serif', serif; font-size: 1.3rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; color: var(--text-primary); }
+        .tier-title { font-family: 'Instrument Serif', serif; font-size: 1.6rem; font-weight: 400; line-height: 1.15; letter-spacing: -0.01em; color: var(--text-primary); }
         .tier-subtitle { font-size: 0.75rem; color: var(--text-muted); margin-left: 4px; }
 
         /* Metrics Grid */
@@ -774,20 +765,19 @@
             gap: 16px;
         }
 
-        /* Movers strip — which metrics drove the score this month */
+        /* Movers strip — which metrics drove the score this month (quiet row, no card) */
         .metric-movers {
             display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px;
-            padding: 12px 16px; margin-bottom: 24px;
-            background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px;
+            padding: 0 4px; margin-bottom: 24px;
             font-size: 0.75rem;
-            transition: background var(--theme-transition), border-color var(--theme-transition);
         }
+        .metric-movers[hidden] { display: none; }
         .movers-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); white-space: nowrap; }
         .movers-items { display: inline-flex; flex-wrap: wrap; gap: 6px 14px; }
         .mover { display: inline-flex; align-items: center; gap: 2px; }
         .mover-name { color: var(--text-secondary); transition: color var(--theme-transition); }
 
-        /* Metrics summary strip — all viewports; card grids expand on demand */
+        /* Metrics summary strip — mobile/tablet affordance; desktop shows the cards directly */
         .metrics-summary {
             display: block;
             padding: 12px 16px;
@@ -810,6 +800,15 @@
         .metrics-grid-wrapper.grid-collapsed {
             grid-template-rows: 0fr;
             opacity: 0;
+        }
+
+        /* Desktop shows the evidence by default: summary strip is mobile/tablet only */
+        @media (min-width: 900px) {
+            .metrics-summary { display: none; }
+            .metrics-grid-wrapper, .metrics-grid-wrapper.grid-collapsed {
+                grid-template-rows: 1fr;
+                opacity: 1;
+            }
         }
 
         .summary-items { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 10px; }
@@ -906,7 +905,7 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 24px;
-            margin-bottom: 24px;
+            margin: var(--space-section) 0;
             transition: background var(--theme-transition), border-color var(--theme-transition);
         }
 
@@ -917,21 +916,20 @@
             transition: border-color var(--theme-transition);
         }
 
-        .scenarios-title { font-family: 'Instrument Serif', serif; font-size: 1.3rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; color: var(--text-primary); }
+        .scenarios-title { font-family: 'Instrument Serif', serif; font-size: 1.6rem; font-weight: 400; line-height: 1.15; letter-spacing: -0.01em; color: var(--text-primary); }
 
         .narrative-assessment {
-            font-size: 0.85rem; color: var(--text-secondary); line-height: 1.75;
-            padding: 14px 16px; background: var(--bg-tertiary); border-radius: 8px;
-            border: 1px solid var(--border-color); margin-bottom: 16px;
-            transition: background var(--theme-transition), color var(--theme-transition), border-color var(--theme-transition);
+            font-size: 0.95rem; color: var(--text-secondary); line-height: 1.75;
+            margin-bottom: 16px; max-width: 72ch;
+            transition: color var(--theme-transition);
         }
         .narrative-assessment strong { color: var(--text-primary); }
 
         .narrative-interpretation {
-            font-size: 0.85rem; color: var(--text-secondary); line-height: 1.75;
-            padding: 14px 16px; background: var(--bg-tertiary); border-radius: 8px;
+            font-size: 0.95rem; color: var(--text-secondary); line-height: 1.75;
+            padding: 4px 0 4px 16px; max-width: 72ch;
             border-left: 3px solid var(--accent-blue);
-            transition: border-color 0.3s ease, background var(--theme-transition), color var(--theme-transition);
+            transition: border-color 0.3s ease, color var(--theme-transition);
         }
         .narrative-interpretation strong { color: var(--text-primary); }
 
@@ -1035,30 +1033,28 @@
         }
         input[type="range"]:focus::-moz-range-thumb { background: var(--accent-blue); }
 
-        /* Accordion */
+        /* Accordion — plain typographic section, hairline separators only */
         .accordion-section {
-            background: var(--bg-secondary); border: 1px solid var(--border-color);
-            border-radius: 8px; margin-bottom: 24px; overflow: hidden;
+            margin-bottom: 24px;
         }
 
         .accordion-header {
             font-family: 'Instrument Serif', serif;
-            font-size: 1.3rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em;
+            font-size: 1.6rem; font-weight: 400; line-height: 1.15; letter-spacing: -0.01em;
             color: var(--text-primary);
-            padding: 20px 24px; border-bottom: 1px solid var(--border-color);
+            padding: 0 0 12px; border-bottom: 1px solid var(--border-color);
         }
 
         .accordion-item { border-bottom: 1px solid var(--border-color); }
-        .accordion-item:last-child { border-bottom: none; }
 
         .accordion-trigger {
             display: flex; justify-content: space-between; align-items: center;
-            width: 100%; padding: 16px 24px; background: none; border: none;
-            color: var(--text-primary); font-family: inherit; font-size: 0.8rem;
+            width: 100%; padding: 16px 0; background: none; border: none;
+            color: var(--text-primary); font-family: inherit; font-size: 0.875rem;
             font-weight: 500; cursor: pointer; text-align: left;
         }
 
-        .accordion-trigger:hover { background: var(--bg-tertiary); }
+        .accordion-trigger:hover { color: var(--accent-blue); }
         .accordion-trigger .icon { color: var(--text-muted); transition: transform 0.25s var(--ease-out-quart); font-size: 0.6rem; }
 
         .chevron {
@@ -1082,22 +1078,22 @@
         }
         .accordion-panel-inner {
             overflow: hidden;
-            padding: 0 24px;
-            padding-bottom: 0;
+            padding: 0;
+            max-width: 720px;
             transition: padding-bottom 0.3s var(--ease-out-quart);
         }
         .accordion-item.open .accordion-panel { grid-template-rows: 1fr; }
         .accordion-item.open .accordion-panel-inner { padding-bottom: 20px; }
 
-        .accordion-panel p { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+        .accordion-panel p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.75; margin-bottom: 12px; }
         .accordion-panel p:last-child { margin-bottom: 0; }
-        .accordion-panel ul { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.7; margin-left: 20px; margin-bottom: 12px; }
+        .accordion-panel ul { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.75; margin-left: 20px; margin-bottom: 12px; }
         .accordion-panel li { margin-bottom: 6px; }
         .accordion-panel strong { color: var(--text-primary); }
         .accordion-panel a { color: var(--accent-blue); text-decoration: none; }
         .accordion-panel a:hover { text-decoration: underline; }
 
-        .formula-block { margin-top: 16px; padding: 14px 16px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-color); }
+        .formula-block { margin-top: 16px; }
         .formula-block strong { display: block; margin-bottom: 8px; font-size: 0.7rem; }
         .formula-block code { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--accent-yellow-text); background: var(--bg-tertiary); padding: 10px 12px; border-radius: 4px; margin-bottom: 10px; overflow-x: auto; }
         .formula-block p { font-size: 0.65rem; margin-bottom: 8px; }
@@ -1142,7 +1138,7 @@
 
         /* Footer */
         footer {
-            text-align: left; padding: 28px 0; font-size: 0.7rem; color: var(--text-muted);
+            text-align: left; padding: 28px 0; font-size: 0.75rem; color: var(--text-muted);
             border-top: 1px solid var(--border-color); margin-top: 20px;
             transition: color var(--theme-transition), border-color var(--theme-transition);
         }
@@ -1151,16 +1147,12 @@
         .footer-content a { color: var(--accent-blue); text-decoration: none; }
         .footer-content a:hover { text-decoration: underline; }
 
-        .footer-bottom {
-            padding-top: 16px; border-top: 1px solid var(--border-color);
-            text-align: center; color: var(--text-muted); font-size: 0.65rem;
-        }
+        .footer-bottom { margin-top: 12px; color: var(--text-muted); font-size: 0.65rem; }
 
         /* ========================================
            RESPONSIVE
            ======================================== */
         @media (max-width: 900px) {
-            .about-content { grid-template-columns: 1fr; gap: 20px; }
             .chart-legend { justify-content: flex-start; }
             .slider-grid { grid-template-columns: 1fr; }
         }
@@ -1168,20 +1160,18 @@
         @media (max-width: 768px) {
             .container { padding: 16px; }
             h1 { font-size: 1.6rem; }
-            .score-value { font-size: 3rem; }
-            .score-approx { font-size: 1.2rem; }
+            .score-value { font-size: 2.4rem; }
+            .score-approx { font-size: 1rem; }
             .metrics-grid { grid-template-columns: 1fr; }
             .header-top { flex-direction: column; gap: 12px; }
             .header-meta { text-align: left; }
             .chart-legend { gap: 8px; font-size: 0.65rem; }
             .legend-item { gap: 4px; }
             .legend-dot { width: 8px; height: 8px; }
-            .score-header { flex-direction: column; gap: 16px; }
-            .score-meta { text-align: left; }
+            .score-header { flex-direction: column; align-items: flex-start; gap: 16px; }
             .tier-header { flex-wrap: wrap; }
             .tier-subtitle { width: 100%; margin-left: 0; margin-top: 4px; }
-            .accordion-trigger { padding: 14px 16px; font-size: 0.75rem; }
-            .accordion-panel-inner { padding: 0 16px; }
+            .accordion-trigger { padding: 14px 0; font-size: 0.8rem; }
             .accordion-item.open .accordion-panel-inner { padding-bottom: 16px; }
             .scenarios-section { padding: 16px; }
             .scenario-chart-area { height: 260px; }
@@ -1194,8 +1184,7 @@
 
         @media (max-width: 480px) {
             .chart-legend { flex-direction: column; align-items: flex-start; gap: 6px; }
-            .about-how ul { font-size: 0.7rem; }
-            .action-list li { font-size: 0.75rem; }
+            .action-list li { font-size: 0.85rem; }
             .metric-header { flex-direction: column; gap: 8px; }
             .metric-value { font-size: 1.5rem; }
             .sparkline-range { min-width: 30px; }
@@ -1231,9 +1220,9 @@
             .last-updated { background: none !important; padding: 0; color: #666 !important; display: inline; }
             .next-update, .data-freshness { display: none; }
             .hero-score { background: #f5f5f5 !important; border: 1px solid #ccc !important; page-break-inside: avoid; }
-            .hero-score::before { display: none; }
             .score-value { color: #1a1a1a !important; }
-            .score-verdict { background: none !important; border: 1px solid currentColor !important; }
+            .score-verdict { color: #1a1a1a !important; }
+            .scale-marker { background: #1a1a1a !important; box-shadow: 0 0 0 2px #f5f5f5 !important; }
             .action-section { background: #f9f9f9 !important; border-color: #999 !important; }
             .metric-chart-wrapper, .sparkline-time, .sparkline-range { display: none !important; }
             .metrics-grid-wrapper { display: contents !important; }
@@ -1316,40 +1305,29 @@
                     <p>Start with the score, then explore what's driving it, then see what would need to change.</p>
                     <p class="about-note">This tracks the US labor market overall. Tech can freeze 18 months before it shows in national data; healthcare and government often move on different cycles entirely. If your sector feels worse than the score suggests, trust your network over the number.</p>
                 </div>
-                <div class="about-how">
-                    <h3>What the score means</h3>
-                    <ul>
-                        <li><strong>70+</strong> — Opportunities find you. Real leverage to negotiate.</li>
-                        <li><strong>55–69</strong> — Opportunities if you look. Some room to negotiate.</li>
-                        <li><strong>40–54</strong> — Slow going. Employers can afford to wait.</li>
-                        <li><strong>&lt;40</strong> — Hiring freezes. Little leverage.</li>
-                    </ul>
-                </div>
             </div>
         </section>
 
-        <!-- Hero Score -->
+        <!-- Hero Score — verdict-first editorial headline -->
         <section class="hero-score" data-nav-section="score">
             <div class="score-header">
-                <div>
-                    <div class="score-label">The Score</div>
-                    <div class="score-display">
-                        <span class="score-approx" title="Approximate — read it as ±3 points">~</span>
-                        <span class="score-value" id="currentScore"><span class="skeleton skeleton-score"></span></span>
-                        <span class="score-max">/ 100</span>
-                    </div>
-                </div>
-                <div class="score-meta">
-                    <div class="score-verdict" id="scoreVerdict">
-                        <span class="verdict-icon" id="verdictIcon"></span>
-                        <span id="verdictText"><span class="skeleton skeleton-text" style="width: 100px;"></span></span>
-                    </div>
+                <div class="verdict-block">
+                    <div class="score-label">The market right now</div>
+                    <h2 class="score-verdict" id="scoreVerdict"><span id="verdictText"><span class="skeleton skeleton-text" style="width: 220px;"></span></span></h2>
                     <div class="score-change" id="scoreChange"><span class="skeleton skeleton-text" style="width: 140px;"></span></div>
-                    <!-- PHASE 8: Inline context replacing standalone section -->
-                    <div class="score-context" id="scoreContext"></div>
+                </div>
+                <div class="score-display">
+                    <span class="score-approx" aria-hidden="true" title="Approximate — read it as ±3 points">~</span>
+                    <span class="score-value" id="currentScore"><span class="skeleton skeleton-score"></span></span>
+                    <span class="score-max">/ 100</span>
                 </div>
             </div>
-            
+
+            <div class="score-scale" aria-hidden="true">
+                <div class="scale-marker" id="scoreMarker"></div>
+            </div>
+            <div class="score-context" id="scoreContext"></div>
+
             <div class="action-section" id="actionSection">
                 <div class="action-header">
                     <span>What does this mean?</span>
@@ -1407,7 +1385,7 @@
                     <div class="legend-item"><span class="legend-dot green"></span> Good Time to Move (70+)</div>
                     <div class="legend-item"><span class="legend-dot yellow"></span> Worth Exploring (55–69)</div>
                     <div class="legend-item"><span class="legend-dot orange"></span> Build Your Position (40–54)</div>
-                    <div class="legend-item"><span class="legend-dot red"></span> Get Creative (&lt;40)</div>
+                    <div class="legend-item"><span class="legend-dot red"></span> Tough Market (&lt;40)</div>
                 </div>
             </div>
             <div class="chart-container">
@@ -1609,7 +1587,7 @@
                     <span aria-hidden="true">❄️</span> <span>Stays Frozen</span> <span class="pill-score" data-pill="frozen"></span>
                 </button>
                 <button class="preset-pill" data-key="now" aria-pressed="false">
-                    <span aria-hidden="true">📍</span> <span>Now</span> <span class="pill-score" data-pill="now"></span>
+                    <span aria-hidden="true">🌡️</span> <span>Now</span> <span class="pill-score" data-pill="now"></span>
                 </button>
                 <button class="preset-pill" data-key="thaw" aria-pressed="false">
                     <span aria-hidden="true">🌤️</span> <span>Gradual Thaw</span> <span class="pill-score" data-pill="thaw"></span>
@@ -1959,12 +1937,14 @@
 
         // Restore UI state on load
         document.addEventListener('DOMContentLoaded', function() {
-            // PHASE 8: About section defaults to collapsed; expand only if user chose
+            // About opens automatically on the first visit only; afterwards it
+            // follows the visitor's last explicit choice (toggleAbout overwrites this)
             var aboutCollapsed = localStorage.getItem('aboutCollapsed');
-            if (aboutCollapsed === 'false') {
+            if (aboutCollapsed === 'false' || aboutCollapsed === null) {
                 document.getElementById('aboutSection').classList.remove('collapsed');
                 document.getElementById('aboutToggleText').textContent = 'Hide';
                 document.getElementById('aboutHeader').setAttribute('aria-expanded', 'true');
+                if (aboutCollapsed === null) localStorage.setItem('aboutCollapsed', 'true');
             }
             
             var scoreGuideOpen = localStorage.getItem('scoreGuideOpen');
@@ -1983,7 +1963,7 @@
             'good-time': 'Good Time to Move',
             'worth-exploring': 'Worth Exploring', 
             'build-your-position': 'Build Your Position',
-            'tough-market': 'Get Creative'
+            'tough-market': 'Tough Market'
         };
 
         // Action advice for each tier
@@ -2139,12 +2119,33 @@
             else if (currentScore >= 40) { tierClass = 'build-your-position'; tierKey = 'build-your-position'; }
             else { tierClass = 'tough-market'; tierKey = 'tough-market'; }
             
-            document.getElementById('currentScore').textContent = currentScore;
             document.getElementById('currentScore').className = 'score-value ' + tierClass;
             document.getElementById('scoreVerdict').className = 'score-verdict ' + tierClass;
-            document.getElementById('verdictIcon').className = 'verdict-icon ' + tierClass;
             document.getElementById('verdictText').textContent = tierNames[tierKey];
             document.getElementById('actionSection').className = 'action-section ' + tierClass;
+
+            // One-time settle: the score counts up once and the spectrum marker
+            // rides along to its resting place. Skipped under reduced motion.
+            (function settleScore() {
+                var scoreEl = document.getElementById('currentScore');
+                var scoreMarker = document.getElementById('scoreMarker');
+                function setScoreDisplay(v) {
+                    scoreEl.textContent = v;
+                    if (scoreMarker) scoreMarker.style.left = Math.min(100, Math.max(0, v)) + '%';
+                }
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    setScoreDisplay(currentScore);
+                    return;
+                }
+                var start = null, duration = 700;
+                requestAnimationFrame(function step(ts) {
+                    if (start === null) start = ts;
+                    var t = Math.min(1, (ts - start) / duration);
+                    var eased = 1 - Math.pow(1 - t, 4);
+                    setScoreDisplay(Math.round(currentScore * eased));
+                    if (t < 1) requestAnimationFrame(step);
+                });
+            })();
             
             var accentColors = { 'good-time': 'var(--accent-green)', 'worth-exploring': 'var(--accent-yellow)', 'build-your-position': 'var(--accent-orange)', 'tough-market': 'var(--accent-red)' };
             document.getElementById('actionSection').style.borderLeft = '3px solid ' + accentColors[tierKey];
@@ -2230,7 +2231,9 @@
                 '<span class="context-sep">\u00b7</span>' +
                 '<span class="context-chip"><span class="context-chip-label">COVID low</span> <span class="context-chip-value">' + covidScore + '</span></span>' +
                 '<span class="context-sep">\u00b7</span>' +
-                '<span class="context-chip"><span class="context-chip-label">Similar to</span> <span class="context-chip-value">' + analogText + '</span></span>';
+                '<span class="context-chip"><span class="context-chip-label">Similar to</span> <span class="context-chip-value">' + analogText + '</span></span>' +
+                '<span class="context-sep">\u00b7</span>' +
+                '<span class="context-chip"><span class="context-chip-label">Margin</span> <span class="context-chip-value">\u00b13 pts</span></span>';
 
             // ========================================
             // CURRENT METRICS (carry-forward aware)
@@ -2437,17 +2440,17 @@
             }
 
             document.getElementById('coreSummaryItems').innerHTML = buildSummaryHTML([
-                { name: 'Quit', value: currentMetrics.quitRate.toFixed(1) + '%', signal: getMetricClass(currentMetrics.quitRate, 'quitRate') },
-                { name: 'Ratio', value: currentMetrics.openingsRatio.toFixed(2), signal: getMetricClass(currentMetrics.openingsRatio, 'openingsRatio') },
-                { name: 'Hires', value: currentMetrics.hiresRate.toFixed(1) + '%', signal: getMetricClass(currentMetrics.hiresRate, 'hiresRate') },
+                { name: 'Quits', value: currentMetrics.quitRate.toFixed(1) + '%', signal: getMetricClass(currentMetrics.quitRate, 'quitRate') },
+                { name: 'Jobs/Seeker', value: currentMetrics.openingsRatio.toFixed(2), signal: getMetricClass(currentMetrics.openingsRatio, 'openingsRatio') },
+                { name: 'Hiring', value: currentMetrics.hiresRate.toFixed(1) + '%', signal: getMetricClass(currentMetrics.hiresRate, 'hiresRate') },
                 { name: 'Layoffs', value: currentMetrics.layoffsRate.toFixed(1) + '%', signal: getMetricClass(currentMetrics.layoffsRate, 'layoffsRate') }
             ]);
 
             document.getElementById('contextSummaryItems').innerHTML = buildSummaryHTML([
-                { name: 'Unemp', value: (currentMetrics.unempRate || 0).toFixed(1) + '%', signal: getMetricClass(currentMetrics.unempRate || 5, 'unempRate') },
-                { name: 'Fed', value: currentMetrics.fedRate.toFixed(1) + '%', signal: getMetricClass(currentMetrics.fedRate, 'fedRate') },
+                { name: 'Unemployment', value: (currentMetrics.unempRate || 0).toFixed(1) + '%', signal: getMetricClass(currentMetrics.unempRate || 5, 'unempRate') },
+                { name: 'Fed Rate', value: currentMetrics.fedRate.toFixed(1) + '%', signal: getMetricClass(currentMetrics.fedRate, 'fedRate') },
                 { name: 'Wages', value: (currentMetrics.wageGrowth || 0).toFixed(1) + '%', signal: getMetricClass(currentMetrics.wageGrowth || 3, 'wageGrowth') },
-                { name: 'LFPR', value: (currentMetrics.lfpr || 0).toFixed(1) + '%', signal: getMetricClass(currentMetrics.lfpr || 82, 'lfpr') }
+                { name: 'Participation', value: (currentMetrics.lfpr || 0).toFixed(1) + '%', signal: getMetricClass(currentMetrics.lfpr || 82, 'lfpr') }
             ]);
 
             // ========================================
@@ -2532,7 +2535,7 @@
                 var r = parseInt(h.slice(1,3),16), g = parseInt(h.slice(3,5),16), b = parseInt(h.slice(5,7),16);
                 return 'rgba(' + r + ',' + g + ',' + b + ',' + (a||0.3) + ')';
             }
-            function getScenarioCategory(s) { return s >= 70 ? 'Good Time to Move' : s >= 55 ? 'Worth Exploring' : s >= 40 ? 'Build Your Position' : 'Get Creative'; }
+            function getScenarioCategory(s) { return s >= 70 ? 'Good Time to Move' : s >= 55 ? 'Worth Exploring' : s >= 40 ? 'Build Your Position' : 'Tough Market'; }
 
             // Historical data for scenario chart
             var SC_HIST_COUNT = 24;
@@ -2694,11 +2697,11 @@
             function selectPreset(key) {
                 activePreset = key;
                 document.querySelectorAll('.preset-pill').forEach(function(p) { var a = p.dataset.key === key; p.classList.toggle('active', a); p.setAttribute('aria-pressed', a); });
+                // Sliders stay where the user left them (open or closed) — presets
+                // only sync the values; the panel opens via its own toggle
                 setSliders(SCENARIOS[key] || CUR);
                 updateChartEmphasis(key);
                 setNarrative(SC_NARRATIVES[key] || SC_NARRATIVES.now);
-                var panel = document.getElementById('slider-panel'), toggle = document.getElementById('slider-toggle');
-                if (panel.classList.contains('collapsed')) { panel.classList.remove('collapsed'); toggle.classList.add('open'); toggle.setAttribute('aria-expanded', 'true'); }
             }
 
             function updateChartEmphasis(key) {
@@ -2849,7 +2852,7 @@
                         legend: { display: false },
                         tooltip: {
                             backgroundColor: tc.tooltipBg, titleColor: tc.tooltipText, bodyColor: tc.tooltipSecondary, borderColor: tc.tooltipBorder, borderWidth: 1, padding: 12, displayColors: false,
-                            callbacks: { title: function(items) { return items[0].label; }, label: function(item) { var s = item.raw, st = s >= 70 ? 'Good Time to Move' : s >= 55 ? 'Worth Exploring' : s >= 40 ? 'Build Your Position' : 'Get Creative'; return ['Score: ~' + s, st]; } }
+                            callbacks: { title: function(items) { return items[0].label; }, label: function(item) { var s = item.raw, st = s >= 70 ? 'Good Time to Move' : s >= 55 ? 'Worth Exploring' : s >= 40 ? 'Build Your Position' : 'Tough Market'; return ['Score: ~' + s, st]; } }
                         },
                         annotation: { annotations: {
                             line70: { type: 'line', yMin: 70, yMax: 70, borderColor: isDarkInit ? 'rgba(0,217,160,0.3)' : 'rgba(0,160,112,0.45)', borderWidth: 1, borderDash: [5, 5] },

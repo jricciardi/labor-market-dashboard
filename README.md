@@ -15,7 +15,7 @@ The score runs from 0 to 100. Higher means better for job seekers.
 - **70+** — Good Time to Move
 - **55–69** — Worth Exploring  
 - **40–54** — Build Your Position
-- **<40** — Get Creative
+- **<40** — Tough Market
 
 ## Data sources
 
