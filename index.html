@@ -1317,7 +1317,7 @@
                     <div class="score-change" id="scoreChange"><span class="skeleton skeleton-text" style="width: 140px;"></span></div>
                 </div>
                 <div class="score-display">
-                    <span class="score-approx" aria-hidden="true" title="Approximate — read it as ±3 points">~</span>
+                    <span class="score-approx" aria-hidden="true" title="Approximate — read it as ±5 points">~</span>
                     <span class="score-value" id="currentScore"><span class="skeleton skeleton-score"></span></span>
                     <span class="score-max">/ 100</span>
                 </div>
@@ -1474,6 +1474,20 @@
                     </div>
                     <div class="sparkline-time"><span>'15</span><span>Now</span></div>
                 </div>
+                <div class="metric-card" id="uempMedCard">
+                    <div class="metric-header">
+                        <div class="metric-info">
+                            <h3>Unemployment Duration</h3>
+                            <span class="description">Median weeks to find work after losing a job</span>
+                        </div>
+                        <span class="metric-value" id="uempMedValue"><span class="skeleton skeleton-text"></span></span>
+                    </div>
+                    <div class="metric-chart-wrapper">
+                        <div class="metric-chart"><canvas id="uempMedChart" role="img" aria-label="Median unemployment duration trend from 2015 to present"></canvas></div>
+                        <div class="sparkline-range" id="uempMedRange"><span class="max">--</span><span class="min">--</span></div>
+                    </div>
+                    <div class="sparkline-time"><span>'15</span><span>Now</span></div>
+                </div>
             </div>
             </div>
         </section>
@@ -1513,7 +1527,7 @@
                     <div class="metric-header">
                         <div class="metric-info">
                             <h3>Fed Interest Rate</h3>
-                            <span class="description">Cost of borrowing that affects hiring budgets</span>
+                            <span class="description">Cost of borrowing — shown for context, not part of the score</span>
                         </div>
                         <span class="metric-value" id="fedValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
@@ -1527,7 +1541,7 @@
                     <div class="metric-header">
                         <div class="metric-info">
                             <h3>Wage Growth</h3>
-                            <span class="description">Year-over-year change in average pay</span>
+                            <span class="description" id="wageDesc">Year-over-year change in average pay</span>
                         </div>
                         <span class="metric-value" id="wageValue"><span class="skeleton skeleton-text"></span></span>
                     </div>
@@ -1623,16 +1637,19 @@
                 </button>
                 <div class="accordion-panel" id="panel-calc" role="region" aria-labelledby="trigger-calc">
                     <div class="accordion-panel-inner">
-                    <p>The score combines eight labor market indicators, weighted by how directly they measure worker leverage:</p>
+                    <p>The score is a weighted average of eight indicators, each normalized to 0–1 against its 2015–present range. The weights reflect how directly each one answers "can I actually get hired, and what happens if a move goes wrong?"</p>
                     <ul>
-                        <li><strong>Core metrics (60% of score):</strong> Quit rate, job openings per unemployed worker, hiring rate, and layoff rate. These directly measure whether workers or employers have the upper hand.</li>
-                        <li><strong>Context metrics (40% of score):</strong> Unemployment rate, Fed interest rate, wage growth, and workforce participation. These shape the environment but are less direct.</li>
+                        <li><strong>Hiring rate (18%)</strong> and <strong>quit rate (18%)</strong> — actual hiring velocity and whether peers are confident enough to move. The two best signals of real leverage.</li>
+                        <li><strong>Jobs per job seeker (12%)</strong> — competition per opening. Deliberately downweighted because postings are the least trustworthy series (unfilled "ghost" listings), with a steeper penalty below 1.0 where seekers outnumber jobs.</li>
+                        <li><strong>Unemployment duration (12%)</strong> — median weeks to find work: the downside risk if a move goes wrong.</li>
+                        <li><strong>Real wage growth (12%)</strong> — pay growth minus inflation. Nominal raises that trail prices aren't pricing power.</li>
+                        <li><strong>Layoff rate (10%)</strong>, <strong>unemployment rate (10%)</strong>, <strong>workforce participation (8%)</strong> — stability and slack context.</li>
                     </ul>
-                    <p>The score also applies adjustments for unusual conditions: when the job openings ratio falls below 1.0 (more seekers than jobs), when the market is "frozen" (low hiring AND low quitting), and when Fed rates are near zero (historically stimulative).</p>
+                    <p><strong>What's deliberately excluded:</strong> the Fed interest rate is charted for context but not scored — near-zero rates historically coincide with recessions, not worker leverage, so scoring "low rates = good" would reward exactly the wrong moments.</p>
                     <div class="formula-block">
                         <strong>The formula:</strong>
-                        <code>Score = (0.6 × CoreAvg + 0.4 × ContextAvg) × 100 × adjustments</code>
-                        <p>Each metric is normalized to 0–1 based on historical ranges (e.g., quit rate: 1.5% = 0, 3.0% = 1). Adjustments: ×0.92 if jobs/seeker &lt; 1.0; up to ×0.88 for frozen market; ×1.08 if Fed rate &lt; 0.5%.</p>
+                        <code>Score = Σ (weight × normalized metric) ÷ Σ weights × 100</code>
+                        <p>Each metric is normalized linearly (e.g., quit rate: 1.5% = 0, 3.0% = 1; duration: 16 wks = 0, 8 wks = 1). If a series hasn't reported yet, the last value carries forward up to 3 months; if a series is unavailable entirely, its weight redistributes across the rest — the score never fills gaps with fake neutral values.</p>
                         <a href="https://github.com/jricciardi/labor-market-dashboard/blob/main/index.html" target="_blank">View source code →</a>
                     </div>
                     </div>
@@ -1653,7 +1670,8 @@
                     <p><strong>This is national data.</strong> Your industry, region, and role may differ significantly. Tech hiring can freeze while healthcare booms. San Francisco and rural Ohio are different markets.</p>
                     <p><strong>The data lags reality.</strong> BLS releases come 4-6 weeks after the reference month. By the time you see it here, conditions may have shifted.</p>
                     <p><strong>The thresholds are calibrated to recent history.</strong> A "bad" quit rate today might have been normal in 2010. The score tells you how now compares to 2015-2025, not to all of history.</p>
-                    <p><strong>There's no confidence interval.</strong> <span id="limitationsScoreText">The score should really be read as ±3 points given measurement uncertainty and model choices.</span></p>
+                    <p><strong>First prints get revised.</strong> BLS revises JOLTS and Employment Situation numbers after initial release. Backtesting this dashboard's own history, a freshly published month's score has moved as much as 7 points once revisions landed. That's why the margin below is wider than it used to be.</p>
+                    <p><strong>There's no confidence interval.</strong> <span id="limitationsScoreText">The score should really be read as ±5 points given measurement uncertainty, data revisions, and model choices.</span></p>
                     </div>
                 </div>
             </div>
@@ -1672,8 +1690,9 @@
                     <p>All data comes from official government sources, retrieved via the <a href="https://fred.stlouisfed.org/" target="_blank">Federal Reserve Economic Data (FRED)</a> API:</p>
                     <ul>
                         <li><strong>Quit rate, hiring rate, layoff rate, job openings:</strong> Bureau of Labor Statistics <a href="https://www.bls.gov/jlt/" target="_blank">Job Openings and Labor Turnover Survey (JOLTS)</a></li>
-                        <li><strong>Unemployment rate, workforce participation, wage growth:</strong> Bureau of Labor Statistics <a href="https://www.bls.gov/ces/" target="_blank">Employment Situation Report</a></li>
-                        <li><strong>Fed interest rate:</strong> Federal Reserve <a href="https://www.federalreserve.gov/monetarypolicy/openmarket.htm" target="_blank">Open Market Operations</a></li>
+                        <li><strong>Unemployment rate, unemployment duration, workforce participation, wage growth:</strong> Bureau of Labor Statistics <a href="https://www.bls.gov/ces/" target="_blank">Employment Situation Report</a></li>
+                        <li><strong>Inflation (for real wage growth):</strong> Bureau of Labor Statistics <a href="https://www.bls.gov/cpi/" target="_blank">Consumer Price Index</a></li>
+                        <li><strong>Fed interest rate (context only):</strong> Federal Reserve <a href="https://www.federalreserve.gov/monetarypolicy/openmarket.htm" target="_blank">Open Market Operations</a></li>
                     </ul>
                     <p>Data updates automatically each month after BLS releases. The code is open source if you want to verify or adapt it.</p>
                     </div>
@@ -2033,7 +2052,11 @@
                 unempRate: data.unempRate,
                 fedRate: data.fedRate,
                 wageGrowth: data.wageGrowth,
-                lfpr: data.lfpr
+                lfpr: data.lfpr,
+                // Added in methodology v2; may be absent until the data pipeline
+                // has run with the updated script. The score renormalizes without them.
+                uempMed: data.uempMed || data.labels.map(function() { return null; }),
+                realWageGrowth: data.realWageGrowth || data.labels.map(function() { return null; })
             };
             
             // Timestamps
@@ -2070,41 +2093,87 @@
             var lastLabel = monthlyData.labels[monthlyData.labels.length - 1];
             document.getElementById('chartRange').textContent = firstLabel + ' \u2013 ' + lastLabel;
 
-            // Composite score calculation
-            function calculateCompositeScore(idx) {
-                var quit = monthlyData.quitRate[idx], ratio = monthlyData.openingsRatio[idx];
-                var hires = monthlyData.hiresRate[idx], layoffs = monthlyData.layoffsRate[idx];
-                var unemp = monthlyData.unempRate[idx], fed = monthlyData.fedRate[idx];
-                var wage = monthlyData.wageGrowth[idx], lfpr = monthlyData.lfpr[idx];
-                // Carry forward JOLTS from previous month if null (JOLTS data lags ~1 month)
-                if (quit == null || ratio == null || hires == null || layoffs == null) {
-                    for (var p = idx - 1; p >= 0; p--) {
-                        if (quit == null && monthlyData.quitRate[p] != null) quit = monthlyData.quitRate[p];
-                        if (ratio == null && monthlyData.openingsRatio[p] != null) ratio = monthlyData.openingsRatio[p];
-                        if (hires == null && monthlyData.hiresRate[p] != null) hires = monthlyData.hiresRate[p];
-                        if (layoffs == null && monthlyData.layoffsRate[p] != null) layoffs = monthlyData.layoffsRate[p];
-                        if (quit != null && ratio != null && hires != null && layoffs != null) break;
-                    }
-                }
-                if (quit == null || ratio == null) return null;
-                var qs = Math.min(1, Math.max(0, (quit - 1.5) / 1.5));
-                var rs = Math.min(1, Math.max(0, (ratio - 0.3) / 1.7));
-                var hs = Math.min(1, Math.max(0, (hires - 2.0) / 2.5));
-                var ls = Math.min(1, Math.max(0, (2.5 - layoffs) / 1.7));
-                var us = unemp != null ? Math.min(1, Math.max(0, (7.0 - unemp) / 3.5)) : 0.5;
-                var fs = Math.min(1, Math.max(0, (5.5 - fed) / 5.5));
-                var ws = wage != null ? Math.min(1, Math.max(0, (wage - 2.0) / 3.0)) : 0.5;
-                var ps = lfpr != null ? Math.min(1, Math.max(0, (lfpr - 79) / 4.0)) : 0.5;
-                var t1 = (qs + rs + hs + ls) / 4 * 0.6;
-                var t2 = (us + fs + ws + ps) / 4 * 0.4;
-                var base = (t1 + t2) * 100;
-                if (ratio < 1.0) base *= 0.92;
-                base *= (1 - 0.12 * (1 - Math.min(qs, hs)));
-                if (fed < 0.5) base *= 1.08;
-                return Math.min(100, Math.round(base));
+            // ========================================
+            // SCORE MODEL v2
+            // One config drives the composite score, the scenario calculator,
+            // and the movers strip. An industry variant only needs to swap each
+            // component's series for its industry equivalent (JOLTS and CES both
+            // publish by supersector on FRED) and reuse everything below.
+            // Fed funds is deliberately NOT scored: near-zero rates historically
+            // coincide with crisis, not worker leverage. It stays as context.
+            // ========================================
+            var SCORE_COMPONENTS = [
+                // Direct leverage: can you actually get hired, and are peers moving?
+                { key: 'quitRate',       name: 'Quit Rate',      weight: 0.18, dec: 1, unit: '%',     inv: false, norm: function(v) { return (v - 1.5) / 1.5; } },
+                // Anchored to the modern operating range (2.8–4.4), not the COVID
+                // crash: today's decade-low hiring should read as low, not middling.
+                { key: 'hiresRate',      name: 'Hiring Rate',    weight: 0.18, dec: 1, unit: '%',     inv: false, norm: function(v) { return (v - 2.8) / 1.6; } },
+                // Postings are the least trustworthy series (ghost jobs), so the
+                // ratio is downweighted; the curve is steeper below 1.0 where every
+                // hundredth means more competition per opening.
+                { key: 'openingsRatio',  name: 'Jobs per Seeker', weight: 0.12, dec: 2, unit: '',     inv: false, norm: function(v) { return v <= 1.0 ? 0.35 * (v - 0.3) / 0.7 : 0.35 + 0.65 * (v - 1.0); } },
+                { key: 'layoffsRate',    name: 'Layoffs',        weight: 0.10, dec: 1, unit: '%',     inv: true,  norm: function(v) { return (2.5 - v) / 1.7; } },
+                // Downside risk: if a move goes wrong, how long is the search?
+                { key: 'uempMed',        name: 'Search Duration', weight: 0.12, dec: 1, unit: ' wks', inv: true,  norm: function(v) { return (16 - v) / 8; } },
+                { key: 'unempRate',      name: 'Unemployment',   weight: 0.10, dec: 1, unit: '%',     inv: true,  norm: function(v) { return (7.0 - v) / 3.5; } },
+                // Pricing power in real terms; falls back to nominal until the
+                // pipeline provides the CPI-adjusted series.
+                { key: 'realWageGrowth', name: 'Real Wages',     weight: 0.12, dec: 1, unit: '%',     inv: false, norm: function(v) { return (v + 1.0) / 3.0; },
+                  fallbackKey: 'wageGrowth', fallbackNorm: function(v) { return (v - 2.0) / 3.0; } },
+                { key: 'lfpr',           name: 'Participation',  weight: 0.08, dec: 1, unit: '%',     inv: false, norm: function(v) { return (v - 80.5) / 4.0; } }
+            ];
+            var CARRY_LIMIT = 3; // max months a stale value may stand in for a missing one
+
+            function scoreFromValues(values) {
+                // values: {seriesKey: number|null}. Components without data drop out
+                // and the remaining weights renormalize — a missing series never gets
+                // a fake "neutral" placeholder.
+                var num = 0, den = 0, have = {};
+                SCORE_COMPONENTS.forEach(function(c) {
+                    var v = values[c.key], norm = c.norm;
+                    if (v == null && c.fallbackKey) { v = values[c.fallbackKey]; norm = c.fallbackNorm; }
+                    if (v == null) return;
+                    have[c.key] = true;
+                    num += Math.min(1, Math.max(0, norm(v))) * c.weight;
+                    den += c.weight;
+                });
+                if (!have.quitRate || !have.openingsRatio || den < 0.5) return null;
+                return Math.min(100, Math.round(num / den * 100));
             }
 
-            var compositeScores = monthlyData.labels.map(function(_, idx) { return calculateCompositeScore(idx); });
+            function valuesAt(idx) {
+                var out = {};
+                SCORE_COMPONENTS.forEach(function(c) {
+                    [c.key, c.fallbackKey].forEach(function(k) {
+                        if (!k || k in out) return;
+                        var series = monthlyData[k] || [];
+                        var v = series[idx];
+                        if (v == null) {
+                            for (var p = idx - 1; p >= idx - CARRY_LIMIT && p >= 0; p--) {
+                                if (series[p] != null) { v = series[p]; break; }
+                            }
+                        }
+                        out[k] = v == null ? null : v;
+                    });
+                });
+                return out;
+            }
+
+            function calculateCompositeScore(idx) { return scoreFromValues(valuesAt(idx)); }
+
+            // Only score months where at least one scored series actually reported —
+            // a month that exists only because the Fed rate posted would otherwise be
+            // scored entirely on carried-over data and labeled as current.
+            function hasRealScoredData(idx) {
+                return SCORE_COMPONENTS.some(function(c) {
+                    return (monthlyData[c.key] && monthlyData[c.key][idx] != null) ||
+                        (c.fallbackKey && monthlyData[c.fallbackKey] && monthlyData[c.fallbackKey][idx] != null);
+                });
+            }
+
+            var compositeScores = monthlyData.labels.map(function(_, idx) {
+                return hasRealScoredData(idx) ? calculateCompositeScore(idx) : null;
+            });
             
             var peakScore = 0, peakIdx = 0;
             compositeScores.forEach(function(score, idx) { if (score !== null && score > peakScore) { peakScore = score; peakIdx = idx; } });
@@ -2182,7 +2251,7 @@
             // Update limitations score text dynamically
             var limEl = document.getElementById('limitationsScoreText');
             if (limEl) {
-                var lo = Math.max(0, currentScore - 3), hi = Math.min(100, currentScore + 3);
+                var lo = Math.max(0, currentScore - 5), hi = Math.min(100, currentScore + 5);
                 limEl.textContent = 'A score of \u201c' + currentScore + '\u201d should really be read as \u201csomewhere around ' + lo + '\u2013' + hi + '\u201d given measurement uncertainty and model choices.';
             }
 
@@ -2233,36 +2302,30 @@
                 '<span class="context-sep">\u00b7</span>' +
                 '<span class="context-chip"><span class="context-chip-label">Similar to</span> <span class="context-chip-value">' + analogText + '</span></span>' +
                 '<span class="context-sep">\u00b7</span>' +
-                '<span class="context-chip"><span class="context-chip-label">Margin</span> <span class="context-chip-value">\u00b13 pts</span></span>';
+                '<span class="context-chip"><span class="context-chip-label">Margin</span> <span class="context-chip-value">\u00b15 pts</span></span>';
 
             // ========================================
             // CURRENT METRICS (carry-forward aware)
             // ========================================
-            var currentMetrics = {
-                quitRate: monthlyData.quitRate[currentIdx],
-                openingsRatio: monthlyData.openingsRatio[currentIdx],
-                hiresRate: monthlyData.hiresRate[currentIdx],
-                layoffsRate: monthlyData.layoffsRate[currentIdx],
-                unempRate: monthlyData.unempRate[currentIdx],
-                fedRate: monthlyData.fedRate[currentIdx],
-                wageGrowth: monthlyData.wageGrowth[currentIdx],
-                lfpr: monthlyData.lfpr[currentIdx]
-            };
+            var METRIC_KEYS = ['quitRate', 'openingsRatio', 'hiresRate', 'layoffsRate', 'unempRate', 'fedRate', 'wageGrowth', 'lfpr', 'uempMed', 'realWageGrowth'];
+            var currentMetrics = {};
+            METRIC_KEYS.forEach(function(k) { currentMetrics[k] = (monthlyData[k] || [])[currentIdx]; });
 
-            // Carry forward JOLTS if null for current month (JOLTS data lags ~1 month),
+            // Carry forward any metric that hasn't reported for the current month
+            // (JOLTS lags ~1 month; CPS-derived series can lag during disruptions),
             // remembering each metric's source month for honest deltas and lag labeling
             var joltsCarried = {};
             var joltsSourceIdx = {};
-            ['quitRate', 'openingsRatio', 'hiresRate', 'layoffsRate'].forEach(function(k) {
-                if (currentMetrics[k] == null) {
-                    for (var p = currentIdx - 1; p >= 0; p--) {
+            METRIC_KEYS.forEach(function(k) {
+                if (currentMetrics[k] == null && monthlyData[k]) {
+                    for (var p = currentIdx - 1; p >= currentIdx - CARRY_LIMIT && p >= 0; p--) {
                         if (monthlyData[k][p] != null) { currentMetrics[k] = monthlyData[k][p]; joltsCarried[k] = true; joltsSourceIdx[k] = p; break; }
                     }
                 }
             });
 
             // Surface the lag: header gets a precise claim, core tier gets one consolidated note
-            var carriedKeys = Object.keys(joltsCarried);
+            var carriedKeys = ['quitRate', 'openingsRatio', 'hiresRate', 'layoffsRate'].filter(function(k) { return joltsCarried[k]; });
             if (carriedKeys.length) {
                 var srcLabel = monthlyData.labels[joltsSourceIdx[carriedKeys[0]]]; // e.g. "Apr-26"
                 var srcParts = srcLabel.split('-');
@@ -2348,9 +2411,17 @@
                     else sentences.push('The openings-to-seekers ratio sits at ' + ratio.toFixed(2) + '.');
                 }
 
-                // Fed rate context
+                // Search duration \u2014 the downside-risk number for anyone weighing a move
+                var dur = currentMetrics.uempMed;
+                if (dur != null) {
+                    if (dur >= 12) sentences.push('The median unemployment spell is ' + dur.toFixed(1) + ' weeks \u2014 losing a job means a long search, so weigh moves carefully.');
+                    else if (dur >= 9.5) sentences.push('The median unemployment spell is ' + dur.toFixed(1) + ' weeks \u2014 searches are taking longer than in a healthy market.');
+                    else sentences.push('The median unemployment spell is ' + dur.toFixed(1) + ' weeks \u2014 people who search are landing reasonably quickly.');
+                }
+
+                // Fed rate context (not scored, but real context)
                 if (fed != null) {
-                    if (fed < 1.0) sentences.push('Near-zero Fed rates are historically stimulative for hiring.');
+                    if (fed < 1.0) sentences.push('Near-zero Fed rates usually mean the Fed is fighting a downturn \u2014 cheap money, weak demand.');
                     else if (fed > 4.0) sentences.push('The Fed rate at ' + fed.toFixed(1) + '% keeps borrowing expensive, weighing on hiring budgets.');
                     else if (fed > 2.5) sentences.push('The Fed rate at ' + fed.toFixed(1) + '% has eased but hasn\u2019t fully translated to hiring activity yet.');
                 }
@@ -2375,16 +2446,8 @@
                 }
                 return null;
             }
-            var prevMetrics = {
-                quitRate: prevValueFor('quitRate'),
-                openingsRatio: prevValueFor('openingsRatio'),
-                hiresRate: prevValueFor('hiresRate'),
-                layoffsRate: prevValueFor('layoffsRate'),
-                unempRate: prevValueFor('unempRate'),
-                fedRate: prevValueFor('fedRate'),
-                wageGrowth: prevValueFor('wageGrowth'),
-                lfpr: prevValueFor('lfpr')
-            };
+            var prevMetrics = {};
+            METRIC_KEYS.forEach(function(k) { prevMetrics[k] = prevValueFor(k); });
             
             function getMetricClass(value, metric) {
                 var thresholds = {
@@ -2395,7 +2458,9 @@
                     unempRate: { good: 4.0, neutral: 4.5, inverted: true },
                     fedRate: { good: 2.5, neutral: 4.0, inverted: true },
                     wageGrowth: { good: 4.0, neutral: 3.0 },
-                    lfpr: { good: 83.0, neutral: 82.0 }
+                    lfpr: { good: 83.0, neutral: 82.0 },
+                    uempMed: { good: 9.5, neutral: 12.0, inverted: true },
+                    realWageGrowth: { good: 1.0, neutral: 0.0 }
                 };
                 var t = thresholds[metric];
                 if (!t) return 'neutral';
@@ -2430,6 +2495,23 @@
             document.getElementById('lfprValue').innerHTML = (currentMetrics.lfpr || 0).toFixed(1) + '%' + getDeltaHTML(currentMetrics.lfpr, prevMetrics.lfpr, 1);
             document.getElementById('lfprValue').className = 'metric-value ' + getMetricClass(currentMetrics.lfpr || 82, 'lfpr');
 
+            // Unemployment duration card renders only once the pipeline provides the series
+            var uempMedCard = document.getElementById('uempMedCard');
+            if (currentMetrics.uempMed != null) {
+                document.getElementById('uempMedValue').innerHTML = currentMetrics.uempMed.toFixed(1) + ' wks' + getDeltaHTML(currentMetrics.uempMed, prevMetrics.uempMed, 1, true);
+                document.getElementById('uempMedValue').className = 'metric-value ' + getMetricClass(currentMetrics.uempMed, 'uempMed');
+            } else if (uempMedCard) {
+                uempMedCard.hidden = true;
+            }
+            var coreToggleText = document.querySelector('#coreSummary .toggle-text');
+            if (coreToggleText) coreToggleText.textContent = 'Show ' + (currentMetrics.uempMed != null ? 5 : 4) + ' metrics';
+
+            // Wage card shows the inflation-adjusted figure alongside the nominal one
+            if (currentMetrics.realWageGrowth != null) {
+                var wageDesc = document.getElementById('wageDesc');
+                if (wageDesc) wageDesc.textContent = 'Pay growth year-over-year — ' + (currentMetrics.realWageGrowth >= 0 ? '+' : '') + currentMetrics.realWageGrowth.toFixed(1) + '% after inflation';
+            }
+
             // ========================================
             // PHASE 8: POPULATE METRICS SUMMARIES (mobile)
             // ========================================
@@ -2439,12 +2521,16 @@
                 }).join('');
             }
 
-            document.getElementById('coreSummaryItems').innerHTML = buildSummaryHTML([
+            var coreSummary = [
                 { name: 'Quits', value: currentMetrics.quitRate.toFixed(1) + '%', signal: getMetricClass(currentMetrics.quitRate, 'quitRate') },
                 { name: 'Jobs/Seeker', value: currentMetrics.openingsRatio.toFixed(2), signal: getMetricClass(currentMetrics.openingsRatio, 'openingsRatio') },
                 { name: 'Hiring', value: currentMetrics.hiresRate.toFixed(1) + '%', signal: getMetricClass(currentMetrics.hiresRate, 'hiresRate') },
                 { name: 'Layoffs', value: currentMetrics.layoffsRate.toFixed(1) + '%', signal: getMetricClass(currentMetrics.layoffsRate, 'layoffsRate') }
-            ]);
+            ];
+            if (currentMetrics.uempMed != null) {
+                coreSummary.push({ name: 'Search Time', value: currentMetrics.uempMed.toFixed(1) + ' wks', signal: getMetricClass(currentMetrics.uempMed, 'uempMed') });
+            }
+            document.getElementById('coreSummaryItems').innerHTML = buildSummaryHTML(coreSummary);
 
             document.getElementById('contextSummaryItems').innerHTML = buildSummaryHTML([
                 { name: 'Unemployment', value: (currentMetrics.unempRate || 0).toFixed(1) + '%', signal: getMetricClass(currentMetrics.unempRate || 5, 'unempRate') },
@@ -2460,25 +2546,18 @@
             (function renderMovers() {
                 var el = document.getElementById('metricMovers'), itemsEl = document.getElementById('moversItems');
                 if (!el || !itemsEl) return;
-                var defs = [
-                    { key: 'quitRate', name: 'Quit Rate', norm: function(v) { return (v - 1.5) / 1.5; }, weight: 0.15, dec: 1, unit: '%', inv: false },
-                    { key: 'openingsRatio', name: 'Jobs per Seeker', norm: function(v) { return (v - 0.3) / 1.7; }, weight: 0.15, dec: 2, unit: '', inv: false },
-                    { key: 'hiresRate', name: 'Hiring Rate', norm: function(v) { return (v - 2.0) / 2.5; }, weight: 0.15, dec: 1, unit: '%', inv: false },
-                    { key: 'layoffsRate', name: 'Layoffs', norm: function(v) { return (2.5 - v) / 1.7; }, weight: 0.15, dec: 1, unit: '%', inv: true },
-                    { key: 'unempRate', name: 'Unemployment', norm: function(v) { return (7.0 - v) / 3.5; }, weight: 0.1, dec: 1, unit: '%', inv: true },
-                    { key: 'fedRate', name: 'Fed Rate', norm: function(v) { return (5.5 - v) / 5.5; }, weight: 0.1, dec: 2, unit: '%', inv: true },
-                    { key: 'wageGrowth', name: 'Wage Growth', norm: function(v) { return (v - 2.0) / 3.0; }, weight: 0.1, dec: 1, unit: '%', inv: false },
-                    { key: 'lfpr', name: 'Participation', norm: function(v) { return (v - 79) / 4.0; }, weight: 0.1, dec: 1, unit: '%', inv: false }
-                ];
                 function clampN(v) { return Math.min(1, Math.max(0, v)); }
                 var movers = [];
-                defs.forEach(function(d) {
-                    var cur = currentMetrics[d.key], prev = prevMetrics[d.key];
+                SCORE_COMPONENTS.forEach(function(d) {
+                    var key = d.key, norm = d.norm;
+                    if (currentMetrics[key] == null && d.fallbackKey) { key = d.fallbackKey; norm = d.fallbackNorm; }
+                    var cur = currentMetrics[key], prev = prevMetrics[key];
                     if (cur == null || prev == null) return;
-                    var contrib = (clampN(d.norm(cur)) - clampN(d.norm(prev))) * d.weight * 100;
+                    var contrib = (clampN(norm(cur)) - clampN(norm(prev))) * d.weight * 100;
                     var rawDelta = cur - prev;
                     if (Math.abs(rawDelta) < Math.pow(10, -d.dec) / 2) return;
-                    movers.push({ d: d, contrib: contrib, rawDelta: rawDelta });
+                    var displayName = key === d.fallbackKey ? 'Wage Growth' : d.name;
+                    movers.push({ d: d, name: displayName, contrib: contrib, rawDelta: rawDelta });
                 });
                 movers.sort(function(a, b) { return Math.abs(b.contrib) - Math.abs(a.contrib); });
                 var top = movers.slice(0, 3).filter(function(m) { return Math.abs(m.contrib) > 0.05; });
@@ -2486,7 +2565,7 @@
                 itemsEl.innerHTML = top.map(function(m) {
                     var sign = m.rawDelta > 0 ? '+' : '';
                     var dirClass = (m.rawDelta > 0 ? 'up' : 'down') + (m.d.inv ? ' inverted' : '');
-                    return '<span class="mover"><span class="mover-name">' + m.d.name + '</span> <span class="metric-delta ' + dirClass + '">' + sign + m.rawDelta.toFixed(m.d.dec) + m.d.unit + '</span></span>';
+                    return '<span class="mover"><span class="mover-name">' + m.name + '</span> <span class="metric-delta ' + dirClass + '">' + sign + m.rawDelta.toFixed(m.d.dec) + m.d.unit + '</span></span>';
                 }).join('');
                 el.hidden = false;
             })();
@@ -2494,8 +2573,11 @@
             // ========================================
             // SCENARIOS
             // ========================================
-            var CUR = { quitRate: currentMetrics.quitRate, openingsRatio: currentMetrics.openingsRatio, hiresRate: currentMetrics.hiresRate, layoffsRate: currentMetrics.layoffsRate, unempRate: currentMetrics.unempRate, fedRate: currentMetrics.fedRate, wageGrowth: currentMetrics.wageGrowth, lfpr: currentMetrics.lfpr };
+            var CUR = {};
+            METRIC_KEYS.forEach(function(k) { CUR[k] = currentMetrics[k]; });
 
+            // Scenario presets share the v2 score model. Fed rate values remain in
+            // the presets as narrative context, but no longer move the score.
             var SCENARIOS = {
                 now: Object.assign({}, CUR),
                 frozen: Object.assign({}, CUR, { quitRate: 1.9, openingsRatio: 0.88, hiresRate: 3.0, fedRate: 3.5, unempRate: 4.8 }),
@@ -2503,24 +2585,22 @@
                 boom: Object.assign({}, CUR, { quitRate: 2.5, openingsRatio: 1.4, hiresRate: 3.8, fedRate: 2.25, unempRate: 3.9, wageGrowth: 4.0, layoffsRate: 1.0 }),
                 worse: Object.assign({}, CUR, { quitRate: 1.7, openingsRatio: 0.7, hiresRate: 2.8, layoffsRate: 1.5, fedRate: 3.75, unempRate: 5.4 })
             };
-
-            function calcScenarioScore(m) {
-                var qs = Math.min(1, Math.max(0, (m.quitRate - 1.5) / 1.5));
-                var rs = Math.min(1, Math.max(0, (m.openingsRatio - 0.3) / 1.7));
-                var hs = Math.min(1, Math.max(0, (m.hiresRate - 2.0) / 2.5));
-                var ls = Math.min(1, Math.max(0, (2.5 - m.layoffsRate) / 1.7));
-                var us = Math.min(1, Math.max(0, (7.0 - m.unempRate) / 3.5));
-                var fs = Math.min(1, Math.max(0, (5.5 - m.fedRate) / 5.5));
-                var ws = Math.min(1, Math.max(0, (m.wageGrowth - 2.0) / 3.0));
-                var ps = Math.min(1, Math.max(0, (m.lfpr - 79) / 4.0));
-                var t1 = (qs + rs + hs + ls) / 4 * 0.6;
-                var t2 = (us + fs + ws + ps) / 4 * 0.4;
-                var base = (t1 + t2) * 100;
-                if (m.openingsRatio < 1.0) base *= 0.92;
-                base *= (1 - 0.12 * (1 - Math.min(qs, hs)));
-                if (m.fedRate < 0.5) base *= 1.08;
-                return Math.min(100, Math.round(base));
+            // Only shift the newer components in scenarios when we actually have
+            // current data for them — otherwise presets and "now" wouldn't be comparable
+            if (CUR.uempMed != null) {
+                SCENARIOS.frozen.uempMed = Math.min(24, CUR.uempMed + 1);
+                SCENARIOS.thaw.uempMed = 9.5;
+                SCENARIOS.boom.uempMed = 8.5;
+                SCENARIOS.worse.uempMed = Math.min(24, CUR.uempMed + 4);
             }
+            if (CUR.realWageGrowth != null) {
+                SCENARIOS.frozen.realWageGrowth = 0.3;
+                SCENARIOS.thaw.realWageGrowth = 1.2;
+                SCENARIOS.boom.realWageGrowth = 1.8;
+                SCENARIOS.worse.realWageGrowth = -0.5;
+            }
+
+            function calcScenarioScore(m) { return scoreFromValues(m); }
 
             var CUR_SCORE = calcScenarioScore(CUR);
             var SCENARIO_SCORES = {};
@@ -2590,7 +2670,7 @@
                 { key: 'quit', name: 'Quit Rate', metric: 'quitRate', min: 1.4, max: 3.2, step: 0.1, cur: CUR.quitRate, fmt: function(v) { return v.toFixed(1)+'%'; }, inv: false },
                 { key: 'ratio', name: 'Openings / Unemployed', metric: 'openingsRatio', min: 0.3, max: 2.0, step: 0.05, cur: CUR.openingsRatio, fmt: function(v) { return v.toFixed(2); }, inv: false },
                 { key: 'hires', name: 'Hires Rate', metric: 'hiresRate', min: 2.0, max: 4.8, step: 0.1, cur: CUR.hiresRate, fmt: function(v) { return v.toFixed(1)+'%'; }, inv: false },
-                { key: 'fed', name: 'Fed Funds Rate', metric: 'fedRate', min: 0, max: 5.5, step: 0.25, cur: CUR.fedRate, fmt: function(v) { return v.toFixed(2)+'%'; }, inv: true },
+                { key: 'layoffs', name: 'Layoff Rate', metric: 'layoffsRate', min: 0.8, max: 2.2, step: 0.1, cur: CUR.layoffsRate, fmt: function(v) { return v.toFixed(1)+'%'; }, inv: true },
                 { key: 'unemp', name: 'Unemployment', metric: 'unempRate', min: 3.4, max: 7.0, step: 0.1, cur: CUR.unempRate, fmt: function(v) { return v.toFixed(1)+'%'; }, inv: true }
             ];
 
@@ -2878,7 +2958,7 @@
             // Sparklines
             function createSparkline(canvasId, dataArray, metric, rangeId) {
                 var ctx = document.getElementById(canvasId).getContext('2d');
-                var thresholds = { quitRate: { good: 2.5, neutral: 2.0 }, openingsRatio: { good: 1.2, neutral: 1.0 }, hiresRate: { good: 3.8, neutral: 3.4 }, layoffsRate: { good: 1.0, neutral: 1.3, inverted: true }, unempRate: { good: 4.0, neutral: 4.5, inverted: true }, fedRate: { good: 2.5, neutral: 4.0, inverted: true }, wageGrowth: { good: 4.0, neutral: 3.0 }, lfpr: { good: 83.0, neutral: 82.0 } };
+                var thresholds = { quitRate: { good: 2.5, neutral: 2.0 }, openingsRatio: { good: 1.2, neutral: 1.0 }, hiresRate: { good: 3.8, neutral: 3.4 }, layoffsRate: { good: 1.0, neutral: 1.3, inverted: true }, unempRate: { good: 4.0, neutral: 4.5, inverted: true }, fedRate: { good: 2.5, neutral: 4.0, inverted: true }, wageGrowth: { good: 4.0, neutral: 3.0 }, lfpr: { good: 83.0, neutral: 82.0 }, uempMed: { good: 9.5, neutral: 12.0, inverted: true } };
                 var validData = dataArray.filter(function(v) { return v != null && !isNaN(v); });
                 var minVal = Math.min.apply(null, validData), maxVal = Math.max.apply(null, validData);
                 var formatValue = function(val) { return metric === 'openingsRatio' ? val.toFixed(1) : metric === 'lfpr' ? val.toFixed(0) : val.toFixed(1); };
@@ -2901,6 +2981,7 @@
             createSparkline('fedChart', monthlyData.fedRate, 'fedRate', 'fedRange');
             createSparkline('wageChart', monthlyData.wageGrowth.map(function(v) { return v || 0; }), 'wageGrowth', 'wageRange');
             createSparkline('lfprChart', monthlyData.lfpr.map(function(v) { return v || 0; }), 'lfpr', 'lfprRange');
+            if (currentMetrics.uempMed != null) createSparkline('uempMedChart', monthlyData.uempMed.map(function(v) { return v || 0; }), 'uempMed', 'uempMedRange');
 
             }, function() {
                 // Chart library never arrived (blocked CDN, offline) — say so where the charts would be

@@ -8,9 +8,11 @@ Built with love for friends currently navigating the tough labor market.
 
 ## What is this?
 
-This dashboard combines eight labor market indicators into a single score to answer a simple question: **does the job market currently favor people looking for work, or employers doing the hiring?**
+This dashboard distills official labor market data into a single score to answer a simple question: **does the job market currently favor people looking for work, or employers doing the hiring?**
 
-The score runs from 0 to 100. Higher means better for job seekers.
+Eight indicators are scored — hiring rate, quit rate, jobs per job seeker, median unemployment duration, real wage growth, layoff rate, unemployment rate, and prime-age participation — and the Fed interest rate is charted for context. See [docs/methodology.md](docs/methodology.md) for the weights and the reasoning behind them.
+
+The score runs from 0 to 100. Higher means better for job seekers. Read it as ±5 points.
 
 - **70+** — Good Time to Move
 - **55–69** — Worth Exploring  
@@ -22,8 +24,9 @@ The score runs from 0 to 100. Higher means better for job seekers.
 All data comes from official government sources via the [FRED API](https://fred.stlouisfed.org/):
 
 - **Bureau of Labor Statistics JOLTS** — Quit rate, hiring rate, layoff rate, job openings
-- **BLS Employment Situation** — Unemployment rate, workforce participation, wage growth
-- **Federal Reserve** — Fed funds interest rate
+- **BLS Employment Situation** — Unemployment rate, unemployment duration, workforce participation, wage growth
+- **BLS Consumer Price Index** — Inflation, for real wage growth
+- **Federal Reserve** — Fed funds interest rate (context only, not scored)
 
 Data updates automatically each month after BLS releases.
 

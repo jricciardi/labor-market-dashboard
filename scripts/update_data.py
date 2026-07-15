@@ -12,6 +12,8 @@ FRED Series used:
 - FEDFUNDS: Federal funds effective rate
 - CES0500000003: Average hourly earnings, private (for YoY wage growth)
 - LNS11300060: Labor force participation rate, 25-54 years
+- UEMPMED: Median duration of unemployment (weeks)
+- CPIAUCSL: CPI-U (for real wage growth = wage YoY minus CPI YoY)
 
 Run with: python update_data.py
 Requires FRED_API_KEY environment variable
@@ -39,6 +41,8 @@ SERIES = {
     'fedRate': 'FEDFUNDS',
     'avgHourlyEarnings': 'CES0500000003',  # For calculating YoY wage growth
     'lfpr': 'LNS11300060',
+    'uempMed': 'UEMPMED',  # Median weeks unemployed
+    'cpi': 'CPIAUCSL',  # For real wage growth (wage YoY - CPI YoY)
 }
 
 def fetch_fred_series(series_id, start_date='2015-01-01'):
@@ -154,10 +158,13 @@ def main():
     fed_rate = []
     wage_growth = []
     lfpr = []
-    
-    # Calculate wage growth (YoY)
+    uemp_med = []
+    real_wage_growth = []
+
+    # Calculate wage growth (YoY) and CPI inflation (YoY)
     wage_yoy = calculate_yoy_growth(parsed['avgHourlyEarnings'])
-    
+    cpi_yoy = calculate_yoy_growth(parsed['cpi'])
+
     for date_str in monthly_dates:
         label = date_to_label(date_str)
         labels.append(label)
@@ -170,7 +177,16 @@ def main():
         fed_rate.append(parsed['fedRate'].get(date_str))
         lfpr.append(parsed['lfpr'].get(date_str))
         wage_growth.append(wage_yoy.get(date_str))
-        
+        uemp_med.append(parsed['uempMed'].get(date_str))
+
+        # Real wage growth: nominal wage YoY minus CPI YoY
+        w = wage_yoy.get(date_str)
+        c = cpi_yoy.get(date_str)
+        if w is not None and c is not None:
+            real_wage_growth.append(round(w - c, 1))
+        else:
+            real_wage_growth.append(None)
+
         # Calculate openings ratio (job openings / unemployment level)
         openings = parsed['jobOpenings'].get(date_str)
         unemp_level = parsed['unemploymentLevel'].get(date_str)
@@ -190,7 +206,8 @@ def main():
         return -1
 
     all_series = [quit_rate, unemp_rate, fed_rate, wage_growth, lfpr,
-                  hires_rate, layoffs_rate, openings_ratio]
+                  hires_rate, layoffs_rate, openings_ratio, uemp_med,
+                  real_wage_growth]
     last_data_idx = max(last_valid_index(s) for s in all_series)
 
     if last_data_idx < 0:
@@ -208,6 +225,8 @@ def main():
     fed_rate = fed_rate[:trim_to]
     wage_growth = wage_growth[:trim_to]
     lfpr = lfpr[:trim_to]
+    uemp_med = uemp_med[:trim_to]
+    real_wage_growth = real_wage_growth[:trim_to]
 
     def interpolate_interior_nulls(arr):
         """Fill null values that are surrounded by real data (not at the end) via linear interpolation."""
@@ -234,6 +253,8 @@ def main():
     unemp_rate = interpolate_interior_nulls(unemp_rate)
     lfpr = interpolate_interior_nulls(lfpr)
     wage_growth = interpolate_interior_nulls(wage_growth)
+    uemp_med = interpolate_interior_nulls(uemp_med)
+    real_wage_growth = interpolate_interior_nulls(real_wage_growth)
     
     # Determine data coverage
     last_label = labels[-1]  # e.g., "Nov-25"
@@ -264,7 +285,9 @@ def main():
         "unempRate": unemp_rate,
         "fedRate": fed_rate,
         "wageGrowth": wage_growth,
-        "lfpr": lfpr
+        "lfpr": lfpr,
+        "uempMed": uemp_med,
+        "realWageGrowth": real_wage_growth
     }
     
     # Write to data.json
