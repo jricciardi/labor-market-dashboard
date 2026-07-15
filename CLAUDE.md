@@ -1,5 +1,14 @@
 # Labor Market Dashboard — Claude Context
 
+## Status & Roadmap (updated 2026-07-15)
+
+- **Score model v2 is live** (merged PR #9 + data refresh): config-driven `SCORE_COMPONENTS` in `index.html`, weighted-average with per-component weight renormalization when data is missing, carry-forward ≤3 months, no neutral placeholders. Fed funds is charted but NOT scored. Margin is ±5 (empirical). Full rationale: `docs/methodology.md` ("Dashboard Scoring Model (v2)").
+- New scored components since v2: median unemployment duration (`uempMed`, FRED UEMPMED) and real wage growth (`realWageGrowth` = AHE YoY − CPI YoY); pipeline fetches both (`scripts/update_data.py`).
+- Backtest tooling pattern: replicate `SCORE_COMPONENTS` in Python, then walk `git log -- data.json` vintages to compare displayed vs revised scores (used to find and fix the 2026-05-07 fake-neutral artifact).
+- **Next up: score v3 — switcher premium + industry/occupation slices.** The full data-science plan (sources, series IDs to verify, statistical treatment, validation battery, phasing) is in `docs/sector-methodology-plan.md`. Phase 0 = Atlanta Fed switcher premium; start with that file's §10 restart checklist.
+- Environment note: the Claude remote environment blocks FRED/Atlanta Fed domains and can't dispatch GitHub Actions (403); data refreshes run via the repo's `update-data.yml` workflow (user triggers manually or scheduled on the 7th/14th).
+- Known nit: "Bets Pay Off" scenario copy says you'd "only just cross" 70 — under v2 it projects 76; reword on next touch.
+
 ## Project Overview
 "Is Now a Good Time?" — A pro-worker labor market dashboard that combines 8 indicators into a single actionable score (0–100) answering: does the job market currently favor job seekers or employers?
 
