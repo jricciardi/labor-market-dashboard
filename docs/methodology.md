@@ -4,6 +4,39 @@ A guide to the quantitative signals that reveal labor market conditions independ
 
 ---
 
+## Dashboard Scoring Model (v2, July 2026)
+
+The composite score is a weighted average of eight indicators, each normalized to 0–1 against its 2015–present operating range, then scaled to 0–100. Weights answer one question: *how directly does this tell an employed person whether investing time in a job search will pay off?*
+
+| Component | Weight | FRED series | Normalization (0 → 1) |
+|---|---|---|---|
+| Hiring rate | 18% | JTSHIR | 2.8% → 4.4% |
+| Quit rate | 18% | JTSQUR | 1.5% → 3.0% |
+| Jobs per job seeker | 12% | JTSJOL / UNEMPLOY | 0.3 → 2.0, piecewise: steeper below 1.0 |
+| Median unemployment duration | 12% | UEMPMED | 16 wks → 8 wks (inverted) |
+| Real wage growth | 12% | CES0500000003 − CPIAUCSL (YoY) | −1% → +2% |
+| Layoff rate | 10% | JTSLDR | 2.5% → 0.8% (inverted) |
+| Unemployment rate | 10% | UNRATE | 7.0% → 3.5% (inverted) |
+| Prime-age participation | 8% | LNS11300060 | 80.5% → 84.5% |
+
+**Design decisions, and why:**
+
+- **Fed funds rate is charted but not scored.** Near-zero rates historically coincide with recessions (2009–2015, 2020) — the worst job markets in memory. Scoring "low rates = good for workers" rewards exactly the wrong moments. v1 did this (including a ×1.08 bonus below 0.5%); v2 treats monetary policy as context for the scenario narratives only.
+- **No hidden multipliers.** v1 applied post-hoc adjustments (×0.92 below 1.0 jobs/seeker, a "frozen market" penalty up to ×0.88) that made the published weights untrue. v2 encodes the same editorial intent in the curves themselves: the openings-ratio curve is steeper below 1.0, and the hires anchor starts at 2.8% (its modern floor) rather than 2.0% (a COVID-crash level), so a frozen market reads as low without a secret penalty.
+- **Real wages, not nominal.** 3.5% raises during 2% inflation and during 4% inflation are different facts. Nominal YoY wage growth remains charted; the score uses wage growth minus CPI. (Falls back to nominal, with the old anchors, if the CPI-derived series is unavailable.)
+- **Duration is the switcher's downside-risk number.** Median weeks unemployed answers "if a move goes wrong, how long am I out?" — the most decision-relevant number in a low-hire market where unemployment is low but exits are slow.
+- **Missing data never gets a neutral placeholder.** A series that hasn't reported carries forward up to 3 months; a series that's absent entirely drops out and the remaining weights renormalize. (v1 substituted 0.5 for missing context metrics — on 2026-05-07 that artifact published a score of 42 for a month whose revised score is 53.)
+- **The margin is empirical.** Backtesting every published vintage against today's revised data: first-print scores have moved up to 7 points after BLS revisions. Read the score as ±5.
+
+**Industry breakout compatibility (planned):** every scored series except duration and participation has JOLTS/CES supersector equivalents on FRED (e.g., quits in Professional & Business Services: `JTS540099QUR`; hires in Information: `JTS510099HIR`; CES wage series by industry). The score is computed from a single component config — an industry variant swaps series IDs and reuses the same normalization/renormalization machinery, dropping the components that have no industry equivalent.
+
+**Candidate additions (not yet wired):**
+- **Atlanta Fed Wage Growth Tracker, job switchers vs. stayers** — the single best "should I switch?" signal (the switcher premium). Not on FRED; needs a separate fetcher against the Atlanta Fed data file.
+- **Continuing claims (CCSA)** — weekly cadence would cut the 5–6 week data lag for the downside-risk half of the score.
+- **Share unemployed 27+ weeks (LNS13025703)** — complements median duration with tail risk.
+
+---
+
 ## Tier 1: The Core Indicators
 
 These are the metrics most directly relevant to employee leverage and job market conditions.
