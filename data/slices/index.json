@@ -1,0 +1,111 @@
+{
+ "generated": "2026-07-16",
+ "methodology": "v3-phase1",
+ "slices": [
+  {
+   "slug": "professional-business",
+   "name": "Professional & Business Services",
+   "dataThrough": "2026-05",
+   "margin": 7,
+   "latestScore": 15,
+   "components": [
+    "hiresRate",
+    "openingsRatio",
+    "quitRate",
+    "realWageGrowth"
+   ]
+  },
+  {
+   "slug": "health-social",
+   "name": "Health Care & Social Assistance",
+   "dataThrough": "2026-05",
+   "margin": 11,
+   "latestScore": 8,
+   "components": [
+    "hiresRate",
+    "quitRate",
+    "realWageGrowth"
+   ]
+  },
+  {
+   "slug": "leisure-hospitality",
+   "name": "Leisure & Hospitality",
+   "dataThrough": "2026-05",
+   "margin": 11,
+   "latestScore": 14,
+   "components": [
+    "hiresRate",
+    "quitRate",
+    "realWageGrowth"
+   ]
+  },
+  {
+   "slug": "manufacturing",
+   "name": "Manufacturing",
+   "dataThrough": "2026-05",
+   "margin": 7,
+   "latestScore": 26,
+   "components": [
+    "hiresRate",
+    "quitRate",
+    "realWageGrowth"
+   ]
+  },
+  {
+   "slug": "government-state-local",
+   "name": "State & Local Government",
+   "dataThrough": "2026-05",
+   "margin": 11,
+   "latestScore": 24,
+   "components": [
+    "hiresRate",
+    "quitRate"
+   ]
+  }
+ ],
+ "skipped": {
+  "information": {
+   "ALL": "no verified series for jolts.information.quits"
+  },
+  "professional-business": {
+   "layoffsRate": "source unverified",
+   "switcherPremium": "national switcher premium unavailable"
+  },
+  "health-social": {
+   "layoffsRate": "source unverified",
+   "openingsRatio": "no CPS unemployed-by-industry series for this sector",
+   "switcherPremium": "national switcher premium unavailable"
+  },
+  "leisure-hospitality": {
+   "layoffsRate": "source unverified",
+   "openingsRatio": "no CPS unemployed-by-industry series for this sector",
+   "switcherPremium": "national switcher premium unavailable"
+  },
+  "manufacturing": {
+   "layoffsRate": "source unverified",
+   "openingsRatio": "no CPS unemployed-by-industry series for this sector",
+   "switcherPremium": "national switcher premium unavailable"
+  },
+  "government-federal": {
+   "ALL": "no verified series for jolts.govfederal.quits"
+  },
+  "government-state-local": {
+   "layoffsRate": "source unverified",
+   "openingsRatio": "no CPS unemployed-by-industry series for this sector",
+   "realWageGrowth": "no wage series for this sector (CES covers private only)",
+   "switcherPremium": "national switcher premium unavailable"
+  }
+ },
+ "faceValidity": {
+  "health_2023_24_above_national": {
+   "pass": true,
+   "slice": 65.7,
+   "national": 64.8
+  },
+  "leisure_quits_spike_2021_22": {
+   "pass": true,
+   "peak_2021_22": 5.77,
+   "peak_2019": 4.8
+  }
+ }
+}

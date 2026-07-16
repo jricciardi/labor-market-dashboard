@@ -1,0 +1,734 @@
+{
+  "generated": "2026-07-16 17:26",
+  "fred": {
+    "jolts.information.quits": [
+      {
+        "id": "JTS5100QUR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS5100QUR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS510000QUR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS510000QUR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.information.hires": [
+      {
+        "id": "JTS5100HIR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS5100HIR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS510000HIR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS510000HIR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.information.layoffs": [
+      {
+        "id": "JTS5100LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS5100LDR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS510000LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS510000LDR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.information.openings": [
+      {
+        "id": "JTS5100JOL",
+        "ok": false,
+        "error": "FRED request failed for series (JTS5100JOL): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS510000JOL",
+        "ok": false,
+        "error": "FRED request failed for series (JTS510000JOL): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.pbs.quits": [
+      {
+        "id": "JTS540099QUR",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Quits: Professional and Business Services",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      },
+      {
+        "id": "JTS5400QUR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS5400QUR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.pbs.hires": [
+      {
+        "id": "JTS540099HIR",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Hires: Professional and Business Services",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      },
+      {
+        "id": "JTS5400HIR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS5400HIR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.pbs.layoffs": [
+      {
+        "id": "JTS540099LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS540099LDR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS5400LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS5400LDR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.pbs.openings": [
+      {
+        "id": "JTS540099JOL",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Job Openings: Professional and Business Services",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      },
+      {
+        "id": "JTS5400JOL",
+        "ok": false,
+        "error": "FRED request failed for series (JTS5400JOL): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.healthsocial.quits": [
+      {
+        "id": "JTS6200QUR",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Quits: Health Care and Social Assistance",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      },
+      {
+        "id": "JTS620000QUR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS620000QUR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS6562QUR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS6562QUR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.healthsocial.hires": [
+      {
+        "id": "JTS6200HIR",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Hires: Health Care and Social Assistance",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      },
+      {
+        "id": "JTS620000HIR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS620000HIR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS6562HIR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS6562HIR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.healthsocial.layoffs": [
+      {
+        "id": "JTS6200LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS6200LDR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS620000LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS620000LDR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS6562LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS6562LDR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.healthsocial.openings": [
+      {
+        "id": "JTS6200JOL",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Job Openings: Health Care and Social Assistance",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      },
+      {
+        "id": "JTS620000JOL",
+        "ok": false,
+        "error": "FRED request failed for series (JTS620000JOL): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS6562JOL",
+        "ok": false,
+        "error": "FRED request failed for series (JTS6562JOL): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.leisure.quits": [
+      {
+        "id": "JTS7000QUR",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Quits: Leisure and Hospitality",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      },
+      {
+        "id": "JTS700000QUR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS700000QUR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS7100QUR",
+        "ok": true,
+        "titleMatchesPurpose": false,
+        "title": "Quits: Arts, Entertainment, and Recreation",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      }
+    ],
+    "jolts.leisure.hires": [
+      {
+        "id": "JTS7000HIR",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Hires: Leisure and Hospitality",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      },
+      {
+        "id": "JTS700000HIR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS700000HIR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS7100HIR",
+        "ok": true,
+        "titleMatchesPurpose": false,
+        "title": "Hires: Arts, Entertainment, and Recreation",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      }
+    ],
+    "jolts.leisure.layoffs": [
+      {
+        "id": "JTS7000LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS7000LDR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS700000LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS700000LDR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS7100LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS7100LDR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.leisure.openings": [
+      {
+        "id": "JTS7000JOL",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Job Openings: Leisure and Hospitality",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      },
+      {
+        "id": "JTS700000JOL",
+        "ok": false,
+        "error": "FRED request failed for series (JTS700000JOL): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS7100JOL",
+        "ok": true,
+        "titleMatchesPurpose": false,
+        "title": "Job Openings: Arts, Entertainment, and Recreation",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      }
+    ],
+    "jolts.manufacturing.quits": [
+      {
+        "id": "JTS3000QUR",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Quits: Manufacturing",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      },
+      {
+        "id": "JTS300000QUR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS300000QUR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.manufacturing.hires": [
+      {
+        "id": "JTS3000HIR",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Hires: Manufacturing",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      },
+      {
+        "id": "JTS300000HIR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS300000HIR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.manufacturing.layoffs": [
+      {
+        "id": "JTS3000LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS3000LDR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS300000LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS300000LDR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.manufacturing.openings": [
+      {
+        "id": "JTS3000JOL",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Job Openings: Manufacturing",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      },
+      {
+        "id": "JTS300000JOL",
+        "ok": false,
+        "error": "FRED request failed for series (JTS300000JOL): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.govfederal.quits": [
+      {
+        "id": "JTS9091QUR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS9091QUR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS910000QUR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS910000QUR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS9100QUR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS9100QUR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.govfederal.hires": [
+      {
+        "id": "JTS9091HIR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS9091HIR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS910000HIR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS910000HIR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS9100HIR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS9100HIR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.govfederal.layoffs": [
+      {
+        "id": "JTS9091LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS9091LDR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS910000LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS910000LDR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS9100LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS9100LDR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.govfederal.openings": [
+      {
+        "id": "JTS9091JOL",
+        "ok": false,
+        "error": "FRED request failed for series (JTS9091JOL): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS910000JOL",
+        "ok": false,
+        "error": "FRED request failed for series (JTS910000JOL): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS9100JOL",
+        "ok": false,
+        "error": "FRED request failed for series (JTS9100JOL): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.govstatelocal.quits": [
+      {
+        "id": "JTS9092QUR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS9092QUR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS920000QUR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS920000QUR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS9200QUR",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Quits: State and Local",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      }
+    ],
+    "jolts.govstatelocal.hires": [
+      {
+        "id": "JTS9092HIR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS9092HIR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS920000HIR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS920000HIR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS9200HIR",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Hires: State and Local",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      }
+    ],
+    "jolts.govstatelocal.layoffs": [
+      {
+        "id": "JTS9092LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS9092LDR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS920000LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS920000LDR): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS9200LDR",
+        "ok": false,
+        "error": "FRED request failed for series (JTS9200LDR): HTTP Error 400: Bad Request"
+      }
+    ],
+    "jolts.govstatelocal.openings": [
+      {
+        "id": "JTS9092JOL",
+        "ok": false,
+        "error": "FRED request failed for series (JTS9092JOL): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS920000JOL",
+        "ok": false,
+        "error": "FRED request failed for series (JTS920000JOL): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "JTS9200JOL",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Job Openings: State and Local",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2000-12-01",
+        "end": "2026-05-01"
+      }
+    ],
+    "ces.information.ahe": [
+      {
+        "id": "CES5000000003",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Average Hourly Earnings of All Employees, Information",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2006-03-01",
+        "end": "2026-06-01"
+      }
+    ],
+    "ces.pbs.ahe": [
+      {
+        "id": "CES6000000003",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Average Hourly Earnings of All Employees, Professional and Business Services",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2006-03-01",
+        "end": "2026-06-01"
+      }
+    ],
+    "ces.healthsocial.ahe": [
+      {
+        "id": "CES6562000003",
+        "ok": false,
+        "error": "FRED request failed for series (CES6562000003): HTTP Error 400: Bad Request"
+      },
+      {
+        "id": "CES6500000003",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Average Hourly Earnings of All Employees, Private Education and Health Services",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2006-03-01",
+        "end": "2026-06-01"
+      }
+    ],
+    "ces.leisure.ahe": [
+      {
+        "id": "CES7000000003",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Average Hourly Earnings of All Employees, Leisure and Hospitality",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2006-03-01",
+        "end": "2026-06-01"
+      }
+    ],
+    "ces.manufacturing.ahe": [
+      {
+        "id": "CES3000000003",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Average Hourly Earnings of All Employees, Manufacturing",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "2006-03-01",
+        "end": "2026-06-01"
+      }
+    ],
+    "ces.software_publishers.employment": [
+      {
+        "id": "CES5051200001",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "All Employees, Motion Picture and Sound Recording Industries",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "1990-01-01",
+        "end": "2026-06-01"
+      },
+      {
+        "id": "CES5051300001",
+        "ok": false,
+        "error": "FRED request failed for series (CES5051300001): HTTP Error 400: Bad Request"
+      }
+    ],
+    "ces.computer_systems_design.employment": [
+      {
+        "id": "CES6054150001",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "All Employees, Computer Systems Design and Related Services",
+        "seasonalAdjustment": "SA",
+        "frequency": "M",
+        "start": "1990-01-01",
+        "end": "2026-06-01"
+      }
+    ],
+    "cps.information.unemployed": [
+      {
+        "id": "LNU03032240",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Unemployment Level - Education and Health Services, Private Wage and Salary Workers",
+        "seasonalAdjustment": "NSA",
+        "frequency": "M",
+        "start": "2000-01-01",
+        "end": "2026-06-01"
+      },
+      {
+        "id": "LNU04032240",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Unemployment Rate - Education and Health Services, Private Wage and Salary Workers",
+        "seasonalAdjustment": "NSA",
+        "frequency": "M",
+        "start": "2000-01-01",
+        "end": "2026-06-01"
+      }
+    ],
+    "cps.pbs.unemployed": [
+      {
+        "id": "LNU03032241",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Unemployment Level - Leisure and Hospitality, Private Wage and Salary Workers",
+        "seasonalAdjustment": "NSA",
+        "frequency": "M",
+        "start": "2000-01-01",
+        "end": "2026-06-01"
+      },
+      {
+        "id": "LNU04032241",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Unemployment Rate - Leisure and Hospitality, Private Wage and Salary Workers",
+        "seasonalAdjustment": "NSA",
+        "frequency": "M",
+        "start": "2000-01-01",
+        "end": "2026-06-01"
+      }
+    ],
+    "cps.occ.mgmt_prof.unemp_rate": [
+      {
+        "id": "LNU04032215",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Unemployment Rate - Management, Professional, and Related Occupations",
+        "seasonalAdjustment": "NSA",
+        "frequency": "M",
+        "start": "2000-01-01",
+        "end": "2026-06-01"
+      }
+    ],
+    "cps.occ.mgmt_business_financial.unemp_rate": [
+      {
+        "id": "LNU04032216",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Unemployment Rate - Management, Business, and Financial Operations Occupations",
+        "seasonalAdjustment": "NSA",
+        "frequency": "M",
+        "start": "2000-01-01",
+        "end": "2026-06-01"
+      }
+    ],
+    "indeed.us.aggregate": [
+      {
+        "id": "IHLIDXUS",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Job Postings on Indeed in the United States",
+        "seasonalAdjustment": "SA",
+        "frequency": "D",
+        "start": "2020-02-01",
+        "end": "2026-06-26"
+      }
+    ],
+    "indeed.us.software_dev": [
+      {
+        "id": "IHLIDXUSTPSOFTDEVE",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Software Development Job Postings on Indeed in the United States",
+        "seasonalAdjustment": "SA",
+        "frequency": "D",
+        "start": "2020-02-01",
+        "end": "2026-06-26"
+      }
+    ],
+    "indeed.us.project_management": [
+      {
+        "id": "IHLIDXUSTPPROJMANA",
+        "ok": true,
+        "titleMatchesPurpose": true,
+        "title": "Project Management Job Postings on Indeed in the United States",
+        "seasonalAdjustment": "SA",
+        "frequency": "D",
+        "start": "2020-02-01",
+        "end": "2026-06-26"
+      },
+      {
+        "id": "IHLIDXUSTPPROJMANAG",
+        "ok": false,
+        "error": "FRED request failed for series (IHLIDXUSTPPROJMANAG): HTTP Error 400: Bad Request"
+      }
+    ]
+  },
+  "atlantaFed": [
+    {
+      "url": "https://www.atlantafed.org/-/media/documents/datafiles/chcs/wage-growth-tracker/wage-growth-data.xlsx",
+      "ok": false,
+      "bytes": 48059,
+      "error": "File is not a zip file"
+    }
+  ],
+  "indeedGithub": [
+    {
+      "url": "https://raw.githubusercontent.com/hiring-lab/job_postings_tracker/master/US/job_postings_by_sector_US.csv",
+      "ok": true,
+      "headerLine": "date,jobcountry,indeed_job_postings_index,variable,display_name"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/hiring-lab/data/master/US/job_postings_by_sector_US.csv",
+      "ok": true,
+      "headerLine": "date,jobcountry,indeed_job_postings_index,variable,display_name"
+    }
+  ]
+}
