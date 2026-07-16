@@ -56,10 +56,12 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add data.json data/
+          git add data.json
+          if [ -d data ]; then git add data; fi
           if git diff --cached --quiet; then
             echo "No data changes."
           else
             git commit -m "Branch data refresh: verification report, national data, slices"
-            git push
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            git push || (git pull --rebase origin "${GITHUB_REF_NAME}" && git push)
           fi

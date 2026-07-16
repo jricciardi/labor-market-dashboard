@@ -92,6 +92,10 @@ Occupation families for overlays (SOC-based, chosen for data coverage): Manageme
 
 Column "V?" = series ID pattern needs verification at implementation time (IDs below are from memory and must be confirmed against FRED/BLS before use).
 
+> **Verification status (first live run, 2026-07-16 — see `data/source-verification.json` for the machine-readable record):**
+> **Confirmed:** JOLTS quits/hires/openings for PBS (`JTS540099*`), Health Care & Social Assistance (`JTS6200*`), Leisure & Hospitality (`JTS7000*`), Manufacturing (`JTS3000*`), State & Local Government (`JTS9200*`); CES AHE supersectors (`CES5000000003` Information, `CES6000000003` PBS, `CES7000000003` L&H, `CES3000000003` Mfg; health resolves only at the Education+Health supersector `CES6500000003` — labeled in provenance); CPS occupation unemployment (`LNU04032215/6`); Indeed on FRED incl. **Project Management** (`IHLIDXUSTPPROJMANA`) and Software Development (`IHLIDXUSTPSOFTDEVE`); Indeed Hiring Lab GitHub CSVs.
+> **Refuted / unresolved (self-healing via FRED search probe on next runs):** all Information JOLTS guesses, all industry **layoffs** suffix guesses, federal-government JOLTS, CPS unemployed-by-industry levels (first guesses resolved to *wrong sectors* — this is why title expectations are now mandatory for every purpose). Atlanta Fed workbook URL returns HTML, not xlsx — fetcher now sniffs content and scrapes the tracker page for the live link.
+
 ### 4A. Industry axis (monthly flows exist — this is the strong axis)
 
 | Component | Series (Information example) | SA? | Caveats | V? |

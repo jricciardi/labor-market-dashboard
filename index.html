@@ -1963,7 +1963,7 @@
                 section.classList.add('metrics-expanded');
             } else {
                 wrapper.classList.add('grid-collapsed');
-                toggle.querySelector('.toggle-text').textContent = 'Show ' + grid.querySelectorAll('.metric-card').length + ' metrics';
+                toggle.querySelector('.toggle-text').textContent = 'Show ' + grid.querySelectorAll('.metric-card:not([hidden])').length + ' metrics';
                 toggle.setAttribute('aria-expanded', 'false');
                 section.classList.remove('metrics-expanded');
             }
@@ -2435,7 +2435,8 @@
                 }
 
                 // Switcher premium \u2014 does moving actually pay right now?
-                var swp = currentMetrics.switcherPremium;
+                // Branch on the rounded value so "-0.04" reads as 0.0, not "-0.0"
+                var swp = currentMetrics.switcherPremium != null ? Math.round(currentMetrics.switcherPremium * 10) / 10 : null;
                 if (swp != null) {
                     if (swp >= 1.3) sentences.push('Job switchers are out-earning stayers by ' + swp.toFixed(1) + ' points \u2014 the market is paying people to move.');
                     else if (swp >= 0.5) sentences.push('Job switchers are earning ' + swp.toFixed(1) + ' points more than stayers \u2014 a modest reward for moving.');
@@ -2511,22 +2512,27 @@
                 return '<span class="metric-delta ' + dir + inv + '">' + sign + d.toFixed(decimals) + '</span>';
             }
             
-            document.getElementById('quitValue').innerHTML = currentMetrics.quitRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.quitRate, prevMetrics.quitRate, 1);
-            document.getElementById('quitValue').className = 'metric-value ' + getMetricClass(currentMetrics.quitRate, 'quitRate');
-            document.getElementById('ratioValue').innerHTML = currentMetrics.openingsRatio.toFixed(2) + getDeltaHTML(currentMetrics.openingsRatio, prevMetrics.openingsRatio, 2);
-            document.getElementById('ratioValue').className = 'metric-value ' + getMetricClass(currentMetrics.openingsRatio, 'openingsRatio');
-            document.getElementById('hiresValue').innerHTML = currentMetrics.hiresRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.hiresRate, prevMetrics.hiresRate, 1);
-            document.getElementById('hiresValue').className = 'metric-value ' + getMetricClass(currentMetrics.hiresRate, 'hiresRate');
-            document.getElementById('layoffsValue').innerHTML = currentMetrics.layoffsRate.toFixed(1) + '%' + getDeltaHTML(currentMetrics.layoffsRate, prevMetrics.layoffsRate, 1, true);
-            document.getElementById('layoffsValue').className = 'metric-value ' + getMetricClass(currentMetrics.layoffsRate, 'layoffsRate');
-            document.getElementById('unempValue').innerHTML = (currentMetrics.unempRate || 0).toFixed(1) + '%' + getDeltaHTML(currentMetrics.unempRate, prevMetrics.unempRate, 1, true);
-            document.getElementById('unempValue').className = 'metric-value ' + getMetricClass(currentMetrics.unempRate || 5, 'unempRate');
-            document.getElementById('fedValue').innerHTML = currentMetrics.fedRate.toFixed(2) + '%' + getDeltaHTML(currentMetrics.fedRate, prevMetrics.fedRate, 2, true);
-            document.getElementById('fedValue').className = 'metric-value ' + getMetricClass(currentMetrics.fedRate, 'fedRate');
-            document.getElementById('wageValue').innerHTML = (currentMetrics.wageGrowth || 0).toFixed(1) + '%' + getDeltaHTML(currentMetrics.wageGrowth, prevMetrics.wageGrowth, 1);
-            document.getElementById('wageValue').className = 'metric-value ' + getMetricClass(currentMetrics.wageGrowth || 3, 'wageGrowth');
-            document.getElementById('lfprValue').innerHTML = (currentMetrics.lfpr || 0).toFixed(1) + '%' + getDeltaHTML(currentMetrics.lfpr, prevMetrics.lfpr, 1);
-            document.getElementById('lfprValue').className = 'metric-value ' + getMetricClass(currentMetrics.lfpr || 82, 'lfpr');
+            // One renderer for the always-on cards: a metric missing beyond the
+            // carry window renders an em dash instead of throwing and killing init
+            function setMetricValue(id, key, decimals, unit, invertedDelta) {
+                var el = document.getElementById(id);
+                var cur = currentMetrics[key];
+                if (cur == null) {
+                    el.textContent = '—';
+                    el.className = 'metric-value';
+                    return;
+                }
+                el.innerHTML = cur.toFixed(decimals) + unit + getDeltaHTML(cur, prevMetrics[key], decimals, invertedDelta);
+                el.className = 'metric-value ' + getMetricClass(cur, key);
+            }
+            setMetricValue('quitValue', 'quitRate', 1, '%');
+            setMetricValue('ratioValue', 'openingsRatio', 2, '');
+            setMetricValue('hiresValue', 'hiresRate', 1, '%');
+            setMetricValue('layoffsValue', 'layoffsRate', 1, '%', true);
+            setMetricValue('unempValue', 'unempRate', 1, '%', true);
+            setMetricValue('fedValue', 'fedRate', 2, '%', true);
+            setMetricValue('wageValue', 'wageGrowth', 1, '%');
+            setMetricValue('lfprValue', 'lfpr', 1, '%');
 
             // Cards for v2.1 metrics render only once the pipeline provides their series
             var uempMedCard = document.getElementById('uempMedCard');
@@ -2536,9 +2542,15 @@
             } else if (uempMedCard) {
                 uempMedCard.hidden = true;
             }
+            // Format from the rounded value so a hair-below-zero premium reads
+            // "+0.0 pp", never "-0.0 pp"
+            function fmtPremium(v) {
+                var r = Math.round(v * 10) / 10;
+                return (r >= 0 ? '+' : '') + r.toFixed(1) + ' pp';
+            }
             var swpCard = document.getElementById('swpCard');
             if (currentMetrics.switcherPremium != null) {
-                document.getElementById('swpValue').innerHTML = (currentMetrics.switcherPremium >= 0 ? '+' : '') + currentMetrics.switcherPremium.toFixed(1) + ' pp' + getDeltaHTML(currentMetrics.switcherPremium, prevMetrics.switcherPremium, 1);
+                document.getElementById('swpValue').innerHTML = fmtPremium(currentMetrics.switcherPremium) + getDeltaHTML(currentMetrics.switcherPremium, prevMetrics.switcherPremium, 1);
                 document.getElementById('swpValue').className = 'metric-value ' + getMetricClass(currentMetrics.switcherPremium, 'switcherPremium');
             } else if (swpCard) {
                 swpCard.hidden = true;
@@ -2562,25 +2574,30 @@
                 }).join('');
             }
 
+            function summaryChip(name, key, fmt) {
+                var v = currentMetrics[key];
+                if (v == null) return { name: name, value: '—', signal: 'neutral' };
+                return { name: name, value: fmt(v), signal: getMetricClass(v, key) };
+            }
             var coreSummary = [
-                { name: 'Quits', value: currentMetrics.quitRate.toFixed(1) + '%', signal: getMetricClass(currentMetrics.quitRate, 'quitRate') },
-                { name: 'Jobs/Seeker', value: currentMetrics.openingsRatio.toFixed(2), signal: getMetricClass(currentMetrics.openingsRatio, 'openingsRatio') },
-                { name: 'Hiring', value: currentMetrics.hiresRate.toFixed(1) + '%', signal: getMetricClass(currentMetrics.hiresRate, 'hiresRate') },
-                { name: 'Layoffs', value: currentMetrics.layoffsRate.toFixed(1) + '%', signal: getMetricClass(currentMetrics.layoffsRate, 'layoffsRate') }
+                summaryChip('Quits', 'quitRate', function(v) { return v.toFixed(1) + '%'; }),
+                summaryChip('Jobs/Seeker', 'openingsRatio', function(v) { return v.toFixed(2); }),
+                summaryChip('Hiring', 'hiresRate', function(v) { return v.toFixed(1) + '%'; }),
+                summaryChip('Layoffs', 'layoffsRate', function(v) { return v.toFixed(1) + '%'; })
             ];
             if (currentMetrics.uempMed != null) {
                 coreSummary.push({ name: 'Search Time', value: currentMetrics.uempMed.toFixed(1) + ' wks', signal: getMetricClass(currentMetrics.uempMed, 'uempMed') });
             }
             if (currentMetrics.switcherPremium != null) {
-                coreSummary.push({ name: 'Switch Premium', value: (currentMetrics.switcherPremium >= 0 ? '+' : '') + currentMetrics.switcherPremium.toFixed(1) + ' pp', signal: getMetricClass(currentMetrics.switcherPremium, 'switcherPremium') });
+                coreSummary.push({ name: 'Switch Premium', value: fmtPremium(currentMetrics.switcherPremium), signal: getMetricClass(currentMetrics.switcherPremium, 'switcherPremium') });
             }
             document.getElementById('coreSummaryItems').innerHTML = buildSummaryHTML(coreSummary);
 
             document.getElementById('contextSummaryItems').innerHTML = buildSummaryHTML([
-                { name: 'Unemployment', value: (currentMetrics.unempRate || 0).toFixed(1) + '%', signal: getMetricClass(currentMetrics.unempRate || 5, 'unempRate') },
-                { name: 'Fed Rate', value: currentMetrics.fedRate.toFixed(1) + '%', signal: getMetricClass(currentMetrics.fedRate, 'fedRate') },
-                { name: 'Wages', value: (currentMetrics.wageGrowth || 0).toFixed(1) + '%', signal: getMetricClass(currentMetrics.wageGrowth || 3, 'wageGrowth') },
-                { name: 'Participation', value: (currentMetrics.lfpr || 0).toFixed(1) + '%', signal: getMetricClass(currentMetrics.lfpr || 82, 'lfpr') }
+                summaryChip('Unemployment', 'unempRate', function(v) { return v.toFixed(1) + '%'; }),
+                summaryChip('Fed Rate', 'fedRate', function(v) { return v.toFixed(1) + '%'; }),
+                summaryChip('Wages', 'wageGrowth', function(v) { return v.toFixed(1) + '%'; }),
+                summaryChip('Participation', 'lfpr', function(v) { return v.toFixed(1) + '%'; })
             ]);
 
             // ========================================
@@ -2682,13 +2699,16 @@
                 _invitation: { tier: 'info', html: '<strong>Four scenarios show the range of plausible futures</strong> \u2014 from continued stasis to genuine recovery. The most likely path is more of the same. Pick one to explore what it means, or build your own.' },
                 now: { get tier() { return getScenarioTierClass(SCENARIO_SCORES.now); }, get html() {
                     var parts = ['<strong>Current conditions \u2192 ' + ss(SCENARIO_SCORES.now) + ', ' + cs(SCENARIO_SCORES.now) + '.</strong>'];
-                    // Quit + hiring dynamics
-                    if (CUR.quitRate < 2.2 && CUR.hiresRate < 3.5) parts.push('Workers staying put (quit rate ' + CUR.quitRate.toFixed(1) + '%), hiring slow (' + CUR.hiresRate.toFixed(1) + '%).');
-                    else if (CUR.quitRate >= 2.5) parts.push('Workers are moving \u2014 quit rate at ' + CUR.quitRate.toFixed(1) + '%, hiring at ' + CUR.hiresRate.toFixed(1) + '%.');
-                    else parts.push('Quit rate at ' + CUR.quitRate.toFixed(1) + '%, hiring at ' + CUR.hiresRate.toFixed(1) + '%.');
+                    // Quit + hiring dynamics (guarded: a metric missing beyond the
+                    // carry window must not kill the narrative)
+                    if (CUR.quitRate != null && CUR.hiresRate != null) {
+                        if (CUR.quitRate < 2.2 && CUR.hiresRate < 3.5) parts.push('Workers staying put (quit rate ' + CUR.quitRate.toFixed(1) + '%), hiring slow (' + CUR.hiresRate.toFixed(1) + '%).');
+                        else if (CUR.quitRate >= 2.5) parts.push('Workers are moving \u2014 quit rate at ' + CUR.quitRate.toFixed(1) + '%, hiring at ' + CUR.hiresRate.toFixed(1) + '%.');
+                        else parts.push('Quit rate at ' + CUR.quitRate.toFixed(1) + '%, hiring at ' + CUR.hiresRate.toFixed(1) + '%.');
+                    }
                     // Openings ratio
-                    if (CUR.openingsRatio < 1.0) parts.push('More job seekers than openings (ratio: ' + CUR.openingsRatio.toFixed(2) + ').');
-                    else parts.push('Openings ratio at ' + CUR.openingsRatio.toFixed(2) + ' jobs per seeker.');
+                    if (CUR.openingsRatio != null && CUR.openingsRatio < 1.0) parts.push('More job seekers than openings (ratio: ' + CUR.openingsRatio.toFixed(2) + ').');
+                    else if (CUR.openingsRatio != null) parts.push('Openings ratio at ' + CUR.openingsRatio.toFixed(2) + ' jobs per seeker.');
                     // Fed rate context
                     if (CUR.fedRate > 4.0) parts.push('Fed rate at ' + CUR.fedRate.toFixed(1) + '% keeps borrowing costs high.');
                     else if (CUR.fedRate > 2.5) parts.push('Fed rate at ' + CUR.fedRate.toFixed(1) + '% \u2014 easing, but not yet translating to hiring.');
@@ -3031,8 +3051,11 @@
             createSparkline('fedChart', monthlyData.fedRate, 'fedRate', 'fedRange');
             createSparkline('wageChart', monthlyData.wageGrowth.map(function(v) { return v || 0; }), 'wageGrowth', 'wageRange');
             createSparkline('lfprChart', monthlyData.lfpr.map(function(v) { return v || 0; }), 'lfpr', 'lfprRange');
-            if (currentMetrics.uempMed != null) createSparkline('uempMedChart', monthlyData.uempMed.map(function(v) { return v || 0; }), 'uempMed', 'uempMedRange');
-            if (currentMetrics.switcherPremium != null) createSparkline('swpChart', monthlyData.switcherPremium.map(function(v) { return v || 0; }), 'switcherPremium', 'swpRange');
+            // Raw arrays (nulls render as gaps): zero is out-of-band for most series
+            // but squarely in-band for the premium, so ||0 would paint fake plunges
+            // at the lagged tail and pollute the min label
+            if (currentMetrics.uempMed != null) createSparkline('uempMedChart', monthlyData.uempMed, 'uempMed', 'uempMedRange');
+            if (currentMetrics.switcherPremium != null) createSparkline('swpChart', monthlyData.switcherPremium, 'switcherPremium', 'swpRange');
 
             }, function() {
                 // Chart library never arrived (blocked CDN, offline) — say so where the charts would be

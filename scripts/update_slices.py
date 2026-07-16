@@ -136,16 +136,24 @@ DENOM_WINDOW = 12  # months, NSA CPS unemployed-by-industry (plan section 5.2)
 
 
 def resolve(report, purpose):
-    """First verified candidate for a purpose, or None. Trusts only entries
-    that exist on FRED and whose title matched the purpose keywords."""
+    """First verified candidate for a purpose, or None.
+
+    Trusts only entries that exist on FRED AND whose title matched the
+    purpose's registered expectations — verify_sources.py marks
+    titleMatchesPurpose False when no expectation is registered, so an
+    unregistered purpose can never feed a slice. (The first live run proved
+    the need: two CPS ids resolved to the wrong sectors.)
+    """
     for entry in report.get('fred', {}).get(purpose, []):
-        if entry.get('ok') and entry.get('titleMatchesPurpose', True):
+        if entry.get('ok') and entry.get('titleMatchesPurpose') is True:
             return entry
     return None
 
 
-def build_component(key, dates, values, provenance, inverted=False):
-    anchors = fc.fit_anchors(dates, values, inverted)
+def build_component(key, dates, values, provenance, inverted=False, window=1):
+    """window: trailing width of the values' averaging (3mma=3, 12mma=12,
+    YoY=13) so anchor fitting can keep pandemic months fully out of sample."""
+    anchors = fc.fit_anchors(dates, values, inverted, window=window)
     if anchors is None:
         return None
     return {
@@ -192,11 +200,29 @@ def build_slice(spec, report, national, cpi_yoy_by_date):
         comp = build_component(key, dates, smoothed, {
             'series': entry['id'], 'title': entry['title'],
             'smoothing': f'{SMOOTH_WINDOW}mma',
-        }, inverted=(key == 'layoffsRate'))
+        }, inverted=(key == 'layoffsRate'), window=SMOOTH_WINDOW)
         if comp:
             components[key] = comp
         else:
             skipped[key] = 'insufficient history to fit anchors'
+
+    # Unemployment rate by industry (CPS NSA -> 12-month average), when a
+    # verified series exists for this sector
+    sector = spec['jolts'].split('.')[1]
+    unemp_map, unemp_entry = fetch_for(f'cps.{sector}.unemp_rate')
+    if unemp_map:
+        smoothed = fc.moving_average(column(unemp_map), DENOM_WINDOW,
+                                     min_periods=DENOM_WINDOW - 2)
+        comp = build_component('unempRate', dates, smoothed, {
+            'series': unemp_entry['id'], 'title': unemp_entry['title'],
+            'smoothing': f'{DENOM_WINDOW}mma (NSA source)',
+        }, inverted=True, window=DENOM_WINDOW)
+        if comp:
+            components['unempRate'] = comp
+        else:
+            skipped['unempRate'] = 'insufficient history to fit anchors'
+    else:
+        skipped['unempRate'] = 'source unverified'
 
     # Openings per unemployed (only where a CPS industry denominator exists)
     if spec['cps_unemployed']:
@@ -204,7 +230,8 @@ def build_slice(spec, report, national, cpi_yoy_by_date):
         unemployed_map, unemployed_entry = fetch_for(spec['cps_unemployed'])
         if openings_map and unemployed_map:
             openings = fc.moving_average(column(openings_map), SMOOTH_WINDOW)
-            denom = fc.moving_average(column(unemployed_map), DENOM_WINDOW)
+            denom = fc.moving_average(column(unemployed_map), DENOM_WINDOW,
+                                      min_periods=DENOM_WINDOW - 2)
             ratio = [round(o / u, 2) if o is not None and u else None
                      for o, u in zip(openings, denom)]
             comp = build_component('openingsRatio', dates, ratio, {
@@ -213,7 +240,7 @@ def build_slice(spec, report, national, cpi_yoy_by_date):
                 'smoothing': f'{SMOOTH_WINDOW}mma numerator, {DENOM_WINDOW}mma NSA denominator',
                 'note': 'Denominator is unemployed by industry of last job '
                         '(CPS, not seasonally adjusted; 12-month average).',
-            })
+            }, window=DENOM_WINDOW)
             if comp:
                 components['openingsRatio'] = comp
             else:
@@ -231,12 +258,14 @@ def build_slice(spec, report, national, cpi_yoy_by_date):
             real = [round(w - c, 1) if w is not None and c is not None else None
                     for w, c in zip(column(wage_yoy),
                                     (cpi_yoy_by_date.get(d) for d in dates))]
+            # window=13: a YoY value dated t compares against t-12, so
+            # pandemic base effects contaminate observations through 2021.
             comp = build_component('realWageGrowth', dates, real, {
                 'series': [ahe_entry['id'], 'CPIAUCSL'],
                 'title': f"{ahe_entry['title']} YoY minus national CPI YoY",
                 'note': 'No industry-level CPI exists; deflating industry '
                         'wages by national CPI is standard practice.',
-            })
+            }, window=13)
             if comp:
                 components['realWageGrowth'] = comp
             else:
@@ -256,9 +285,11 @@ def build_slice(spec, report, national, cpi_yoy_by_date):
             'scope': 'national',
             'note': 'The tracker does not publish switcher/stayer by industry; '
                     'this component is the same for every slice.',
-        })
+        }, window=3)  # published series is a 3-month moving average
         if comp:
             components['switcherPremium'] = comp
+        else:
+            skipped['switcherPremium'] = 'insufficient history to fit anchors'
     else:
         skipped['switcherPremium'] = 'national switcher premium unavailable'
 
@@ -272,6 +303,13 @@ def build_slice(spec, report, national, cpi_yoy_by_date):
     for comp in components.values():
         comp['values'] = comp['values'][:last_idx + 1]
 
+    # Coverage gate: a slice scored on too few components leans entirely on
+    # whichever signals happen to be extreme right now (the first live run
+    # produced single-digit scores from quits+hires alone). Such slices are
+    # still emitted for inspection but flagged so no UI presents them.
+    covered_weight = round(sum(c['weight'] for c in components.values()), 3)
+    coverage = 'ok' if covered_weight >= 0.60 else 'insufficient'
+
     doc = {
         'meta': {
             'slug': spec['slug'],
@@ -281,9 +319,12 @@ def build_slice(spec, report, national, cpi_yoy_by_date):
             'generated': datetime.now().strftime('%Y-%m-%d'),
             'dataThrough': dates[-1][:7],
             'caveats': spec['caveats'],
-            'anchorWindow': '2015-present excluding 2020-03..2020-12, p5/p95',
+            'anchorWindow': '2015-present excluding 2020-03..2020-12 '
+                            '(extended by each component\'s averaging window), p5/p95',
             'scoreNote': 'Scores compare this sector to its own history, not '
                          'to other sectors. See methodology plan section 5.4.',
+            'coverage': coverage,
+            'coveredWeight': covered_weight,
             'skippedComponents': skipped,
         },
         'labels': labels,
@@ -380,7 +421,8 @@ def main():
         print(f'    wrote {os.path.relpath(path)} '
               f'(through {doc["meta"]["dataThrough"]}, latest score {latest}, '
               f'margin +/-{doc["meta"]["margin"]}, '
-              f'{len(doc["components"])} components)')
+              f'{len(doc["components"])} components, '
+              f'coverage {doc["meta"]["coverage"]} [{doc["meta"]["coveredWeight"]}])')
 
     manifest = {
         'generated': datetime.now().strftime('%Y-%m-%d'),
@@ -390,6 +432,8 @@ def main():
             'name': doc['meta']['name'],
             'dataThrough': doc['meta']['dataThrough'],
             'margin': doc['meta']['margin'],
+            'coverage': doc['meta']['coverage'],
+            'coveredWeight': doc['meta']['coveredWeight'],
             'latestScore': next((s for s in reversed(doc['scores']) if s is not None), None),
             'components': sorted(doc['components'].keys()),
         } for doc in built.values()],

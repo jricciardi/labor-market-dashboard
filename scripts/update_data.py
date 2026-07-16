@@ -77,6 +77,14 @@ def fetch_switcher_premium_with_fallback(dates):
 
 
 def main():
+    if not os.environ.get('FRED_API_KEY'):
+        print('Error: FRED_API_KEY environment variable not set')
+        print('Get a free API key at: https://fred.stlouisfed.org/docs/api/api_key.html')
+        sys.exit(1)
+
+    # Deliberate failure mode: any FRED series failing aborts the whole
+    # refresh (data.json untouched) rather than writing a file with a
+    # blanked column. The next scheduled run retries.
     print('Fetching data from FRED...')
     parsed = {}
     for name, series_id in SERIES.items():

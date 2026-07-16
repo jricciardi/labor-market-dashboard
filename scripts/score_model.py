@@ -14,12 +14,20 @@ Two scorers live here:
     JSON) per docs/sector-methodology-plan.md section 5.3.
 """
 
+import math
+
 MODEL_VERSION = '2.1'
 CARRY_LIMIT = 3  # max months a stale value may stand in for a missing one
 
 
 def clamp(x):
     return min(1.0, max(0.0, x))
+
+
+def round_half_up(x):
+    """JS Math.round semantics; Python's round() is half-to-even, which can
+    disagree with the browser by 1 point exactly on tier boundaries."""
+    return math.floor(x + 0.5)
 
 
 def _ratio_norm(v):
@@ -89,7 +97,7 @@ def score_from_values(values):
         den += weight
     if 'quitRate' not in have or 'openingsRatio' not in have or den < 0.5:
         return None
-    return min(100, round(num / den * 100))
+    return min(100, round_half_up(num / den * 100))
 
 
 def has_real_scored_data(data, idx):
@@ -169,7 +177,7 @@ def slice_score_at(components, idx, carry_limit=CARRY_LIMIT):
         den += comp['weight']
     if 'quitRate' not in have or 'hiresRate' not in have or den < total * 0.5:
         return None
-    return min(100, round(num / den * 100))
+    return min(100, round_half_up(num / den * 100))
 
 
 def slice_scores(slice_doc):

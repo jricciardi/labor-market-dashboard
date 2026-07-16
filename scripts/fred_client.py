@@ -120,14 +120,21 @@ def yoy_growth(values_by_date):
     return growth
 
 
-def moving_average(series, window):
-    """Trailing moving average over a list; needs a full window, else None."""
+def moving_average(series, window, min_periods=None):
+    """Trailing moving average over a list.
+
+    Requires a full window of positions; min_periods (default: the full
+    window) sets how many non-None values must be present. A long NSA
+    average (e.g. 12MMA) can tolerate a stray missing month via
+    min_periods without letting one gap null out a year of output.
+    """
+    need = window if min_periods is None else min_periods
     out = []
     for i in range(len(series)):
         tail = series[max(0, i - window + 1):i + 1]
         vals = [v for v in tail if v is not None]
-        if len(tail) == window and len(vals) == window:
-            out.append(round(sum(vals) / window, 2))
+        if len(tail) == window and len(vals) >= need:
+            out.append(round(sum(vals) / len(vals), 2))
         else:
             out.append(None)
     return out
@@ -177,16 +184,28 @@ def percentile(sorted_values, p):
 PANDEMIC_WINDOW = ('2020-03-01', '2020-12-01')
 
 
-def fit_anchors(dates, values, inverted, lo_p=0.05, hi_p=0.95):
+def add_months(date_str, n):
+    """YYYY-MM-01 plus n months."""
+    dt = datetime.strptime(date_str, '%Y-%m-%d')
+    total = dt.year * 12 + (dt.month - 1) + n
+    return f'{total // 12:04d}-{total % 12 + 1:02d}-01'
+
+
+def fit_anchors(dates, values, inverted, lo_p=0.05, hi_p=0.95, window=1):
     """Fit percentile normalization anchors per the v3 methodology plan.
 
     Uses the series' own 2015-present history, excluding Mar-Dec 2020 so the
-    COVID shock doesn't stretch the scale. Returns {lo, hi, inverted} where
-    lo maps to normalized 0.05 and hi to 0.95 (see score_model.normalize).
+    COVID shock doesn't stretch the scale. `window` is the trailing-average
+    width of the values being fit: a smoothed observation dated after the
+    pandemic still contains pandemic months until `window - 1` months have
+    passed, so the exclusion end extends accordingly. Returns
+    {lo, hi, inverted} where lo maps to normalized 0.05 and hi to 0.95
+    (see score_model.normalize).
     """
+    exclude_end = add_months(PANDEMIC_WINDOW[1], window - 1)
     sample = sorted(
         v for d, v in zip(dates, values)
-        if v is not None and not (PANDEMIC_WINDOW[0] <= d <= PANDEMIC_WINDOW[1])
+        if v is not None and not (PANDEMIC_WINDOW[0] <= d <= exclude_end)
     )
     if len(sample) < 24:  # need a couple of years of data to calibrate
         return None

@@ -5,11 +5,13 @@ stayers (3-month moving averages) as a downloadable Excel workbook. The
 switcher premium — switcher minus stayer, in percentage points — is the
 dashboard's "does moving actually pay right now?" component.
 
-This fetcher is deliberately paranoid: the workbook's exact layout is not a
-stable API, so we locate the data by header text rather than by position,
-and we fail loudly with diagnostics rather than guessing. Callers fall back
-to last-known-good values (see update_data.py) so a broken download or a
-reshuffled spreadsheet can never blank out the published series.
+This fetcher is deliberately paranoid: the workbook's layout is not a stable
+API, so data is located by header text, ambiguity is treated as failure, and
+parsed values must pass magnitude sanity checks. Every failure raises rather
+than guesses; callers fall back to last-known-good values (update_data.py),
+so a broken download or a reshuffled spreadsheet can never blank out or
+corrupt the published series. verify_sources.py dumps the workbook structure
+so a human can adjust the matching rules precisely when the layout changes.
 
 Requires openpyxl (installed by the GitHub Actions workflow); import is
 deferred so the FRED-only path has no third-party dependency.
@@ -18,17 +20,32 @@ deferred so the FRED-only path has no third-party dependency.
 import io
 import re
 from datetime import datetime
+from urllib.parse import urljoin
 from urllib.request import Request, urlopen
 
+# Direct workbook guesses, tried first.
 WORKBOOK_URLS = [
-    # Primary and historical locations; verify_sources.py probes these and
-    # records which resolve, plus the workbook structure it finds.
     'https://www.atlantafed.org/-/media/documents/datafiles/chcs/wage-growth-tracker/wage-growth-data.xlsx',
 ]
-_UA = {'User-Agent': 'labor-market-dashboard/1.0 (github.com/jricciardi/labor-market-dashboard)'}
+# The tracker's landing page, scraped for the current workbook link when the
+# direct guesses fail or stop pointing at a real xlsx.
+DISCOVERY_PAGES = [
+    'https://www.atlantafed.org/chcs/wage-growth-tracker',
+]
+_UA = {'User-Agent': 'Mozilla/5.0 (compatible; labor-market-dashboard/1.0; '
+                     '+https://github.com/jricciardi/labor-market-dashboard)'}
 
 _SWITCHER = re.compile(r'switcher', re.I)
 _STAYER = re.compile(r'stayer', re.I)
+_XLSX_HREF = re.compile(r'href="([^"]*wage[-_]?growth[^"]*\.xlsx?)"', re.I)
+_ZIP_MAGIC = b'PK\x03\x04'
+
+# Sanity bounds: the tracker's median wage growth series has lived in roughly
+# 0-16% for its entire history; the premium in roughly -3..+4pp. Values far
+# outside mean we parsed the wrong thing (e.g. Excel percent fractions).
+_WAGE_RANGE = (-5.0, 25.0)
+_PREMIUM_RANGE = (-6.0, 8.0)
+_MIN_PLAUSIBLE_MEDIAN = 0.5  # fractions like 0.045 would fail this
 
 
 class AtlantaFedError(RuntimeError):
@@ -38,6 +55,38 @@ class AtlantaFedError(RuntimeError):
 def _download(url, timeout=60):
     with urlopen(Request(url, headers=_UA), timeout=timeout) as resp:
         return resp.read()
+
+
+def _workbook_bytes():
+    """Fetch the workbook, discovering the current link if guesses fail.
+
+    Returns (content, url). Raises AtlantaFedError with per-URL diagnostics.
+    """
+    errors = []
+    candidates = list(WORKBOOK_URLS)
+    for page_url in DISCOVERY_PAGES:
+        try:
+            page = _download(page_url).decode('utf-8', 'replace')
+            for href in _XLSX_HREF.findall(page):
+                candidates.append(urljoin(page_url, href))
+        except Exception as e:  # noqa: BLE001 - discovery is best-effort
+            errors.append(f'discovery {page_url}: {e}')
+    seen = set()
+    for url in candidates:
+        if url in seen:
+            continue
+        seen.add(url)
+        try:
+            content = _download(url)
+        except Exception as e:  # noqa: BLE001
+            errors.append(f'{url}: {e}')
+            continue
+        if not content.startswith(_ZIP_MAGIC):
+            head = content[:40].decode('utf-8', 'replace')
+            errors.append(f'{url}: not an xlsx (starts with {head!r})')
+            continue
+        return content, url
+    raise AtlantaFedError('no workbook found; ' + '; '.join(errors))
 
 
 def _parse_date(cell):
@@ -56,34 +105,66 @@ def _parse_date(cell):
 def _find_columns(rows):
     """Locate (header_row_idx, switcher_col, stayer_col) by header text.
 
-    Scans the first few rows for cells matching /switcher/i and /stayer/i.
-    Returns None if the sheet doesn't carry both series.
+    Requires exactly one column matching /switcher/i and exactly one matching
+    /stayer/i in the same header row — ambiguity (e.g. smoothed and
+    unsmoothed variants side by side, or a derived "switcher minus stayer"
+    column) raises instead of guessing a column.
     """
     for row_idx, row in enumerate(rows[:10]):
-        switcher = stayer = None
+        switchers, stayers = [], []
         for col_idx, cell in enumerate(row):
             if not isinstance(cell, str):
                 continue
             if _SWITCHER.search(cell):
-                switcher = col_idx
+                switchers.append(col_idx)
             elif _STAYER.search(cell):
-                stayer = col_idx
-        if switcher is not None and stayer is not None:
-            return row_idx, switcher, stayer
+                stayers.append(col_idx)
+        if switchers or stayers:
+            if len(switchers) == 1 and len(stayers) == 1:
+                return row_idx, switchers[0], stayers[0]
+            raise AtlantaFedError(
+                f'ambiguous switcher/stayer headers in row {row_idx}: '
+                f'{len(switchers)} switcher and {len(stayers)} stayer columns')
     return None
 
 
+def _sanity_check(series):
+    """Reject parses whose magnitudes can't be median wage growth percents."""
+    values = [v for pair in series.values() for v in pair]
+    values.sort()
+    median = values[len(values) // 2]
+    if not (_MIN_PLAUSIBLE_MEDIAN <= median <= _WAGE_RANGE[1]):
+        raise AtlantaFedError(
+            f'wage growth magnitudes implausible (median {median}); '
+            'wrong column or percent-fraction formatting?')
+    if any(not (_WAGE_RANGE[0] <= v <= _WAGE_RANGE[1]) for v in values):
+        raise AtlantaFedError('wage growth values outside plausible range')
+    premiums = [sw - st for sw, st in series.values()]
+    if any(not (_PREMIUM_RANGE[0] <= p <= _PREMIUM_RANGE[1]) for p in premiums):
+        raise AtlantaFedError('switcher premium outside plausible range')
+
+
 def parse_workbook(content):
-    """Extract {YYYY-MM-01: (switcher, stayer)} from workbook bytes."""
+    """Extract {YYYY-MM-01: (switcher, stayer)} from workbook bytes.
+
+    Exactly one sheet must parse; multiple parseable sheets (e.g. smoothed
+    and unsmoothed cuts both matching) is an ambiguity error so a human can
+    pin the right one via verify_sources' structure dump.
+    """
     import openpyxl  # deferred: only the switcher path needs it
 
     workbook = openpyxl.load_workbook(io.BytesIO(content), read_only=True, data_only=True)
-    tried = []
+    parsed = {}
+    notes = []
     for sheet in workbook.worksheets:
         rows = [list(r) for r in sheet.iter_rows(values_only=True)]
-        found = _find_columns(rows)
+        try:
+            found = _find_columns(rows)
+        except AtlantaFedError as e:
+            notes.append(f'{sheet.title}: {e}')
+            continue
         if not found:
-            tried.append(sheet.title)
+            notes.append(f'{sheet.title}: no switcher/stayer headers')
             continue
         header_idx, sw_col, st_col = found
         series = {}
@@ -98,30 +179,31 @@ def parse_workbook(content):
             if isinstance(sw, (int, float)) and isinstance(st, (int, float)):
                 series[date] = (float(sw), float(st))
         if series:
-            return series
-        tried.append(f'{sheet.title} (headers found, no parseable rows)')
-    raise AtlantaFedError(
-        'no sheet with switcher+stayer columns and data; inspected: ' + ', '.join(tried))
+            parsed[sheet.title] = series
+        else:
+            notes.append(f'{sheet.title}: headers found, no parseable rows')
+    if not parsed:
+        raise AtlantaFedError('no usable sheet; ' + '; '.join(notes))
+    if len(parsed) > 1:
+        raise AtlantaFedError(
+            'multiple sheets parse (ambiguous which is the 3MMA cut): '
+            + ', '.join(parsed))
+    series = next(iter(parsed.values()))
+    _sanity_check(series)
+    return series
 
 
 def fetch_switcher_premium(start='2015-01-01'):
     """Return {YYYY-MM-01: premium_pp} — switcher minus stayer wage growth.
 
-    Only the published 3MMA series are used upstream (the matched-CPS cell is
-    too small for unsmoothed monthly reads); if the workbook carries both
-    smoothed and unsmoothed variants, header matching prefers whichever sheet
-    lists them first, so verify_sources.py's structure dump is the check that
-    we're reading the smoothed cut.
+    Only the published smoothed (3MMA) series should ever be consumed; the
+    ambiguity and sanity rules above make the parser fail loudly rather than
+    silently score an unsmoothed or misparsed cut.
     """
-    errors = []
-    for url in WORKBOOK_URLS:
-        try:
-            series = parse_workbook(_download(url))
-            return {
-                date: round(sw - st, 2)
-                for date, (sw, st) in sorted(series.items())
-                if date >= start
-            }
-        except Exception as e:  # noqa: BLE001 - every failure type falls through to LKG
-            errors.append(f'{url}: {e}')
-    raise AtlantaFedError('; '.join(errors))
+    content, _url = _workbook_bytes()
+    series = parse_workbook(content)
+    return {
+        date: round(sw - st, 2)
+        for date, (sw, st) in sorted(series.items())
+        if date >= start
+    }
