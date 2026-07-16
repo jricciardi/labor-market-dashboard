@@ -1,0 +1,65 @@
+# Runs the full data pipeline on development branches so real FRED /
+# Atlanta Fed data can be fetched, verified, and committed back for review —
+# the Claude remote environment cannot reach those domains itself.
+#
+# Triggers on pushes that change pipeline code (not data commits: pushes made
+# by GITHUB_TOKEN don't re-trigger workflows, and the paths filter ignores
+# data output anyway).
+name: Branch Data Refresh
+
+on:
+  push:
+    branches: ['claude/**']
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/branch-data-refresh.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: branch-data-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install openpyxl
+
+      - name: Verify data sources
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python scripts/verify_sources.py
+
+      - name: Update national data
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python scripts/update_data.py
+
+      - name: Build slice data
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python scripts/update_slices.py
+
+      - name: Commit results to branch
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data.json data/
+          if git diff --cached --quiet; then
+            echo "No data changes."
+          else
+            git commit -m "Branch data refresh: verification report, national data, slices"
+            git push
+          fi

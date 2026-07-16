@@ -11,3 +11,4 @@ Thumbs.db
 # Local development
 *.log
 .env
+scripts/__pycache__/

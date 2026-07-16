@@ -1,13 +1,12 @@
 # Labor Market Dashboard — Claude Context
 
-## Status & Roadmap (updated 2026-07-15)
+## Status & Roadmap (updated 2026-07-15, v3 Phase 0+1 in progress)
 
-- **Score model v2 is live** (merged PR #9 + data refresh): config-driven `SCORE_COMPONENTS` in `index.html`, weighted-average with per-component weight renormalization when data is missing, carry-forward ≤3 months, no neutral placeholders. Fed funds is charted but NOT scored. Margin is ±5 (empirical). Full rationale: `docs/methodology.md` ("Dashboard Scoring Model (v2)").
-- New scored components since v2: median unemployment duration (`uempMed`, FRED UEMPMED) and real wage growth (`realWageGrowth` = AHE YoY − CPI YoY); pipeline fetches both (`scripts/update_data.py`).
-- Backtest tooling pattern: replicate `SCORE_COMPONENTS` in Python, then walk `git log -- data.json` vintages to compare displayed vs revised scores (used to find and fix the 2026-05-07 fake-neutral artifact).
-- **Next up: score v3 — switcher premium + industry/occupation slices.** The full data-science plan (sources, series IDs to verify, statistical treatment, validation battery, phasing) is in `docs/sector-methodology-plan.md`. Phase 0 = Atlanta Fed switcher premium; start with that file's §10 restart checklist.
-- Environment note: the Claude remote environment blocks FRED/Atlanta Fed domains and can't dispatch GitHub Actions (403); data refreshes run via the repo's `update-data.yml` workflow (user triggers manually or scheduled on the 7th/14th).
-- Known nit: "Bets Pay Off" scenario copy says you'd "only just cross" 70 — under v2 it projects 76; reword on next touch.
+- **Score model v2.1** (v3 plan Phase 0): adds `switcherPremium` (Atlanta Fed Wage Growth Tracker, switcher − stayer wage growth, pp) at 12% weight with the §2 rebalance. Config lives in `index.html` (`SCORE_COMPONENTS`) and is mirrored in `scripts/score_model.py` — **keep them in lockstep**; the browser smoke test cross-checks the two. Margin ±5; fed funds charted, not scored.
+- **Pipeline is now modular**: `scripts/fred_client.py` (FRED + transforms + percentile anchors), `scripts/atlanta_fed.py` (defensive xlsx parsing, last-known-good fallback recorded in `metadata.switcherPremiumSource`), `scripts/update_data.py` (national), `scripts/update_slices.py` (Phase 1 industry slices → `data/slices/*.json` with data-driven anchors, provenance, face-validity checks), `scripts/verify_sources.py` (probes candidate series IDs → `data/source-verification.json`; slices only build from verified IDs), `scripts/backtest.py` (vintage walk; frozen v2 comparison).
+- **CI**: `.github/workflows/branch-data-refresh.yml` runs verify + national + slices on any push to `claude/**` that touches `scripts/**` and commits results back to the branch — this is how a network-restricted session gets real FRED/Atlanta Fed data. `update-data.yml` (main, scheduled 7th/14th) also builds slices once a verification report is committed.
+- **Next actions**: (1) after the branch data refresh lands, read `data/source-verification.json` — fix any unresolved series IDs in `verify_sources.py` candidates and record confirmed IDs in the plan doc §4; (2) check `data/slices/index.json` face-validity results (§7.1 must pass before any slice UI ships); (3) calibrate `switcherPremium` norm anchors against the real downloaded history (provisional: (v+0.5)/3); (4) then Phase 1 frontend (slice picker, per-slice view) and the rest of `docs/sector-methodology-plan.md` §10.
+- Environment note: the Claude remote environment blocks FRED/Atlanta Fed domains and can't dispatch GitHub Actions (403) — but pushes to `claude/**` auto-trigger the branch refresh workflow, which has the secrets.
 
 ## Project Overview
 "Is Now a Good Time?" — A pro-worker labor market dashboard that combines 8 indicators into a single actionable score (0–100) answering: does the job market currently favor job seekers or employers?

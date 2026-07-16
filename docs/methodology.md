@@ -4,20 +4,23 @@ A guide to the quantitative signals that reveal labor market conditions independ
 
 ---
 
-## Dashboard Scoring Model (v2, July 2026)
+## Dashboard Scoring Model (v2.1, July 2026)
 
-The composite score is a weighted average of eight indicators, each normalized to 0–1 against its 2015–present operating range, then scaled to 0–100. Weights answer one question: *how directly does this tell an employed person whether investing time in a job search will pay off?*
+The composite score is a weighted average of nine indicators, each normalized to 0–1 against its 2015–present operating range, then scaled to 0–100. Weights answer one question: *how directly does this tell an employed person whether investing time in a job search will pay off?*
 
-| Component | Weight | FRED series | Normalization (0 → 1) |
+| Component | Weight | Source series | Normalization (0 → 1) |
 |---|---|---|---|
-| Hiring rate | 18% | JTSHIR | 2.8% → 4.4% |
-| Quit rate | 18% | JTSQUR | 1.5% → 3.0% |
-| Jobs per job seeker | 12% | JTSJOL / UNEMPLOY | 0.3 → 2.0, piecewise: steeper below 1.0 |
+| Hiring rate | 16% | JTSHIR | 2.8% → 4.4% |
+| Quit rate | 16% | JTSQUR | 1.5% → 3.0% |
+| Switching pay premium | 12% | Atlanta Fed Wage Growth Tracker, switcher − stayer (3MMA, pp) | −0.5pp → +2.5pp |
 | Median unemployment duration | 12% | UEMPMED | 16 wks → 8 wks (inverted) |
-| Real wage growth | 12% | CES0500000003 − CPIAUCSL (YoY) | −1% → +2% |
-| Layoff rate | 10% | JTSLDR | 2.5% → 0.8% (inverted) |
-| Unemployment rate | 10% | UNRATE | 7.0% → 3.5% (inverted) |
+| Jobs per job seeker | 10% | JTSJOL / UNEMPLOY | 0.3 → 2.0, piecewise: steeper below 1.0 |
+| Real wage growth | 10% | CES0500000003 − CPIAUCSL (YoY) | −1% → +2% |
+| Layoff rate | 8% | JTSLDR | 2.5% → 0.8% (inverted) |
+| Unemployment rate | 8% | UNRATE | 7.0% → 3.5% (inverted) |
 | Prime-age participation | 8% | LNS11300060 | 80.5% → 84.5% |
+
+**v2.1 (Phase 0 of the v3 plan):** adds the switcher premium — the most direct answer to "will a move raise my pay?" — and rebalances weights per `docs/sector-methodology-plan.md` §2. The premium is fetched independently of FRED; on a failed download the previous values carry forward (`metadata.switcherPremiumSource` records `live`/`carried`/`unavailable`). The score model is mirrored in `scripts/score_model.py` for pipeline validation and backtesting (`scripts/backtest.py`); the two implementations must move together.
 
 **Design decisions, and why:**
 
