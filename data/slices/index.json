@@ -1,0 +1,170 @@
+{
+ "generated": "2026-07-16",
+ "methodology": "v3-phase1",
+ "slices": [
+  {
+   "slug": "information",
+   "name": "Information",
+   "dataThrough": "2026-05",
+   "margin": 8,
+   "coverage": "ok",
+   "coveredWeight": 0.72,
+   "latestScore": 19,
+   "components": [
+    "hiresRate",
+    "layoffsRate",
+    "openingsRatio",
+    "quitRate",
+    "realWageGrowth",
+    "switcherPremium"
+   ]
+  },
+  {
+   "slug": "professional-business",
+   "name": "Professional & Business Services",
+   "dataThrough": "2026-05",
+   "margin": 8,
+   "coverage": "ok",
+   "coveredWeight": 0.72,
+   "latestScore": 18,
+   "components": [
+    "hiresRate",
+    "layoffsRate",
+    "openingsRatio",
+    "quitRate",
+    "realWageGrowth",
+    "switcherPremium"
+   ]
+  },
+  {
+   "slug": "health-social",
+   "name": "Health Care & Social Assistance",
+   "dataThrough": "2026-05",
+   "margin": 11,
+   "coverage": "ok",
+   "coveredWeight": 0.62,
+   "latestScore": 13,
+   "components": [
+    "hiresRate",
+    "layoffsRate",
+    "quitRate",
+    "realWageGrowth",
+    "switcherPremium"
+   ]
+  },
+  {
+   "slug": "leisure-hospitality",
+   "name": "Leisure & Hospitality",
+   "dataThrough": "2026-05",
+   "margin": 11,
+   "coverage": "ok",
+   "coveredWeight": 0.62,
+   "latestScore": 21,
+   "components": [
+    "hiresRate",
+    "layoffsRate",
+    "quitRate",
+    "realWageGrowth",
+    "switcherPremium"
+   ]
+  },
+  {
+   "slug": "manufacturing",
+   "name": "Manufacturing",
+   "dataThrough": "2026-05",
+   "margin": 8,
+   "coverage": "ok",
+   "coveredWeight": 0.62,
+   "latestScore": 34,
+   "components": [
+    "hiresRate",
+    "layoffsRate",
+    "quitRate",
+    "realWageGrowth",
+    "switcherPremium"
+   ]
+  },
+  {
+   "slug": "government-federal",
+   "name": "Federal Government",
+   "dataThrough": "2026-05",
+   "margin": 9,
+   "coverage": "insufficient",
+   "coveredWeight": 0.52,
+   "latestScore": 53,
+   "components": [
+    "hiresRate",
+    "layoffsRate",
+    "quitRate",
+    "switcherPremium"
+   ]
+  },
+  {
+   "slug": "government-state-local",
+   "name": "State & Local Government",
+   "dataThrough": "2026-05",
+   "margin": 10,
+   "coverage": "insufficient",
+   "coveredWeight": 0.52,
+   "latestScore": 33,
+   "components": [
+    "hiresRate",
+    "layoffsRate",
+    "quitRate",
+    "switcherPremium"
+   ]
+  }
+ ],
+ "skipped": {
+  "information": {
+   "unempRate": "source unverified"
+  },
+  "professional-business": {
+   "unempRate": "source unverified"
+  },
+  "health-social": {
+   "unempRate": "source unverified",
+   "openingsRatio": "no CPS unemployed-by-industry series for this sector"
+  },
+  "leisure-hospitality": {
+   "unempRate": "source unverified",
+   "openingsRatio": "no CPS unemployed-by-industry series for this sector"
+  },
+  "manufacturing": {
+   "unempRate": "source unverified",
+   "openingsRatio": "no CPS unemployed-by-industry series for this sector"
+  },
+  "government-federal": {
+   "unempRate": "source unverified",
+   "openingsRatio": "no CPS unemployed-by-industry series for this sector",
+   "realWageGrowth": "no wage series for this sector (CES covers private only)"
+  },
+  "government-state-local": {
+   "unempRate": "source unverified",
+   "openingsRatio": "no CPS unemployed-by-industry series for this sector",
+   "realWageGrowth": "no wage series for this sector (CES covers private only)"
+  }
+ },
+ "faceValidity": {
+  "information_2023_below_health": {
+   "pass": true,
+   "information": 41.8,
+   "health": 68.6
+  },
+  "information_2023_below_pbs": {
+   "pass": true,
+   "information": 41.8,
+   "pbs": 48
+  },
+  "federal_falls_2025_26": {
+   "pass": true,
+   "2024": 49,
+   "2025_26": 41
+  },
+  "leisure_quits_spike_2021_22": {
+   "pass": true,
+   "peak_2021_22": 5.77,
+   "peak_2019": 4.8
+  }
+ }
+}

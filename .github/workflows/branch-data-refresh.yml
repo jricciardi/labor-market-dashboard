@@ -1,27 +1,34 @@
-name: Update Labor Market Data
+# Runs the full data pipeline on development branches so real FRED /
+# Atlanta Fed data can be fetched, verified, and committed back for review —
+# the Claude remote environment cannot reach those domains itself.
+#
+# Triggers on pushes that change pipeline code (not data commits: pushes made
+# by GITHUB_TOKEN don't re-trigger workflows, and the paths filter ignores
+# data output anyway).
+name: Branch Data Refresh
 
 on:
-  # Run twice monthly to catch staggered BLS releases:
-  # - 7th: Employment Situation data (released first Friday of month)
-  # - 14th: JOLTS data (released ~10th-12th of month)
-  schedule:
-    - cron: '0 10 7 * *'
-    - cron: '0 10 14 * *'
-  
-  # Allow manual trigger from GitHub UI
+  push:
+    branches: ['claude/**']
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/branch-data-refresh.yml'
   workflow_dispatch:
 
+concurrency:
+  group: branch-data-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
 jobs:
-  update-data:
+  refresh:
     runs-on: ubuntu-latest
-    
-    permissions:
-      contents: write
-    
     steps:
-      - name: Checkout repository
+      - name: Checkout branch
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -30,19 +37,22 @@ jobs:
       - name: Install dependencies
         run: pip install openpyxl
 
-      - name: Run update script
+      - name: Verify data sources
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python scripts/verify_sources.py
+
+      - name: Update national data
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python scripts/update_data.py
 
-      # Slices only build once a committed source-verification report exists
-      # (data/source-verification.json); the script no-ops otherwise.
       - name: Build slice data
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python scripts/update_slices.py
 
-      - name: Commit and push if changed
+      - name: Commit results to branch
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -51,7 +61,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes."
           else
-            git commit -m "Update data.json with latest BLS data"
+            git commit -m "Branch data refresh: verification report, national data, slices"
             git pull --rebase origin "${GITHUB_REF_NAME}" || true
             git push || (git pull --rebase origin "${GITHUB_REF_NAME}" && git push)
           fi
