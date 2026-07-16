@@ -80,10 +80,10 @@ FRED_CANDIDATES = {
     'jolts.manufacturing.hires': ['JTS3000HIR'],
     'jolts.manufacturing.layoffs': ['JTS3000LDR', 'JTS300099LDR'],
     'jolts.manufacturing.openings': ['JTS3000JOL'],
-    'jolts.govfederal.quits': ['JTS910099QUR', 'JTS9100QUR'],
-    'jolts.govfederal.hires': ['JTS910099HIR', 'JTS9100HIR'],
-    'jolts.govfederal.layoffs': ['JTS910099LDR', 'JTS9100LDR'],
-    'jolts.govfederal.openings': ['JTS910099JOL', 'JTS9100JOL'],
+    'jolts.govfederal.quits': ['JTS9100QUR', 'JTU9100QUR'],
+    'jolts.govfederal.hires': ['JTS9100HIR', 'JTU9100HIR'],
+    'jolts.govfederal.layoffs': ['JTU9100LDR', 'JTS9100LDR'],
+    'jolts.govfederal.openings': ['JTS9100JOL', 'JTU9100JOL'],
     'jolts.govstatelocal.quits': ['JTS9200QUR'],
     'jolts.govstatelocal.hires': ['JTS9200HIR'],
     'jolts.govstatelocal.layoffs': ['JTS9200LDR', 'JTS920099LDR'],
@@ -133,10 +133,12 @@ TITLE_EXPECTATIONS.update({
 SEARCH_TEXTS = {}
 for _sector, _name in [('information', 'Information'),
                        ('pbs', 'Professional and Business Services'),
-                       ('healthsocial', 'Health Care and Social Assistance'),
+                       # CPS industry naming groups health under Education and
+                       # Health Services; search text must use CPS's name
+                       ('healthsocial', 'Education and Health Services'),
                        ('leisure', 'Leisure and Hospitality'),
                        ('manufacturing', 'Manufacturing'),
-                       ('govfederal', 'Federal government'),
+                       ('govfederal', 'Federal'),
                        ('govstatelocal', 'State and Local government')]:
     for _measure, _mname in [('quits', 'Quits rate'), ('hires', 'Hires rate'),
                              ('layoffs', 'Layoffs and discharges rate'),
@@ -167,6 +169,9 @@ def _meta_entry(purpose, series_id, meta, source):
         'source': source,
         'titleMatchesPurpose': title_matches(purpose, meta.get('title', '')),
         'title': meta.get('title'),
+        # units distinguishes 'Rate' from 'Level in Thousands' — JOLTS titles
+        # don't (JTU5100HIR and JTU5100HIL are both "Hires: Information")
+        'units': meta.get('units_short'),
         'seasonalAdjustment': meta.get('seasonal_adjustment_short'),
         'frequency': meta.get('frequency_short'),
         'start': meta.get('observation_start'),
@@ -193,10 +198,9 @@ def _probe_id(purpose, series_id, source='candidate'):
                         'kind': 'transient', 'error': str(e)}
 
 
-def _search_series(text, limit=8):
+def _search_series(text, limit=25):
     """FRED full-text series search; returns raw series metadata dicts."""
-    payload = fc._get_json('series/search', {
-        'search_text': text, 'limit': limit, 'order_by': 'popularity'})
+    payload = fc._get_json('series/search', {'search_text': text, 'limit': limit})
     return payload.get('seriess', [])
 
 

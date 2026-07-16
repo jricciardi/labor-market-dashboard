@@ -135,19 +135,41 @@ SMOOTH_WINDOW = 3  # months, for JOLTS industry cells (plan section 5.1)
 DENOM_WINDOW = 12  # months, NSA CPS unemployed-by-industry (plan section 5.2)
 
 
-def resolve(report, purpose):
-    """First verified candidate for a purpose, or None.
+_UNIT_TESTS = {
+    'rate': lambda u: 'rate' in u or u == 'percent',
+    'level': lambda u: 'level' in u or 'thous' in u or 'persons' in u,
+}
+
+
+def resolve(report, purpose, want_units=None):
+    """Best verified candidate for a purpose, or None.
 
     Trusts only entries that exist on FRED AND whose title matched the
     purpose's registered expectations — verify_sources.py marks
     titleMatchesPurpose False when no expectation is registered, so an
     unregistered purpose can never feed a slice. (The first live run proved
     the need: two CPS ids resolved to the wrong sectors.)
+
+    want_units ('rate'|'level') disambiguates JOLTS rate vs level series,
+    whose FRED titles are identical (run 2 picked hires *levels* for
+    Information before this existed). Entries arrive sorted SA-first.
     """
+    check = _UNIT_TESTS.get(want_units)
     for entry in report.get('fred', {}).get(purpose, []):
-        if entry.get('ok') and entry.get('titleMatchesPurpose') is True:
-            return entry
+        if not (entry.get('ok') and entry.get('titleMatchesPurpose') is True):
+            continue
+        if check and not check((entry.get('units') or '').lower()):
+            continue
+        return entry
     return None
+
+
+def smoothing_for(entry, sa_window=SMOOTH_WINDOW):
+    """(window, min_periods, label): NSA series get a 12-month average per
+    plan section 5.2; SA series keep the short JOLTS-noise window."""
+    if entry.get('seasonalAdjustment') == 'SA':
+        return sa_window, None, f'{sa_window}mma'
+    return DENOM_WINDOW, DENOM_WINDOW - 2, f'{DENOM_WINDOW}mma (NSA source)'
 
 
 def build_component(key, dates, values, provenance, inverted=False, window=1):
@@ -171,18 +193,18 @@ def build_slice(spec, report, national, cpi_yoy_by_date):
     skipped = {}
     fetched = {}
 
-    def fetch_for(purpose):
-        entry = resolve(report, purpose)
+    def fetch_for(purpose, want_units=None):
+        entry = resolve(report, purpose, want_units)
         if entry is None:
             return None, None
-        if purpose not in fetched:
-            fetched[purpose] = fc.fetch_observations(entry['id'])
-        return fetched[purpose], entry
+        if entry['id'] not in fetched:
+            fetched[entry['id']] = fc.fetch_observations(entry['id'])
+        return fetched[entry['id']], entry
 
     # Month grid from the slice's JOLTS quits series (its defining axis)
-    quits_map, quits_entry = fetch_for(f'{spec["jolts"]}.quits')
+    quits_map, quits_entry = fetch_for(f'{spec["jolts"]}.quits', 'rate')
     if quits_map is None:
-        skipped['ALL'] = f'no verified series for {spec["jolts"]}.quits'
+        skipped['ALL'] = f'no verified rate series for {spec["jolts"]}.quits'
         return None, skipped
     dates = fc.month_grid([quits_map])
     labels = [fc.date_to_label(d) for d in dates]
@@ -190,17 +212,19 @@ def build_slice(spec, report, national, cpi_yoy_by_date):
     def column(source):
         return [source.get(d) for d in dates]
 
-    # JOLTS rates, smoothed
+    # JOLTS rates, smoothed (NSA-only sectors get the longer window)
     for key, measure in JOLTS_MEASURES.items():
-        source, entry = fetch_for(f'{spec["jolts"]}.{measure}')
+        source, entry = fetch_for(f'{spec["jolts"]}.{measure}', 'rate')
         if source is None:
-            skipped[key] = 'source unverified'
+            skipped[key] = 'no verified rate series'
             continue
-        smoothed = fc.moving_average(column(source), SMOOTH_WINDOW)
+        window, min_periods, label = smoothing_for(entry)
+        smoothed = fc.moving_average(column(source), window, min_periods)
         comp = build_component(key, dates, smoothed, {
             'series': entry['id'], 'title': entry['title'],
-            'smoothing': f'{SMOOTH_WINDOW}mma',
-        }, inverted=(key == 'layoffsRate'), window=SMOOTH_WINDOW)
+            'seasonalAdjustment': entry.get('seasonalAdjustment'),
+            'smoothing': label,
+        }, inverted=(key == 'layoffsRate'), window=window)
         if comp:
             components[key] = comp
         else:
@@ -209,7 +233,7 @@ def build_slice(spec, report, national, cpi_yoy_by_date):
     # Unemployment rate by industry (CPS NSA -> 12-month average), when a
     # verified series exists for this sector
     sector = spec['jolts'].split('.')[1]
-    unemp_map, unemp_entry = fetch_for(f'cps.{sector}.unemp_rate')
+    unemp_map, unemp_entry = fetch_for(f'cps.{sector}.unemp_rate', 'rate')
     if unemp_map:
         smoothed = fc.moving_average(column(unemp_map), DENOM_WINDOW,
                                      min_periods=DENOM_WINDOW - 2)
@@ -226,8 +250,8 @@ def build_slice(spec, report, national, cpi_yoy_by_date):
 
     # Openings per unemployed (only where a CPS industry denominator exists)
     if spec['cps_unemployed']:
-        openings_map, openings_entry = fetch_for(f'{spec["jolts"]}.openings')
-        unemployed_map, unemployed_entry = fetch_for(spec['cps_unemployed'])
+        openings_map, openings_entry = fetch_for(f'{spec["jolts"]}.openings', 'level')
+        unemployed_map, unemployed_entry = fetch_for(spec['cps_unemployed'], 'level')
         if openings_map and unemployed_map:
             openings = fc.moving_average(column(openings_map), SMOOTH_WINDOW)
             denom = fc.moving_average(column(unemployed_map), DENOM_WINDOW,
@@ -353,25 +377,29 @@ def mean_over(labels, scores, year_prefixes):
 
 def face_validity(slices, national):
     """Plan section 7.1 sign tests. Reported, not silently enforced."""
-    national_scores = sm.national_scores(national)
-    nat_labels = national['labels']
     checks = {}
 
     def slice_mean(slug, years):
         doc = slices.get(slug)
         return mean_over(doc['labels'], doc['scores'], years) if doc else None
 
-    nat_2023 = mean_over(nat_labels, national_scores, ['-23'])
+    # Cross-slice comparisons only: slice scores are percentile-normalized
+    # against each sector's own history, so comparing them to the national
+    # fixed-anchor score would be apples to oranges (plan section 5.4). The
+    # meaningful sign test is "tech fell further below ITS normal than
+    # health care fell below ITS normal" during the 2022-24 tech downturn.
     info_2023 = slice_mean('information', ['-23'])
-    if info_2023 is not None and nat_2023 is not None:
-        checks['information_2023_below_national'] = {
-            'pass': info_2023 < nat_2023, 'slice': info_2023, 'national': nat_2023}
+    health_2023 = slice_mean('health-social', ['-23'])
+    if info_2023 is not None and health_2023 is not None:
+        checks['information_2023_below_health'] = {
+            'pass': info_2023 < health_2023,
+            'information': info_2023, 'health': health_2023}
 
-    health_2324 = slice_mean('health-social', ['-23', '-24'])
-    nat_2324 = mean_over(nat_labels, national_scores, ['-23', '-24'])
-    if health_2324 is not None and nat_2324 is not None:
-        checks['health_2023_24_above_national'] = {
-            'pass': health_2324 > nat_2324, 'slice': health_2324, 'national': nat_2324}
+    pbs_2023 = slice_mean('professional-business', ['-23'])
+    if info_2023 is not None and pbs_2023 is not None:
+        checks['information_2023_below_pbs'] = {
+            'pass': info_2023 < pbs_2023,
+            'information': info_2023, 'pbs': pbs_2023}
 
     fed_2024 = slice_mean('government-federal', ['-24'])
     fed_2526 = slice_mean('government-federal', ['-25', '-26'])

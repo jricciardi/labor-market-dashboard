@@ -144,53 +144,61 @@ def _sanity_check(series):
         raise AtlantaFedError('switcher premium outside plausible range')
 
 
+# Sheet preference, most-preferred first (verified against the live workbook
+# structure, 2026-07-16): `data_overall` is the tracker's headline 3MMA grid
+# and carries Job Switcher / Job Stayer columns; the `Job Switcher` sheet is
+# the 12-month-average cut (small-sample smoothing, laggier); anything else
+# that happens to match (`Alternative WGT` uses a different methodology) is
+# never used.
+SHEET_PREFERENCE = [re.compile(r'^data_overall$', re.I),
+                    re.compile(r'^job switcher$', re.I)]
+
+
 def parse_workbook(content):
     """Extract {YYYY-MM-01: (switcher, stayer)} from workbook bytes.
 
-    Exactly one sheet must parse; multiple parseable sheets (e.g. smoothed
-    and unsmoothed cuts both matching) is an ambiguity error so a human can
-    pin the right one via verify_sources' structure dump.
+    Only sheets on the SHEET_PREFERENCE list are eligible, in order — a
+    workbook where none of the preferred sheets parses is an error (never
+    fall through to an arbitrary sheet: it could be an alternative
+    methodology or an unsmoothed cut).
     """
     import openpyxl  # deferred: only the switcher path needs it
 
     workbook = openpyxl.load_workbook(io.BytesIO(content), read_only=True, data_only=True)
-    parsed = {}
+    by_title = {s.title: s for s in workbook.worksheets}
     notes = []
-    for sheet in workbook.worksheets:
-        rows = [list(r) for r in sheet.iter_rows(values_only=True)]
-        try:
-            found = _find_columns(rows)
-        except AtlantaFedError as e:
-            notes.append(f'{sheet.title}: {e}')
-            continue
-        if not found:
-            notes.append(f'{sheet.title}: no switcher/stayer headers')
-            continue
-        header_idx, sw_col, st_col = found
-        series = {}
-        for row in rows[header_idx + 1:]:
-            if not row:
+    for pattern in SHEET_PREFERENCE:
+        for title, sheet in by_title.items():
+            if not pattern.match(title):
                 continue
-            date = _parse_date(row[0])
-            if date is None:
+            rows = [list(r) for r in sheet.iter_rows(values_only=True)]
+            try:
+                found = _find_columns(rows)
+            except AtlantaFedError as e:
+                notes.append(f'{title}: {e}')
                 continue
-            sw = row[sw_col] if sw_col < len(row) else None
-            st = row[st_col] if st_col < len(row) else None
-            if isinstance(sw, (int, float)) and isinstance(st, (int, float)):
-                series[date] = (float(sw), float(st))
-        if series:
-            parsed[sheet.title] = series
-        else:
-            notes.append(f'{sheet.title}: headers found, no parseable rows')
-    if not parsed:
-        raise AtlantaFedError('no usable sheet; ' + '; '.join(notes))
-    if len(parsed) > 1:
-        raise AtlantaFedError(
-            'multiple sheets parse (ambiguous which is the 3MMA cut): '
-            + ', '.join(parsed))
-    series = next(iter(parsed.values()))
-    _sanity_check(series)
-    return series
+            if not found:
+                notes.append(f'{title}: no switcher/stayer headers')
+                continue
+            header_idx, sw_col, st_col = found
+            series = {}
+            for row in rows[header_idx + 1:]:
+                if not row:
+                    continue
+                date = _parse_date(row[0])
+                if date is None:
+                    continue
+                sw = row[sw_col] if sw_col < len(row) else None
+                st = row[st_col] if st_col < len(row) else None
+                if isinstance(sw, (int, float)) and isinstance(st, (int, float)):
+                    series[date] = (float(sw), float(st))
+            if series:
+                _sanity_check(series)
+                return series
+            notes.append(f'{title}: headers found, no parseable rows')
+    raise AtlantaFedError(
+        'no preferred sheet parsed (sheets present: '
+        + ', '.join(by_title) + ')' + ('; ' + '; '.join(notes) if notes else ''))
 
 
 def fetch_switcher_premium(start='2015-01-01'):
