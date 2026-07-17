@@ -4,7 +4,7 @@
   "name": "Information",
   "naics": "51",
   "methodology": "v3-phase1 (docs/sector-methodology-plan.md)",
-  "generated": "2026-07-16",
+  "generated": "2026-07-17",
   "dataThrough": "2026-05",
   "caveats": [
    "NAICS 51 is the closest measurable proxy for \"tech\" but also includes broadcasting, telecom, and publishing; software-adjacent consulting (computer systems design) sits in Professional & Business Services instead."

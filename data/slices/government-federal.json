@@ -4,7 +4,7 @@
   "name": "Federal Government",
   "naics": "91 (fed)",
   "methodology": "v3-phase1 (docs/sector-methodology-plan.md)",
-  "generated": "2026-07-16",
+  "generated": "2026-07-17",
   "dataThrough": "2026-05",
   "caveats": [
    "Wage components are unavailable for government; the score leans on turnover flows and the national switcher premium."

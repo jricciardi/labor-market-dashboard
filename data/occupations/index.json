@@ -1,0 +1,16 @@
+{
+ "generated": "2026-07-17",
+ "methodology": "v3-phase2",
+ "occupations": [],
+ "skipped": {
+  "management-business-ops": {
+   "unempRate": "source unverified",
+   "ALL": "postings/unemployment missing \u2014 family not scorable"
+  },
+  "software-development": {
+   "unempRate": "source unverified",
+   "ALL": "postings/unemployment missing \u2014 family not scorable"
+  }
+ },
+ "faceValidity": {}
+}

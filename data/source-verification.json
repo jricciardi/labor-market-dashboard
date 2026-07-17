@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-16 17:46",
+  "generated": "2026-07-17 19:19",
   "fred": {
     "jolts.information.quits": [
       {
@@ -880,6 +880,7 @@
         "end": "2026-06-01"
       }
     ],
+    "cps.occ.computer_math.unemp_rate": [],
     "indeed.us.aggregate": [
       {
         "id": "IHLIDXUS",
@@ -891,7 +892,7 @@
         "seasonalAdjustment": "SA",
         "frequency": "D",
         "start": "2020-02-01",
-        "end": "2026-06-26"
+        "end": "2026-07-10"
       }
     ],
     "indeed.us.software_dev": [
@@ -905,7 +906,7 @@
         "seasonalAdjustment": "SA",
         "frequency": "D",
         "start": "2020-02-01",
-        "end": "2026-06-26"
+        "end": "2026-07-10"
       }
     ],
     "indeed.us.project_management": [
@@ -919,7 +920,7 @@
         "seasonalAdjustment": "SA",
         "frequency": "D",
         "start": "2020-02-01",
-        "end": "2026-06-26"
+        "end": "2026-07-10"
       }
     ]
   },

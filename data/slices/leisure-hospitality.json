@@ -4,7 +4,7 @@
   "name": "Leisure & Hospitality",
   "naics": "71-72",
   "methodology": "v3-phase1 (docs/sector-methodology-plan.md)",
-  "generated": "2026-07-16",
+  "generated": "2026-07-17",
   "dataThrough": "2026-05",
   "caveats": [
    "Structurally high-churn: quit and hire rates run roughly twice the national level. Scores compare this sector to its own history, not to other sectors."

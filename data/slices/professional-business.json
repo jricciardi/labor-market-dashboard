@@ -4,7 +4,7 @@
   "name": "Professional & Business Services",
   "naics": "54-56",
   "methodology": "v3-phase1 (docs/sector-methodology-plan.md)",
-  "generated": "2026-07-16",
+  "generated": "2026-07-17",
   "dataThrough": "2026-05",
   "caveats": [
    "This supersector spans consultants, lawyers, and engineers (54) together with temp agencies, janitorial, and waste services (56); the aggregate can mask opposite moves in white-collar vs support work."

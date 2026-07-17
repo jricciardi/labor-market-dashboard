@@ -4,7 +4,7 @@
   "name": "Manufacturing",
   "naics": "31-33",
   "methodology": "v3-phase1 (docs/sector-methodology-plan.md)",
-  "generated": "2026-07-16",
+  "generated": "2026-07-17",
   "dataThrough": "2026-05",
   "caveats": [
    "Durable and nondurable goods can diverge within this aggregate."

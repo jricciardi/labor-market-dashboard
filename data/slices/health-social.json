@@ -4,7 +4,7 @@
   "name": "Health Care & Social Assistance",
   "naics": "62",
   "methodology": "v3-phase1 (docs/sector-methodology-plan.md)",
-  "generated": "2026-07-16",
+  "generated": "2026-07-17",
   "dataThrough": "2026-05",
   "caveats": [
    "Hospitals, home health, and childcare have very different pay and churn dynamics; this is the sector aggregate."
