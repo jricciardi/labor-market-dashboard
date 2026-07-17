@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-17 19:19",
+  "generated": "2026-07-17 19:22",
   "fred": {
     "jolts.information.quits": [
       {
@@ -836,8 +836,34 @@
         "end": "2026-06-01"
       }
     ],
-    "cps.healthsocial.unemp_rate": [],
-    "cps.leisure.unemp_rate": [],
+    "cps.healthsocial.unemp_rate": [
+      {
+        "id": "LNU04032240",
+        "ok": true,
+        "source": "candidate",
+        "titleMatchesPurpose": true,
+        "title": "Unemployment Rate - Education and Health Services, Private Wage and Salary Workers",
+        "units": "%",
+        "seasonalAdjustment": "NSA",
+        "frequency": "M",
+        "start": "2000-01-01",
+        "end": "2026-06-01"
+      }
+    ],
+    "cps.leisure.unemp_rate": [
+      {
+        "id": "LNU04032241",
+        "ok": true,
+        "source": "candidate",
+        "titleMatchesPurpose": true,
+        "title": "Unemployment Rate - Leisure and Hospitality, Private Wage and Salary Workers",
+        "units": "%",
+        "seasonalAdjustment": "NSA",
+        "frequency": "M",
+        "start": "2000-01-01",
+        "end": "2026-06-01"
+      }
+    ],
     "cps.manufacturing.unemp_rate": [
       {
         "id": "LNU04032232",
@@ -880,7 +906,32 @@
         "end": "2026-06-01"
       }
     ],
-    "cps.occ.computer_math.unemp_rate": [],
+    "cps.occ.computer_math.unemp_rate": [
+      {
+        "id": "LNU04032218",
+        "ok": true,
+        "source": "candidate",
+        "titleMatchesPurpose": false,
+        "title": "Unemployment Rate - Service Occupations",
+        "units": "%",
+        "seasonalAdjustment": "NSA",
+        "frequency": "M",
+        "start": "2000-01-01",
+        "end": "2026-06-01"
+      },
+      {
+        "id": "LNU04032217",
+        "ok": true,
+        "source": "candidate",
+        "titleMatchesPurpose": false,
+        "title": "Unemployment Rate - Professional and Related Occupations",
+        "units": "%",
+        "seasonalAdjustment": "NSA",
+        "frequency": "M",
+        "start": "2000-01-01",
+        "end": "2026-06-01"
+      }
+    ],
     "indeed.us.aggregate": [
       {
         "id": "IHLIDXUS",
