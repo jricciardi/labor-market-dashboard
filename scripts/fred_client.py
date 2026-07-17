@@ -88,6 +88,21 @@ def month_grid(date_maps, start='2015-01-01'):
     return sorted(dates)
 
 
+def monthly_mean(obs_map):
+    """Collapse a daily/weekly {date: value} map to {YYYY-MM-01: mean}.
+
+    Used for the Indeed postings indexes, which FRED publishes at daily
+    cadence; the pipeline's grid is monthly.
+    """
+    buckets = {}
+    for date_str, v in obs_map.items():
+        if v is None:
+            continue
+        buckets.setdefault(date_str[:7], []).append(v)
+    return {f'{month}-01': round(sum(vals) / len(vals), 1)
+            for month, vals in buckets.items()}
+
+
 def date_to_label(date_str):
     """YYYY-MM-DD -> Mon-YY (the dashboard's label format)."""
     return datetime.strptime(date_str, '%Y-%m-%d').strftime('%b-%y')

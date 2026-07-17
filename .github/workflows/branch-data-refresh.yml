@@ -52,6 +52,11 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python scripts/update_slices.py
 
+      - name: Build occupation data
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python scripts/update_occupations.py
+
       - name: Commit results to branch
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"

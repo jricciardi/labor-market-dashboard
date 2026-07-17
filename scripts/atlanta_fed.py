@@ -215,3 +215,50 @@ def fetch_switcher_premium(start='2015-01-01'):
         for date, (sw, st) in sorted(series.items())
         if date >= start
     }
+
+
+def fetch_wgt_column(sheet_name, column_pattern, start='2015-01-01'):
+    """Return {YYYY-MM-01: value} for one column of one tracker sheet.
+
+    Used for the Occupation cut ('Professional and management' etc.), whose
+    sheets are 12-month moving averages of median 12-month wage growth.
+    Exactly one column may match `column_pattern` in the header row; values
+    must pass the wage-growth magnitude bounds. Fails loudly on anything
+    ambiguous — callers treat failure as a missing component.
+    """
+    import openpyxl  # deferred
+
+    content, _url = _workbook_bytes()
+    workbook = openpyxl.load_workbook(io.BytesIO(content), read_only=True, data_only=True)
+    sheet = next((s for s in workbook.worksheets if s.title == sheet_name), None)
+    if sheet is None:
+        raise AtlantaFedError(f'no sheet named {sheet_name!r}')
+    rows = [list(r) for r in sheet.iter_rows(values_only=True)]
+    pattern = re.compile(column_pattern, re.I)
+    for row_idx, row in enumerate(rows[:10]):
+        matches = [i for i, c in enumerate(row) if isinstance(c, str) and pattern.search(c)]
+        if not matches:
+            continue
+        if len(matches) > 1:
+            raise AtlantaFedError(
+                f'{sheet_name}: {len(matches)} columns match {column_pattern!r}')
+        col = matches[0]
+        series = {}
+        for row_data in rows[row_idx + 1:]:
+            if not row_data:
+                continue
+            date = _parse_date(row_data[0])
+            if date is None or date < start:
+                continue
+            v = row_data[col] if col < len(row_data) else None
+            if isinstance(v, (int, float)):
+                series[date] = float(v)
+        if not series:
+            raise AtlantaFedError(f'{sheet_name}: column matched but no numeric rows')
+        values = sorted(series.values())
+        median = values[len(values) // 2]
+        if not (_MIN_PLAUSIBLE_MEDIAN <= median <= _WAGE_RANGE[1]):
+            raise AtlantaFedError(
+                f'{sheet_name}: magnitudes implausible (median {median})')
+        return series
+    raise AtlantaFedError(f'{sheet_name}: no header row matches {column_pattern!r}')

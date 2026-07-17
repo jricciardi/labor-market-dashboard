@@ -104,9 +104,10 @@ FRED_CANDIDATES = {
     'cps.healthsocial.unemp_rate': [],
     'cps.leisure.unemp_rate': [],
     'cps.manufacturing.unemp_rate': [],
-    # --- occupation axis (Phase 2 prep) ---
+    # --- occupation axis (Phase 2) ---
     'cps.occ.mgmt_prof.unemp_rate': ['LNU04032215'],
     'cps.occ.mgmt_business_financial.unemp_rate': ['LNU04032216'],
+    'cps.occ.computer_math.unemp_rate': [],  # resolved via search
     'indeed.us.aggregate': ['IHLIDXUS'],
     'indeed.us.software_dev': ['IHLIDXUSTPSOFTDEVE'],
     'indeed.us.project_management': ['IHLIDXUSTPPROJMANA'],
@@ -124,10 +125,13 @@ for _sector, _pat in SECTOR_PATTERNS.items():
 TITLE_EXPECTATIONS.update({
     'cps.occ.mgmt_prof.unemp_rate': [r'unemployment rate', r'management, professional'],
     'cps.occ.mgmt_business_financial.unemp_rate': [r'unemployment rate', r'management, business'],
+    'cps.occ.computer_math.unemp_rate': [r'unemployment rate', r'computer and mathematical'],
     'indeed.us.aggregate': [r'job postings on indeed'],
     'indeed.us.software_dev': [r'software development', r'indeed'],
     'indeed.us.project_management': [r'project management', r'indeed'],
 })
+SEARCH_TEXTS['cps.occ.computer_math.unemp_rate'] = \
+    'Unemployment rate computer and mathematical occupations'
 
 # Search texts used when no direct candidate verifies for a purpose.
 SEARCH_TEXTS = {}

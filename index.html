@@ -987,6 +987,8 @@
            own history, and the copy must keep saying so. */
         .sector-section { margin-bottom: 48px; }
         .sector-intro { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.6; margin: 8px 0 14px; max-width: 640px; transition: color var(--theme-transition); }
+        .sector-group-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 8px; transition: color var(--theme-transition); }
+        .sector-group-label[hidden] { display: none; }
         .sector-pills { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
         .sector-pill {
             display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px;
@@ -1449,8 +1451,11 @@
                 <span class="tier-badge">Sectors</span>
                 <h2 class="tier-title">Your Corner of the Market</h2>
             </div>
-            <p class="sector-intro">Each sector is scored against <em>its own</em> 2015–now history — a timing signal for your field, not a ranking of fields against each other. A quit rate that would be a boom in manufacturing is a slump in hospitality.</p>
+            <p class="sector-intro">Each group is scored against <em>its own</em> history — a timing signal for your corner of the market, not a ranking of groups against each other. A quit rate that would be a boom in manufacturing is a slump in hospitality.</p>
+            <div class="sector-group-label" id="sectorGroupLabel" hidden>By sector</div>
             <div class="sector-pills" id="sectorPills" role="group" aria-label="Choose a sector"></div>
+            <div class="sector-group-label" id="occGroupLabel" hidden>By role</div>
+            <div class="sector-pills" id="occPills" role="group" aria-label="Choose a role family"></div>
             <div class="sector-panel" id="sectorPanel" hidden aria-live="polite"></div>
         </section>
 
@@ -3158,6 +3163,7 @@
                 { key: 'hiresRate', name: 'Hiring', fmt: function(v) { return v.toFixed(1) + '%'; } },
                 { key: 'layoffsRate', name: 'Layoffs', fmt: function(v) { return v.toFixed(1) + '%'; } },
                 { key: 'openingsRatio', name: 'Jobs/Seeker', fmt: function(v) { return v.toFixed(2); } },
+                { key: 'postings', name: 'Job Postings', fmt: function(v) { return v.toFixed(0) + ' (Feb 2020 = 100)'; } },
                 { key: 'unempRate', name: 'Unemployment', fmt: function(v) { return v.toFixed(1) + '%'; } },
                 { key: 'realWageGrowth', name: 'Real Wages', fmt: function(v) { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; } },
                 { key: 'switcherPremium', name: 'Switch Premium', fmt: fmtPremium }
@@ -3170,7 +3176,15 @@
                 return Math.min(1, Math.max(0, t));
             }
 
-            function sliceScoreAt(comps, idx) {
+            // Required keys per axis — mirrors score_model.required_for:
+            // industry slices need the leverage core, occupation overlays need
+            // demand + slack.
+            function requiredFor(doc) {
+                return doc.meta && doc.meta.kind === 'occupation'
+                    ? ['postings', 'unempRate'] : ['quitRate', 'hiresRate'];
+            }
+
+            function sliceScoreAt(comps, idx, required) {
                 var num = 0, den = 0, total = 0, have = {};
                 Object.keys(comps).forEach(function(k) {
                     var c = comps[k];
@@ -3188,26 +3202,33 @@
                     num += n * c.weight;
                     den += c.weight;
                 });
-                if (!have.quitRate || !have.hiresRate || den < total * 0.5) return null;
+                if (required.some(function(k) { return !have[k]; }) || den < total * 0.5) return null;
                 return Math.min(100, Math.round(num / den * 100));
             }
 
-            // Bands are RELATIVE: 50 means "around this sector's own 2015-now
-            // median", not the national tier scale.
-            function sliceBand(s) {
+            // Bands are RELATIVE: 50 means "around this group's own median",
+            // not the national tier scale. historyStart varies by axis
+            // (sectors: 2015; occupation postings history starts 2020).
+            function sliceBand(s, historyStart) {
                 if (s >= 65) return { cls: 'sem-good', color: 'semGood', label: 'stronger than its usual' };
                 if (s >= 50) return { cls: 'sem-neutral', color: 'semNeutral', label: 'around its usual' };
                 if (s >= 30) return { cls: 'sem-caution', color: 'semCaution', label: 'weaker than its usual' };
-                return { cls: 'sem-bad', color: 'semBad', label: 'near its 2015–now floor' };
+                return { cls: 'sem-bad', color: 'semBad', label: 'near its ' + (historyStart || '2015') + '–now floor' };
             }
 
             function initSectors() {
                 var section = document.getElementById('sectorSection');
-                var pillsEl = document.getElementById('sectorPills');
                 var panelEl = document.getElementById('sectorPanel');
-                if (!section || !pillsEl || !panelEl) return;
-                var sliceCache = {};
-                var manifest = null;
+                if (!section || !panelEl) return;
+                // Two axes share one panel: industry slices and occupation
+                // overlays have the same document shape, different required
+                // keys and history windows.
+                var AXES = {
+                    industry: { dir: 'data/slices', listKey: 'slices', pillsEl: document.getElementById('sectorPills'), labelEl: document.getElementById('sectorGroupLabel') },
+                    occupation: { dir: 'data/occupations', listKey: 'occupations', pillsEl: document.getElementById('occPills'), labelEl: document.getElementById('occGroupLabel') }
+                };
+                var docCache = {};
+                var manifests = { industry: null, occupation: null };
 
                 function lastNonNull(arr) {
                     for (var i = arr.length - 1; i >= 0; i--) if (arr[i] != null) return arr[i];
@@ -3217,11 +3238,13 @@
                 function renderPanel(doc) {
                     var meta = doc.meta;
                     var comps = doc.components;
+                    var historyStart = meta.historyStart || '2015';
+                    var noun = meta.kind === 'occupation' ? 'role family' : 'sector';
                     var html = '';
                     if (meta.coverage === 'insufficient') {
                         var missing = Object.keys(meta.skippedComponents || {}).filter(function(k) { return k !== 'ALL'; });
                         html += '<div class="sector-panel-header"><span class="sector-panel-name">' + meta.name + '</span></div>';
-                        html += '<div class="sector-insufficient"><strong>Not enough data to score this sector honestly.</strong> ' +
+                        html += '<div class="sector-insufficient"><strong>Not enough data to score this ' + noun + ' honestly.</strong> ' +
                             'Only ' + Math.round((meta.coveredWeight || 0) * 100) + '% of the score model has usable data here (we require 60%), ' +
                             'so a headline number would lean too hard on whichever signals happen to exist. Missing: ' + missing.join(', ') + '.</div>';
                         html += '<div class="sector-caveats" style="margin-top:10px;">' + (meta.caveats || []).map(function(c) { return '<p>' + c + '</p>'; }).join('') + '</div>';
@@ -3230,20 +3253,21 @@
                         return;
                     }
 
-                    var scores = doc.labels.map(function(_, i) { return sliceScoreAt(comps, i); });
+                    var required = requiredFor(doc);
+                    var scores = doc.labels.map(function(_, i) { return sliceScoreAt(comps, i, required); });
                     // Drift alarm: the pipeline embeds its Python-computed scores;
                     // any mismatch means the two scorers diverged.
                     if (doc.scores && doc.scores.some(function(s, i) { return s !== scores[i]; })) {
                         console.warn('Slice scorer drift vs pipeline for ' + meta.slug);
                     }
                     var current = lastNonNull(scores);
-                    var band = sliceBand(current);
+                    var band = sliceBand(current, historyStart);
                     html += '<div class="sector-panel-header">' +
                         '<span class="sector-panel-name">' + meta.name + '</span>' +
                         '<span class="sector-panel-score ' + band.cls + '">' + current + '</span>' +
                         '<span class="sector-panel-band ' + band.cls + '">' + band.label + '</span></div>';
                     html += '<div class="sector-panel-meta">Data through ' + meta.dataThrough + ' · margin ±' + meta.margin +
-                        ' · scored on ' + Object.keys(comps).length + ' indicators · scaled to this sector’s own 2015–now range</div>';
+                        ' · scored on ' + Object.keys(comps).length + ' indicators · scaled to this ' + noun + '’s own ' + historyStart + '–now range</div>';
                     // Trend chart only when the chart library made it in
                     if (typeof Chart !== 'undefined') {
                         html += '<div class="sector-trend"><canvas id="sectorTrendChart" role="img" aria-label="' + meta.name + ' sector score trend"></canvas></div>';
@@ -3259,14 +3283,17 @@
                             (prov.scope === 'national' ? '*' : '') + ' <span class="comp-val">' + (v != null ? d.fmt(v) : '—') + '</span></span>';
                     }).join('') + '</div>';
 
-                    var ranked = (manifest.slices || []).filter(function(s) { return s.coverage === 'ok' && s.latestScore != null; })
+                    var kind = meta.kind === 'occupation' ? 'occupation' : 'industry';
+                    var listing = manifests[kind] ? manifests[kind][AXES[kind].listKey] || [] : [];
+                    var ranked = listing.filter(function(s) { return s.coverage === 'ok' && s.latestScore != null; })
                         .sort(function(a, b) { return b.latestScore - a.latestScore; });
                     if (ranked.length >= 2) {
                         html += '<div class="sector-rank">Closest to its own highs right now: ' + ranked[0].name + ' (' + ranked[0].latestScore + ')' +
                             ' · furthest below: ' + ranked[ranked.length - 1].name + ' (' + ranked[ranked.length - 1].latestScore + ')</div>';
                     }
+                    var hasNationalComp = SLICE_DISPLAY.some(function(d) { return comps[d.key] && (comps[d.key].provenance || {}).scope === 'national'; });
                     html += '<div class="sector-caveats">' + (meta.caveats || []).map(function(c) { return '<p>' + c + '</p>'; }).join('') +
-                        '<p>* national series — the Atlanta Fed doesn’t publish the switching premium by industry.</p></div>';
+                        (hasNationalComp ? '<p>* national series — the Atlanta Fed doesn’t publish the switching premium by industry.</p>' : '') + '</div>';
                     panelEl.innerHTML = html;
                     panelEl.hidden = false;
 
@@ -3295,7 +3322,7 @@
                                     tooltip: {
                                         backgroundColor: tc.tooltipBg, titleColor: tc.tooltipText, bodyColor: tc.tooltipSecondary,
                                         borderColor: tc.tooltipBorder, borderWidth: 1, padding: 8, displayColors: false,
-                                        callbacks: { label: function(item) { return item.raw != null ? 'Sector score: ' + item.raw : ''; } }
+                                        callbacks: { label: function(item) { return item.raw != null ? 'Score: ' + item.raw : ''; } }
                                     }
                                 },
                                 scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } }
@@ -3304,41 +3331,58 @@
                     }
                 }
 
-                function selectSlice(slug) {
-                    pillsEl.querySelectorAll('.sector-pill').forEach(function(p) {
-                        var active = p.dataset.slug === slug;
-                        p.classList.toggle('active', active);
-                        p.setAttribute('aria-pressed', active);
+                function selectDoc(kind, slug) {
+                    Object.keys(AXES).forEach(function(k) {
+                        AXES[k].pillsEl.querySelectorAll('.sector-pill').forEach(function(p) {
+                            var active = k === kind && p.dataset.slug === slug;
+                            p.classList.toggle('active', active);
+                            p.setAttribute('aria-pressed', active);
+                        });
                     });
-                    if (sliceCache[slug]) { renderPanel(sliceCache[slug]); return; }
-                    fetch('data/slices/' + slug + '.json')
+                    var cacheKey = kind + '/' + slug;
+                    if (docCache[cacheKey]) { renderPanel(docCache[cacheKey]); return; }
+                    fetch(AXES[kind].dir + '/' + slug + '.json')
                         .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-                        .then(function(doc) { sliceCache[slug] = doc; renderPanel(doc); })
+                        .then(function(doc) { docCache[cacheKey] = doc; renderPanel(doc); })
                         .catch(function() {
-                            panelEl.innerHTML = '<div class="sector-insufficient">Couldn’t load this sector’s data. It may not be published yet.</div>';
+                            panelEl.innerHTML = '<div class="sector-insufficient">Couldn’t load this data. It may not be published yet.</div>';
                             panelEl.hidden = false;
                         });
                 }
 
-                fetch('data/slices/index.json')
-                    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-                    .then(function(m) {
-                        manifest = m;
-                        if (!m.slices || !m.slices.length) return;
-                        pillsEl.innerHTML = m.slices.map(function(s) {
-                            var scoreHTML = s.coverage === 'ok' && s.latestScore != null
-                                ? '<span class="pill-score ' + sliceBand(s.latestScore).cls + '">' + s.latestScore + '</span>'
-                                : '<span class="pill-na">no score</span>';
-                            return '<button class="sector-pill" data-slug="' + s.slug + '" aria-pressed="false">' + s.name + ' ' + scoreHTML + '</button>';
-                        }).join('');
-                        pillsEl.querySelectorAll('.sector-pill').forEach(function(p) {
-                            p.addEventListener('click', function() { selectSlice(p.dataset.slug); });
-                        });
-                        section.hidden = false;
-                        var navSectors = document.getElementById('navSectors');
-                        if (navSectors) navSectors.hidden = false;
-                    })
-                    .catch(function() { /* no slice data published: section stays hidden */ });
+                function initAxis(kind) {
+                    var axis = AXES[kind];
+                    return fetch(axis.dir + '/index.json')
+                        .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+                        .then(function(m) {
+                            manifests[kind] = m;
+                            var listing = m[axis.listKey] || [];
+                            if (!listing.length) return false;
+                            axis.pillsEl.innerHTML = listing.map(function(s) {
+                                var scoreHTML = s.coverage === 'ok' && s.latestScore != null
+                                    ? '<span class="pill-score ' + sliceBand(s.latestScore).cls + '">' + s.latestScore + '</span>'
+                                    : '<span class="pill-na">no score</span>';
+                                return '<button class="sector-pill" data-slug="' + s.slug + '" aria-pressed="false">' + s.name + ' ' + scoreHTML + '</button>';
+                            }).join('');
+                            axis.pillsEl.querySelectorAll('.sector-pill').forEach(function(p) {
+                                p.addEventListener('click', function() { selectDoc(kind, p.dataset.slug); });
+                            });
+                            return true;
+                        })
+                        .catch(function() { return false; });
+                }
+
+                Promise.all([initAxis('industry'), initAxis('occupation')]).then(function(loaded) {
+                    if (!loaded[0] && !loaded[1]) return; // nothing published: section stays hidden
+                    // Group labels only earn their place when both axes exist
+                    if (loaded[0] && loaded[1]) {
+                        AXES.industry.labelEl.hidden = false;
+                        AXES.occupation.labelEl.hidden = false;
+                    }
+                    section.hidden = false;
+                    var navSectors = document.getElementById('navSectors');
+                    if (navSectors) navSectors.hidden = false;
+                });
             }
             initSectors();
 
