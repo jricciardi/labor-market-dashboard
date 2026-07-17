@@ -63,9 +63,12 @@ OCC_DEFS = [
         'name': 'Software Development',
         'soc': '15-125x (family)',
         'postings': 'indeed.us.software_dev',
-        'unemp': 'cps.occ.computer_math.unemp_rate',
+        'unemp': 'cps.occ.professional_related.unemp_rate',
         'wgt_column': r'professional and management',
         'caveats': [
+            'Unemployment uses the coarse "Professional and Related '
+            'Occupations" group — monthly computer/math-specific rates '
+            'aren\'t published on FRED.',
             'Wage growth uses the tracker\'s coarse "Professional and '
             'management" group, which spans this family and non-technical '
             'management roles.',
