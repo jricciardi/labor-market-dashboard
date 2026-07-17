@@ -101,12 +101,17 @@ FRED_CANDIDATES = {
     'cps.pbs.unemployed': [],
     'cps.information.unemp_rate': [],
     'cps.pbs.unemp_rate': [],
-    'cps.healthsocial.unemp_rate': [],
-    'cps.leisure.unemp_rate': [],
+    'cps.healthsocial.unemp_rate': ['LNU04032240'],
+    'cps.leisure.unemp_rate': ['LNU04032241'],
     'cps.manufacturing.unemp_rate': [],
-    # --- occupation axis (Phase 2 prep) ---
+    # --- occupation axis (Phase 2) ---
     'cps.occ.mgmt_prof.unemp_rate': ['LNU04032215'],
     'cps.occ.mgmt_business_financial.unemp_rate': ['LNU04032216'],
+    # Monthly computer/math-specific unemployment isn't published on FRED
+    # (CPS monthly occupation series stop at major groups — run-5 diagnostics
+    # refuted the detailed-id guesses). The containing major group is the
+    # honest proxy:
+    'cps.occ.professional_related.unemp_rate': ['LNU04032217'],
     'indeed.us.aggregate': ['IHLIDXUS'],
     'indeed.us.software_dev': ['IHLIDXUSTPSOFTDEVE'],
     'indeed.us.project_management': ['IHLIDXUSTPPROJMANA'],
@@ -124,6 +129,7 @@ for _sector, _pat in SECTOR_PATTERNS.items():
 TITLE_EXPECTATIONS.update({
     'cps.occ.mgmt_prof.unemp_rate': [r'unemployment rate', r'management, professional'],
     'cps.occ.mgmt_business_financial.unemp_rate': [r'unemployment rate', r'management, business'],
+    'cps.occ.professional_related.unemp_rate': [r'unemployment rate', r'professional and related'],
     'indeed.us.aggregate': [r'job postings on indeed'],
     'indeed.us.software_dev': [r'software development', r'indeed'],
     'indeed.us.project_management': [r'project management', r'indeed'],
@@ -147,6 +153,8 @@ for _sector, _name in [('information', 'Information'),
     SEARCH_TEXTS[f'ces.{_sector}.ahe'] = f'Average hourly earnings {_name}'
     SEARCH_TEXTS[f'cps.{_sector}.unemployed'] = f'Unemployment level {_name} industry'
     SEARCH_TEXTS[f'cps.{_sector}.unemp_rate'] = f'Unemployment rate {_name} industry'
+SEARCH_TEXTS['cps.occ.professional_related.unemp_rate'] = \
+    'Unemployment rate professional and related occupations'
 
 INDEED_GITHUB_CANDIDATES = [
     'https://raw.githubusercontent.com/hiring-lab/job_postings_tracker/master/US/job_postings_by_sector_US.csv',
@@ -211,16 +219,26 @@ def probe_fred():
         verified = [e for e in entries if e.get('ok') and e.get('titleMatchesPurpose')]
         if not verified and purpose in SEARCH_TEXTS:
             try:
+                rejected = []
                 for meta in _search_series(SEARCH_TEXTS[purpose]):
                     if meta.get('frequency_short') != 'M':
+                        rejected.append((meta, 'frequency ' + str(meta.get('frequency_short'))))
                         continue
                     if not title_matches(purpose, meta.get('title', '')):
+                        rejected.append((meta, 'title mismatch'))
                         continue
                     entry = _meta_entry(purpose, meta['id'], meta, 'search')
                     entries.append(entry)
                     verified.append(entry)
                 # prefer seasonally adjusted search hits
                 verified.sort(key=lambda e: e.get('seasonalAdjustment') != 'SA')
+                if not verified:
+                    # diagnostics: show what the search DID return so a human
+                    # (or the next session) can fix the search text precisely
+                    for meta, why in rejected[:5]:
+                        entries.append({'id': meta.get('id'), 'ok': False,
+                                        'source': 'search', 'kind': 'rejected',
+                                        'why': why, 'title': meta.get('title')})
             except fc.FredError as e:
                 entries.append({'id': f'search:{SEARCH_TEXTS[purpose]}',
                                 'ok': False, 'source': 'search',

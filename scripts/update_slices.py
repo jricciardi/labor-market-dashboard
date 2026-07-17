@@ -135,12 +135,6 @@ SMOOTH_WINDOW = 3  # months, for JOLTS industry cells (plan section 5.1)
 DENOM_WINDOW = 12  # months, NSA CPS unemployed-by-industry (plan section 5.2)
 
 
-_UNIT_TESTS = {
-    'rate': lambda u: 'rate' in u or u == 'percent',
-    'level': lambda u: 'level' in u or 'thous' in u or 'persons' in u,
-}
-
-
 def resolve(report, purpose, want_units=None):
     """Best verified candidate for a purpose, or None.
 
@@ -153,12 +147,12 @@ def resolve(report, purpose, want_units=None):
     want_units ('rate'|'level') disambiguates JOLTS rate vs level series,
     whose FRED titles are identical (run 2 picked hires *levels* for
     Information before this existed). Entries arrive sorted SA-first.
+    Unit-string vagaries ('%' vs 'Percent') live in fred_client.units_match.
     """
-    check = _UNIT_TESTS.get(want_units)
     for entry in report.get('fred', {}).get(purpose, []):
         if not (entry.get('ok') and entry.get('titleMatchesPurpose') is True):
             continue
-        if check and not check((entry.get('units') or '').lower()):
+        if not fc.units_match(entry.get('units'), want_units):
             continue
         return entry
     return None

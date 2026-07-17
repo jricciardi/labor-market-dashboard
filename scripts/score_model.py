@@ -149,12 +149,17 @@ def normalize(value, anchors):
     return clamp(t)
 
 
-def slice_score_at(components, idx, carry_limit=CARRY_LIMIT):
-    """Score one month of a slice from its JSON `components` block.
+SLICE_REQUIRED = ('quitRate', 'hiresRate')       # industry axis: leverage core
+OCCUPATION_REQUIRED = ('postings', 'unempRate')  # role axis: demand + slack
+
+
+def slice_score_at(components, idx, carry_limit=CARRY_LIMIT,
+                   required=SLICE_REQUIRED):
+    """Score one month of a slice/overlay from its JSON `components` block.
 
     components: {key: {weight, norm: {lo,hi,inverted}, values: [...]}}.
-    Requires quits + hires (the slice-axis leverage core) and at least half
-    of the slice's total weight present, else None.
+    Requires every `required` key (the axis' defining signals) and at least
+    half of the document's total weight present, else None.
     """
     num = den = total = 0.0
     have = set()
@@ -175,12 +180,19 @@ def slice_score_at(components, idx, carry_limit=CARRY_LIMIT):
         have.add(key)
         num += norm * comp['weight']
         den += comp['weight']
-    if 'quitRate' not in have or 'hiresRate' not in have or den < total * 0.5:
+    if any(k not in have for k in required) or den < total * 0.5:
         return None
     return min(100, round_half_up(num / den * 100))
+
+
+def required_for(doc):
+    """Axis-appropriate required keys for a slice/overlay document."""
+    kind = doc.get('meta', {}).get('kind', 'industry')
+    return OCCUPATION_REQUIRED if kind == 'occupation' else SLICE_REQUIRED
 
 
 def slice_scores(slice_doc):
     comps = slice_doc['components']
     n = len(slice_doc['labels'])
-    return [slice_score_at(comps, i) for i in range(n)]
+    required = required_for(slice_doc)
+    return [slice_score_at(comps, i, required=required) for i in range(n)]

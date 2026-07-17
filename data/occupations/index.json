@@ -1,0 +1,50 @@
+{
+ "generated": "2026-07-17",
+ "methodology": "v3-phase2",
+ "occupations": [
+  {
+   "slug": "management-business-ops",
+   "name": "Program & Project Management, Business Ops",
+   "dataThrough": "2026-07",
+   "margin": 5,
+   "coverage": "ok",
+   "coveredWeight": 1.0,
+   "latestScore": 28,
+   "components": [
+    "postings",
+    "realWageGrowth",
+    "unempRate"
+   ]
+  },
+  {
+   "slug": "software-development",
+   "name": "Software Development",
+   "dataThrough": "2026-07",
+   "margin": 5,
+   "coverage": "ok",
+   "coveredWeight": 1.0,
+   "latestScore": 25,
+   "components": [
+    "postings",
+    "realWageGrowth",
+    "unempRate"
+   ]
+  }
+ ],
+ "skipped": {
+  "management-business-ops": {},
+  "software-development": {}
+ },
+ "faceValidity": {
+  "management-business-ops_postings_below_2022_peak": {
+   "pass": true,
+   "peak2022": 188.3,
+   "recentMean": 104.6
+  },
+  "software-development_postings_below_2022_peak": {
+   "pass": true,
+   "peak2022": 229.2,
+   "recentMean": 69.5
+  }
+ }
+}

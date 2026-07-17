@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-16 17:46",
+  "generated": "2026-07-17 19:24",
   "fred": {
     "jolts.information.quits": [
       {
@@ -836,8 +836,34 @@
         "end": "2026-06-01"
       }
     ],
-    "cps.healthsocial.unemp_rate": [],
-    "cps.leisure.unemp_rate": [],
+    "cps.healthsocial.unemp_rate": [
+      {
+        "id": "LNU04032240",
+        "ok": true,
+        "source": "candidate",
+        "titleMatchesPurpose": true,
+        "title": "Unemployment Rate - Education and Health Services, Private Wage and Salary Workers",
+        "units": "%",
+        "seasonalAdjustment": "NSA",
+        "frequency": "M",
+        "start": "2000-01-01",
+        "end": "2026-06-01"
+      }
+    ],
+    "cps.leisure.unemp_rate": [
+      {
+        "id": "LNU04032241",
+        "ok": true,
+        "source": "candidate",
+        "titleMatchesPurpose": true,
+        "title": "Unemployment Rate - Leisure and Hospitality, Private Wage and Salary Workers",
+        "units": "%",
+        "seasonalAdjustment": "NSA",
+        "frequency": "M",
+        "start": "2000-01-01",
+        "end": "2026-06-01"
+      }
+    ],
     "cps.manufacturing.unemp_rate": [
       {
         "id": "LNU04032232",
@@ -880,6 +906,20 @@
         "end": "2026-06-01"
       }
     ],
+    "cps.occ.professional_related.unemp_rate": [
+      {
+        "id": "LNU04032217",
+        "ok": true,
+        "source": "candidate",
+        "titleMatchesPurpose": true,
+        "title": "Unemployment Rate - Professional and Related Occupations",
+        "units": "%",
+        "seasonalAdjustment": "NSA",
+        "frequency": "M",
+        "start": "2000-01-01",
+        "end": "2026-06-01"
+      }
+    ],
     "indeed.us.aggregate": [
       {
         "id": "IHLIDXUS",
@@ -891,7 +931,7 @@
         "seasonalAdjustment": "SA",
         "frequency": "D",
         "start": "2020-02-01",
-        "end": "2026-06-26"
+        "end": "2026-07-10"
       }
     ],
     "indeed.us.software_dev": [
@@ -905,7 +945,7 @@
         "seasonalAdjustment": "SA",
         "frequency": "D",
         "start": "2020-02-01",
-        "end": "2026-06-26"
+        "end": "2026-07-10"
       }
     ],
     "indeed.us.project_management": [
@@ -919,7 +959,7 @@
         "seasonalAdjustment": "SA",
         "frequency": "D",
         "start": "2020-02-01",
-        "end": "2026-06-26"
+        "end": "2026-07-10"
       }
     ]
   },

@@ -35,12 +35,17 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python scripts/update_data.py
 
-      # Slices only build once a committed source-verification report exists
-      # (data/source-verification.json); the script no-ops otherwise.
+      # Slices/occupations only build once a committed source-verification
+      # report exists (data/source-verification.json); they no-op otherwise.
       - name: Build slice data
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python scripts/update_slices.py
+
+      - name: Build occupation data
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python scripts/update_occupations.py
 
       - name: Commit and push if changed
         run: |
