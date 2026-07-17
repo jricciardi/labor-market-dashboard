@@ -75,15 +75,12 @@ OCC_DEFS = [
 
 
 def resolve(report, purpose, want_units=None):
-    """Same trust rule as update_slices: verified + title-matched only."""
-    unit_ok = {
-        'rate': lambda u: 'rate' in u or u == 'percent',
-        'index': lambda u: 'index' in u,
-    }.get(want_units)
+    """Same trust rule as update_slices: verified + title-matched only;
+    unit-string vagaries live in fred_client.units_match."""
     for entry in report.get('fred', {}).get(purpose, []):
         if not (entry.get('ok') and entry.get('titleMatchesPurpose') is True):
             continue
-        if unit_ok and not unit_ok((entry.get('units') or '').lower()):
+        if not fc.units_match(entry.get('units'), want_units):
             continue
         return entry
     return None

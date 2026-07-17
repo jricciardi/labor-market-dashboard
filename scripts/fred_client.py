@@ -196,6 +196,25 @@ def percentile(sorted_values, p):
     return sorted_values[lo] * (1 - frac) + sorted_values[hi] * frac
 
 
+def units_match(units, want):
+    """Does a FRED units string satisfy a requirement ('rate'|'level'|'index')?
+
+    FRED is inconsistent about unit strings ('%' vs 'Percent' vs 'Rate';
+    'Level in Thousands' vs 'Thous. of Persons') — this is the one place
+    that knowledge lives. want=None accepts anything.
+    """
+    if want is None:
+        return True
+    u = (units or '').lower()
+    if want == 'rate':
+        return 'rate' in u or u in ('%', 'percent', 'per cent')
+    if want == 'level':
+        return 'level' in u or 'thous' in u or 'persons' in u
+    if want == 'index':
+        return 'index' in u
+    return False
+
+
 PANDEMIC_WINDOW = ('2020-03-01', '2020-12-01')
 
 
