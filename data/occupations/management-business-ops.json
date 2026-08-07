@@ -5,7 +5,7 @@
   "kind": "occupation",
   "soc": "11-3, 13-1 (family)",
   "methodology": "v3-phase2 (docs/sector-methodology-plan.md)",
-  "generated": "2026-07-17",
+  "generated": "2026-08-07",
   "dataThrough": "2026-07",
   "historyStart": "2020",
   "caveats": [
@@ -134,9 +134,9 @@
     173.4,
     173.0,
     181.1,
-    186.2,
-    188.3,
+    186.1,
     188.2,
+    188.1,
     183.2,
     178.8,
     172.0,
@@ -186,7 +186,7 @@
     106.6,
     107.0,
     108.1,
-    108.7
+    110.7
    ],
    "provenance": {
     "series": "IHLIDXUSTPPROJMANA",
@@ -409,7 +409,7 @@
   40,
   37,
   39,
-  44,
+  43,
   49,
   54,
   56,
@@ -461,6 +461,6 @@
   29,
   28,
   28,
-  28
+  29
  ]
 }

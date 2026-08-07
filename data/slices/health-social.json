@@ -4,8 +4,8 @@
   "name": "Health Care & Social Assistance",
   "naics": "62",
   "methodology": "v3-phase1 (docs/sector-methodology-plan.md)",
-  "generated": "2026-07-17",
-  "dataThrough": "2026-05",
+  "generated": "2026-08-07",
+  "dataThrough": "2026-06",
   "caveats": [
    "Hospitals, home health, and childcare have very different pay and churn dynamics; this is the sector aggregate."
   ],
@@ -16,7 +16,7 @@
   "skippedComponents": {
    "openingsRatio": "no CPS unemployed-by-industry series for this sector"
   },
-  "margin": 10
+  "margin": 9
  },
  "labels": [
   "Jan-15",
@@ -155,7 +155,8 @@
   "Feb-26",
   "Mar-26",
   "Apr-26",
-  "May-26"
+  "May-26",
+  "Jun-26"
  ],
  "components": {
   "quitRate": {
@@ -163,7 +164,7 @@
    "weight": 0.16,
    "norm": {
     "lo": 1.73,
-    "hi": 2.727,
+    "hi": 2.725,
     "inverted": false
    },
    "values": [
@@ -302,6 +303,7 @@
     1.9,
     1.87,
     1.87,
+    1.9,
     1.9,
     1.87
    ],
@@ -457,7 +459,8 @@
     2.93,
     2.83,
     2.73,
-    2.77
+    2.73,
+    2.73
    ],
    "provenance": {
     "series": "JTS6200HIR",
@@ -611,7 +614,8 @@
     0.71,
     0.72,
     0.71,
-    0.73
+    0.72,
+    0.72
    ],
    "provenance": {
     "series": "JTU6000LDR",
@@ -624,8 +628,8 @@
    "name": "unempRate",
    "weight": 0.08,
    "norm": {
-    "lo": 2.432,
-    "hi": 3.46,
+    "lo": 2.433,
+    "hi": 3.458,
     "inverted": true
    },
    "values": [
@@ -765,7 +769,8 @@
     3.1,
     3.13,
     3.15,
-    3.23
+    3.23,
+    3.27
    ],
    "provenance": {
     "series": "LNU04032240",
@@ -777,7 +782,7 @@
    "name": "realWageGrowth",
    "weight": 0.1,
    "norm": {
-    "lo": -1.995,
+    "lo": -1.99,
     "hi": 1.4,
     "inverted": false
    },
@@ -918,7 +923,8 @@
     0.3,
     -0.9,
     -1.3,
-    -2.0
+    -2.0,
+    -1.1
    ],
    "provenance": {
     "series": [
@@ -934,7 +940,7 @@
    "weight": 0.12,
    "norm": {
     "lo": -0.1,
-    "hi": 2.07,
+    "hi": 2.06,
     "inverted": false
    },
    "values": [
@@ -1074,7 +1080,8 @@
     1.1,
     1.2,
     0.2,
-    0.4
+    0.4,
+    0.7
    ],
    "provenance": {
     "series": "Atlanta Fed Wage Growth Tracker (national)",
@@ -1119,7 +1126,7 @@
   34,
   33,
   34,
-  34,
+  35,
   33,
   30,
   31,
@@ -1134,11 +1141,11 @@
   49,
   55,
   52,
-  48,
+  49,
   44,
   41,
   40,
-  42,
+  43,
   45,
   48,
   47,
@@ -1163,11 +1170,11 @@
   41,
   43,
   56,
-  64,
+  65,
   76,
   73,
   73,
-  65,
+  66,
   69,
   69,
   70,
@@ -1189,7 +1196,7 @@
   80,
   67,
   65,
-  66,
+  67,
   65,
   60,
   61,
@@ -1220,6 +1227,7 @@
   34,
   27,
   18,
-  15
+  16,
+  20
  ]
 }

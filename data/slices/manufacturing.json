@@ -4,8 +4,8 @@
   "name": "Manufacturing",
   "naics": "31-33",
   "methodology": "v3-phase1 (docs/sector-methodology-plan.md)",
-  "generated": "2026-07-17",
-  "dataThrough": "2026-05",
+  "generated": "2026-08-07",
+  "dataThrough": "2026-06",
   "caveats": [
    "Durable and nondurable goods can diverge within this aggregate."
   ],
@@ -155,7 +155,8 @@
   "Feb-26",
   "Mar-26",
   "Apr-26",
-  "May-26"
+  "May-26",
+  "Jun-26"
  ],
  "components": {
   "quitRate": {
@@ -303,7 +304,8 @@
     1.33,
     1.3,
     1.3,
-    1.33
+    1.37,
+    1.43
    ],
    "provenance": {
     "series": "JTS3000QUR",
@@ -317,7 +319,7 @@
    "weight": 0.16,
    "norm": {
     "lo": 2.2,
-    "hi": 3.897,
+    "hi": 3.895,
     "inverted": false
    },
    "values": [
@@ -457,7 +459,8 @@
     2.23,
     2.3,
     2.3,
-    2.33
+    2.37,
+    2.43
    ],
    "provenance": {
     "series": "JTS3000HIR",
@@ -611,7 +614,8 @@
     0.87,
     0.87,
     0.84,
-    0.82
+    0.83,
+    0.83
    ],
    "provenance": {
     "series": "JTU3000LDR",
@@ -624,7 +628,7 @@
    "name": "unempRate",
    "weight": 0.08,
    "norm": {
-    "lo": 2.798,
+    "lo": 2.8,
     "hi": 4.258,
     "inverted": true
    },
@@ -765,7 +769,8 @@
     3.54,
     3.56,
     3.54,
-    3.49
+    3.49,
+    3.5
    ],
    "provenance": {
     "series": "LNU04032232",
@@ -777,8 +782,8 @@
    "name": "realWageGrowth",
    "weight": 0.1,
    "norm": {
-    "lo": -3.89,
-    "hi": 2.295,
+    "lo": -3.88,
+    "hi": 2.29,
     "inverted": false
    },
    "values": [
@@ -918,7 +923,8 @@
     1.9,
     0.3,
     0.5,
-    -0.3
+    -0.3,
+    0.3
    ],
    "provenance": {
     "series": [
@@ -934,7 +940,7 @@
    "weight": 0.12,
    "norm": {
     "lo": -0.1,
-    "hi": 2.07,
+    "hi": 2.06,
     "inverted": false
    },
    "values": [
@@ -1074,7 +1080,8 @@
     1.1,
     1.2,
     0.2,
-    0.4
+    0.4,
+    0.7
    ],
    "provenance": {
     "series": "Atlanta Fed Wage Growth Tracker (national)",
@@ -1099,7 +1106,7 @@
   28,
   33,
   35,
-  30,
+  31,
   29,
   32,
   36,
@@ -1114,7 +1121,7 @@
   43,
   47,
   46,
-  48,
+  49,
   50,
   48,
   46,
@@ -1197,7 +1204,7 @@
   44,
   40,
   44,
-  42,
+  43,
   44,
   41,
   41,
@@ -1220,6 +1227,7 @@
   40,
   38,
   34,
-  36
+  36,
+  41
  ]
 }

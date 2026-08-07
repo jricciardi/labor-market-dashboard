@@ -4,8 +4,8 @@
   "name": "State & Local Government",
   "naics": "92-93 (S&L)",
   "methodology": "v3-phase1 (docs/sector-methodology-plan.md)",
-  "generated": "2026-07-17",
-  "dataThrough": "2026-05",
+  "generated": "2026-08-07",
+  "dataThrough": "2026-06",
   "caveats": [
    "Wage components are unavailable for government; the score leans on turnover flows and the national switcher premium."
   ],
@@ -157,7 +157,8 @@
   "Feb-26",
   "Mar-26",
   "Apr-26",
-  "May-26"
+  "May-26",
+  "Jun-26"
  ],
  "components": {
   "quitRate": {
@@ -305,6 +306,7 @@
     0.8,
     0.8,
     0.83,
+    0.83,
     0.83
    ],
    "provenance": {
@@ -318,7 +320,7 @@
    "name": "hiresRate",
    "weight": 0.16,
    "norm": {
-    "lo": 1.434,
+    "lo": 1.436,
     "hi": 1.87,
     "inverted": false
    },
@@ -459,7 +461,8 @@
     1.43,
     1.43,
     1.47,
-    1.5
+    1.47,
+    1.47
    ],
    "provenance": {
     "series": "JTS9200HIR",
@@ -613,6 +616,7 @@
     0.36,
     0.36,
     0.36,
+    0.36,
     0.36
    ],
    "provenance": {
@@ -627,7 +631,7 @@
    "weight": 0.12,
    "norm": {
     "lo": -0.1,
-    "hi": 2.07,
+    "hi": 2.06,
     "inverted": false
    },
    "values": [
@@ -767,7 +771,8 @@
     1.1,
     1.2,
     0.2,
-    0.4
+    0.4,
+    0.7
    ],
    "provenance": {
     "series": "Atlanta Fed Wage Growth Tracker (national)",
@@ -780,11 +785,11 @@
   null,
   null,
   17,
-  16,
+  15,
   21,
   25,
-  27,
   26,
+  25,
   20,
   33,
   32,
@@ -848,7 +853,7 @@
   29,
   32,
   40,
-  35,
+  34,
   33,
   31,
   36,
@@ -863,7 +868,7 @@
   82,
   81,
   86,
-  90,
+  91,
   92,
   93,
   90,
@@ -879,7 +884,7 @@
   58,
   61,
   56,
-  58,
+  59,
   49,
   51,
   52,
@@ -890,7 +895,7 @@
   55,
   49,
   49,
-  39,
+  38,
   40,
   31,
   37,
@@ -912,7 +917,8 @@
   31,
   33,
   34,
-  30,
-  33
+  29,
+  31,
+  34
  ]
 }

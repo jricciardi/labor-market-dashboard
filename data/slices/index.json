@@ -1,15 +1,15 @@
 {
- "generated": "2026-07-17",
+ "generated": "2026-08-07",
  "methodology": "v3-phase1",
  "slices": [
   {
    "slug": "information",
    "name": "Information",
-   "dataThrough": "2026-05",
+   "dataThrough": "2026-06",
    "margin": 7,
    "coverage": "ok",
    "coveredWeight": 0.8,
-   "latestScore": 18,
+   "latestScore": 22,
    "components": [
     "hiresRate",
     "layoffsRate",
@@ -23,11 +23,11 @@
   {
    "slug": "professional-business",
    "name": "Professional & Business Services",
-   "dataThrough": "2026-05",
-   "margin": 8,
+   "dataThrough": "2026-06",
+   "margin": 7,
    "coverage": "ok",
    "coveredWeight": 0.8,
-   "latestScore": 23,
+   "latestScore": 29,
    "components": [
     "hiresRate",
     "layoffsRate",
@@ -41,11 +41,11 @@
   {
    "slug": "health-social",
    "name": "Health Care & Social Assistance",
-   "dataThrough": "2026-05",
-   "margin": 10,
+   "dataThrough": "2026-06",
+   "margin": 9,
    "coverage": "ok",
    "coveredWeight": 0.7,
-   "latestScore": 15,
+   "latestScore": 20,
    "components": [
     "hiresRate",
     "layoffsRate",
@@ -58,11 +58,11 @@
   {
    "slug": "leisure-hospitality",
    "name": "Leisure & Hospitality",
-   "dataThrough": "2026-05",
+   "dataThrough": "2026-06",
    "margin": 9,
    "coverage": "ok",
    "coveredWeight": 0.7,
-   "latestScore": 26,
+   "latestScore": 29,
    "components": [
     "hiresRate",
     "layoffsRate",
@@ -75,11 +75,11 @@
   {
    "slug": "manufacturing",
    "name": "Manufacturing",
-   "dataThrough": "2026-05",
+   "dataThrough": "2026-06",
    "margin": 7,
    "coverage": "ok",
    "coveredWeight": 0.7,
-   "latestScore": 36,
+   "latestScore": 41,
    "components": [
     "hiresRate",
     "layoffsRate",
@@ -92,11 +92,11 @@
   {
    "slug": "government-federal",
    "name": "Federal Government",
-   "dataThrough": "2026-05",
+   "dataThrough": "2026-06",
    "margin": 9,
    "coverage": "insufficient",
    "coveredWeight": 0.52,
-   "latestScore": 53,
+   "latestScore": 57,
    "components": [
     "hiresRate",
     "layoffsRate",
@@ -107,11 +107,11 @@
   {
    "slug": "government-state-local",
    "name": "State & Local Government",
-   "dataThrough": "2026-05",
+   "dataThrough": "2026-06",
    "margin": 10,
    "coverage": "insufficient",
    "coveredWeight": 0.52,
-   "latestScore": 33,
+   "latestScore": 34,
    "components": [
     "hiresRate",
     "layoffsRate",
@@ -146,18 +146,18 @@
  "faceValidity": {
   "information_2023_below_health": {
    "pass": true,
-   "information": 46.9,
-   "health": 70.9
+   "information": 47.7,
+   "health": 71
   },
   "information_2023_below_pbs": {
    "pass": true,
-   "information": 46.9,
-   "pbs": 52.4
+   "information": 47.7,
+   "pbs": 53
   },
   "federal_falls_2025_26": {
    "pass": true,
    "2024": 49,
-   "2025_26": 41
+   "2025_26": 41.3
   },
   "leisure_quits_spike_2021_22": {
    "pass": true,
