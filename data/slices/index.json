@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-07",
+ "generated": "2026-08-14",
  "methodology": "v3-phase1",
  "slices": [
   {
@@ -9,7 +9,7 @@
    "margin": 7,
    "coverage": "ok",
    "coveredWeight": 0.8,
-   "latestScore": 22,
+   "latestScore": 21,
    "components": [
     "hiresRate",
     "layoffsRate",
@@ -45,7 +45,7 @@
    "margin": 9,
    "coverage": "ok",
    "coveredWeight": 0.7,
-   "latestScore": 20,
+   "latestScore": 19,
    "components": [
     "hiresRate",
     "layoffsRate",
@@ -79,7 +79,7 @@
    "margin": 7,
    "coverage": "ok",
    "coveredWeight": 0.7,
-   "latestScore": 41,
+   "latestScore": 42,
    "components": [
     "hiresRate",
     "layoffsRate",

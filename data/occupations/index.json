@@ -1,15 +1,15 @@
 {
- "generated": "2026-08-07",
+ "generated": "2026-08-14",
  "methodology": "v3-phase2",
  "occupations": [
   {
    "slug": "management-business-ops",
    "name": "Program & Project Management, Business Ops",
-   "dataThrough": "2026-07",
+   "dataThrough": "2026-08",
    "margin": 5,
    "coverage": "ok",
    "coveredWeight": 1.0,
-   "latestScore": 29,
+   "latestScore": 28,
    "components": [
     "postings",
     "realWageGrowth",
@@ -19,11 +19,11 @@
   {
    "slug": "software-development",
    "name": "Software Development",
-   "dataThrough": "2026-07",
+   "dataThrough": "2026-08",
    "margin": 5,
    "coverage": "ok",
    "coveredWeight": 1.0,
-   "latestScore": 26,
+   "latestScore": 25,
    "components": [
     "postings",
     "realWageGrowth",
@@ -39,12 +39,12 @@
   "management-business-ops_postings_below_2022_peak": {
    "pass": true,
    "peak2022": 188.2,
-   "recentMean": 104.8
+   "recentMean": 105.7
   },
   "software-development_postings_below_2022_peak": {
    "pass": true,
    "peak2022": 229.2,
-   "recentMean": 69.5
+   "recentMean": 70.2
   }
  }
 }

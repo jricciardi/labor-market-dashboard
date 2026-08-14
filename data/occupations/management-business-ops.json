@@ -5,8 +5,8 @@
   "kind": "occupation",
   "soc": "11-3, 13-1 (family)",
   "methodology": "v3-phase2 (docs/sector-methodology-plan.md)",
-  "generated": "2026-08-07",
-  "dataThrough": "2026-07",
+  "generated": "2026-08-14",
+  "dataThrough": "2026-08",
   "historyStart": "2020",
   "caveats": [
    "Postings are Indeed's \"Project Management\" category \u2014 narrower than the full management/business-operations family, but the closest live demand signal for PM-type roles.",
@@ -97,15 +97,16 @@
   "Apr-26",
   "May-26",
   "Jun-26",
-  "Jul-26"
+  "Jul-26",
+  "Aug-26"
  ],
  "components": {
   "postings": {
    "name": "postings",
    "weight": 0.4,
    "norm": {
-    "lo": 99.37,
-    "hi": 182.465,
+    "lo": 99.38,
+    "hi": 182.36,
     "inverted": false
    },
    "values": [
@@ -186,7 +187,8 @@
     106.6,
     107.0,
     108.1,
-    110.7
+    110.7,
+    111.5
    ],
    "provenance": {
     "series": "IHLIDXUSTPPROJMANA",
@@ -199,7 +201,7 @@
    "weight": 0.3,
    "norm": {
     "lo": 1.76,
-    "hi": 2.463,
+    "hi": 2.472,
     "inverted": true
    },
    "values": [
@@ -280,6 +282,7 @@
     2.43,
     2.4,
     2.43,
+    2.45,
     null
    ],
    "provenance": {
@@ -292,7 +295,7 @@
    "name": "realWageGrowth",
    "weight": 0.3,
    "norm": {
-    "lo": -1.45,
+    "lo": -1.425,
     "hi": 2.2,
     "inverted": false
    },
@@ -374,6 +377,7 @@
     1.2,
     0.9,
     1.0,
+    0.8,
     null
    ],
    "provenance": {
@@ -407,12 +411,12 @@
   37,
   38,
   40,
-  37,
-  39,
-  43,
+  36,
+  38,
+  44,
   49,
   54,
-  56,
+  57,
   58,
   59,
   58,
@@ -420,7 +424,7 @@
   56,
   53,
   52,
-  51,
+  50,
   50,
   49,
   50,
@@ -434,12 +438,12 @@
   56,
   56,
   55,
-  54,
+  55,
   53,
   52,
   49,
   49,
-  49,
+  50,
   48,
   46,
   45,
@@ -453,14 +457,15 @@
   39,
   38,
   39,
-  37,
+  38,
   36,
-  35,
+  36,
   34,
   31,
   29,
   28,
   28,
-  29
+  27,
+  28
  ]
 }

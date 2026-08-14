@@ -5,8 +5,8 @@
   "kind": "occupation",
   "soc": "15-125x (family)",
   "methodology": "v3-phase2 (docs/sector-methodology-plan.md)",
-  "generated": "2026-08-07",
-  "dataThrough": "2026-07",
+  "generated": "2026-08-14",
+  "dataThrough": "2026-08",
   "historyStart": "2020",
   "caveats": [
    "Unemployment uses the coarse \"Professional and Related Occupations\" group \u2014 monthly computer/math-specific rates aren't published on FRED.",
@@ -97,15 +97,16 @@
   "Apr-26",
   "May-26",
   "Jun-26",
-  "Jul-26"
+  "Jul-26",
+  "Aug-26"
  ],
  "components": {
   "postings": {
    "name": "postings",
    "weight": 0.4,
    "norm": {
-    "lo": 64.835,
-    "hi": 222.385,
+    "lo": 64.84,
+    "hi": 222.04,
     "inverted": false
    },
    "values": [
@@ -186,7 +187,8 @@
     72.8,
     74.2,
     73.2,
-    75.0
+    75.0,
+    74.2
    ],
    "provenance": {
     "series": "IHLIDXUSTPSOFTDEVE",
@@ -199,7 +201,7 @@
    "weight": 0.3,
    "norm": {
     "lo": 2.018,
-    "hi": 2.715,
+    "hi": 2.714,
     "inverted": true
    },
    "values": [
@@ -280,6 +282,7 @@
     2.69,
     2.73,
     2.71,
+    2.68,
     null
    ],
    "provenance": {
@@ -292,7 +295,7 @@
    "name": "realWageGrowth",
    "weight": 0.3,
    "norm": {
-    "lo": -1.45,
+    "lo": -1.425,
     "hi": 2.2,
     "inverted": false
    },
@@ -374,6 +377,7 @@
     1.2,
     0.9,
     1.0,
+    0.8,
     null
    ],
    "provenance": {
@@ -402,20 +406,20 @@
   41,
   39,
   39,
-  39,
+  38,
   41,
-  41,
+  40,
   41,
   42,
   39,
   43,
   46,
   49,
-  53,
+  54,
   55,
   54,
   53,
-  51,
+  52,
   49,
   47,
   44,
@@ -461,6 +465,7 @@
   27,
   24,
   25,
-  26
+  25,
+  25
  ]
 }
