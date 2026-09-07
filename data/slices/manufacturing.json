@@ -4,8 +4,8 @@
   "name": "Manufacturing",
   "naics": "31-33",
   "methodology": "v3-phase1 (docs/sector-methodology-plan.md)",
-  "generated": "2026-08-14",
-  "dataThrough": "2026-06",
+  "generated": "2026-09-07",
+  "dataThrough": "2026-07",
   "caveats": [
    "Durable and nondurable goods can diverge within this aggregate."
   ],
@@ -156,7 +156,8 @@
   "Mar-26",
   "Apr-26",
   "May-26",
-  "Jun-26"
+  "Jun-26",
+  "Jul-26"
  ],
  "components": {
   "quitRate": {
@@ -305,7 +306,8 @@
     1.3,
     1.3,
     1.37,
-    1.43
+    1.43,
+    1.47
    ],
    "provenance": {
     "series": "JTS3000QUR",
@@ -319,7 +321,7 @@
    "weight": 0.16,
    "norm": {
     "lo": 2.2,
-    "hi": 3.895,
+    "hi": 3.894,
     "inverted": false
    },
    "values": [
@@ -460,6 +462,7 @@
     2.3,
     2.3,
     2.37,
+    2.43,
     2.43
    ],
    "provenance": {
@@ -473,7 +476,7 @@
    "name": "layoffsRate",
    "weight": 0.08,
    "norm": {
-    "lo": 0.812,
+    "lo": 0.813,
     "hi": 0.95,
     "inverted": true
    },
@@ -615,7 +618,8 @@
     0.87,
     0.84,
     0.83,
-    0.83
+    0.83,
+    0.82
    ],
    "provenance": {
     "series": "JTU3000LDR",
@@ -628,8 +632,8 @@
    "name": "unempRate",
    "weight": 0.08,
    "norm": {
-    "lo": 2.8,
-    "hi": 4.258,
+    "lo": 2.802,
+    "hi": 4.257,
     "inverted": true
    },
    "values": [
@@ -770,7 +774,8 @@
     3.56,
     3.54,
     3.49,
-    3.5
+    3.5,
+    3.38
    ],
    "provenance": {
     "series": "LNU04032232",
@@ -782,8 +787,8 @@
    "name": "realWageGrowth",
    "weight": 0.1,
    "norm": {
-    "lo": -3.88,
-    "hi": 2.29,
+    "lo": -3.87,
+    "hi": 2.285,
     "inverted": false
    },
    "values": [
@@ -924,7 +929,8 @@
     0.3,
     0.5,
     -0.2,
-    0.4
+    0.4,
+    0.5
    ],
    "provenance": {
     "series": [
@@ -940,7 +946,7 @@
    "weight": 0.12,
    "norm": {
     "lo": -0.1,
-    "hi": 2.06,
+    "hi": 2.05,
     "inverted": false
    },
    "values": [
@@ -1081,7 +1087,8 @@
     1.2,
     0.2,
     0.4,
-    0.7
+    0.7,
+    0.8
    ],
    "provenance": {
     "series": "Atlanta Fed Wage Growth Tracker (national)",
@@ -1124,7 +1131,7 @@
   49,
   50,
   48,
-  46,
+  47,
   46,
   48,
   53,
@@ -1133,7 +1140,7 @@
   50,
   48,
   48,
-  43,
+  44,
   39,
   37,
   35,
@@ -1142,7 +1149,7 @@
   48,
   48,
   46,
-  43,
+  44,
   48,
   49,
   50,
@@ -1152,7 +1159,7 @@
   52,
   52,
   54,
-  49,
+  50,
   43,
   37,
   45,
@@ -1189,11 +1196,11 @@
   71,
   70,
   66,
-  70,
+  71,
   65,
   64,
   65,
-  67,
+  68,
   56,
   54,
   52,
@@ -1228,6 +1235,7 @@
   38,
   34,
   37,
-  42
+  42,
+  45
  ]
 }

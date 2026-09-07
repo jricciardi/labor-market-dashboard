@@ -4,8 +4,8 @@
   "name": "Leisure & Hospitality",
   "naics": "71-72",
   "methodology": "v3-phase1 (docs/sector-methodology-plan.md)",
-  "generated": "2026-08-14",
-  "dataThrough": "2026-06",
+  "generated": "2026-09-07",
+  "dataThrough": "2026-07",
   "caveats": [
    "Structurally high-churn: quit and hire rates run roughly twice the national level. Scores compare this sector to its own history, not to other sectors."
   ],
@@ -156,15 +156,16 @@
   "Mar-26",
   "Apr-26",
   "May-26",
-  "Jun-26"
+  "Jun-26",
+  "Jul-26"
  ],
  "components": {
   "quitRate": {
    "name": "quitRate",
    "weight": 0.16,
    "norm": {
-    "lo": 3.636,
-    "hi": 5.625,
+    "lo": 3.638,
+    "hi": 5.624,
     "inverted": false
    },
    "values": [
@@ -305,7 +306,8 @@
     4.0,
     3.77,
     3.8,
-    3.93
+    3.83,
+    3.73
    ],
    "provenance": {
     "series": "JTS7000QUR",
@@ -318,7 +320,7 @@
    "name": "hiresRate",
    "weight": 0.16,
    "norm": {
-    "lo": 5.345,
+    "lo": 5.306,
     "hi": 8.1,
     "inverted": false
    },
@@ -460,7 +462,8 @@
     5.9,
     5.67,
     5.73,
-    5.47
+    5.47,
+    5.3
    ],
    "provenance": {
     "series": "JTS7000HIR",
@@ -473,7 +476,7 @@
    "name": "layoffsRate",
    "weight": 0.08,
    "norm": {
-    "lo": 1.292,
+    "lo": 1.293,
     "hi": 2.0,
     "inverted": true
    },
@@ -615,7 +618,8 @@
     1.58,
     1.6,
     1.62,
-    1.62
+    1.62,
+    1.65
    ],
    "provenance": {
     "series": "JTU7000LDR",
@@ -628,8 +632,8 @@
    "name": "unempRate",
    "weight": 0.08,
    "norm": {
-    "lo": 5.352,
-    "hi": 7.82,
+    "lo": 5.353,
+    "hi": 7.818,
     "inverted": true
    },
    "values": [
@@ -770,7 +774,8 @@
     6.3,
     6.3,
     6.25,
-    6.19
+    6.19,
+    6.13
    ],
    "provenance": {
     "series": "LNU04032241",
@@ -782,8 +787,8 @@
    "name": "realWageGrowth",
    "weight": 0.1,
    "norm": {
-    "lo": -0.09,
-    "hi": 3.18,
+    "lo": -0.085,
+    "hi": 3.17,
     "inverted": false
    },
    "values": [
@@ -924,7 +929,8 @@
     0.0,
     -0.1,
     -0.2,
-    0.5
+    0.5,
+    0.4
    ],
    "provenance": {
     "series": [
@@ -940,7 +946,7 @@
    "weight": 0.12,
    "norm": {
     "lo": -0.1,
-    "hi": 2.06,
+    "hi": 2.05,
     "inverted": false
    },
    "values": [
@@ -1081,7 +1087,8 @@
     1.2,
     0.2,
     0.4,
-    0.7
+    0.7,
+    0.8
    ],
    "provenance": {
     "series": "Atlanta Fed Wage Growth Tracker (national)",
@@ -1093,42 +1100,42 @@
  "scores": [
   null,
   null,
-  23,
+  24,
   19,
   25,
-  27,
+  28,
   31,
-  29,
+  30,
   32,
-  40,
+  41,
   41,
   27,
   30,
   37,
   38,
   38,
-  39,
+  40,
   44,
   49,
-  44,
+  45,
   43,
   42,
   43,
   39,
+  39,
   38,
-  38,
+  46,
   45,
-  45,
-  47,
+  48,
   44,
   42,
-  42,
+  43,
   38,
   35,
   36,
   38,
   41,
-  39,
+  40,
   40,
   40,
   39,
@@ -1138,7 +1145,7 @@
   34,
   36,
   39,
-  42,
+  43,
   49,
   55,
   52,
@@ -1146,8 +1153,8 @@
   53,
   56,
   56,
-  57,
-  57,
+  58,
+  58,
   55,
   51,
   50,
@@ -1163,7 +1170,7 @@
   37,
   41,
   43,
-  43,
+  44,
   45,
   47,
   46,
@@ -1187,7 +1194,7 @@
   72,
   72,
   74,
-  70,
+  71,
   65,
   67,
   60,
@@ -1202,32 +1209,33 @@
   50,
   49,
   45,
-  37,
+  38,
   36,
   28,
   30,
   30,
   35,
-  32,
+  33,
   31,
   28,
-  24,
+  25,
   22,
   28,
   28,
   33,
   37,
-  38,
+  39,
   38,
   30,
   28,
-  29,
-  33,
+  30,
+  34,
   46,
-  42,
+  43,
   35,
   23,
   25,
-  29
+  29,
+  26
  ]
 }

@@ -4,8 +4,8 @@
   "name": "Professional & Business Services",
   "naics": "54-56",
   "methodology": "v3-phase1 (docs/sector-methodology-plan.md)",
-  "generated": "2026-08-14",
-  "dataThrough": "2026-06",
+  "generated": "2026-09-07",
+  "dataThrough": "2026-07",
   "caveats": [
    "This supersector spans consultants, lawyers, and engineers (54) together with temp agencies, janitorial, and waste services (56); the aggregate can mask opposite moves in white-collar vs support work."
   ],
@@ -154,14 +154,15 @@
   "Mar-26",
   "Apr-26",
   "May-26",
-  "Jun-26"
+  "Jun-26",
+  "Jul-26"
  ],
  "components": {
   "quitRate": {
    "name": "quitRate",
    "weight": 0.16,
    "norm": {
-    "lo": 2.14,
+    "lo": 2.082,
     "hi": 3.47,
     "inverted": false
    },
@@ -303,7 +304,8 @@
     2.07,
     1.97,
     2.03,
-    2.1
+    2.07,
+    2.03
    ],
    "provenance": {
     "series": "JTS540099QUR",
@@ -316,8 +318,8 @@
    "name": "hiresRate",
    "weight": 0.16,
    "norm": {
-    "lo": 4.279,
-    "hi": 5.964,
+    "lo": 4.282,
+    "hi": 5.962,
     "inverted": false
    },
    "values": [
@@ -458,7 +460,8 @@
     4.4,
     4.33,
     4.6,
-    4.63
+    4.63,
+    4.53
    ],
    "provenance": {
     "series": "JTS540099HIR",
@@ -613,7 +616,8 @@
     2.07,
     2.06,
     2.07,
-    2.06
+    2.05,
+    2.05
    ],
    "provenance": {
     "series": "JTU540099LDR",
@@ -626,8 +630,8 @@
    "name": "unempRate",
    "weight": 0.08,
    "norm": {
-    "lo": 3.552,
-    "hi": 5.28,
+    "lo": 3.553,
+    "hi": 5.278,
     "inverted": true
    },
    "values": [
@@ -768,7 +772,8 @@
     4.02,
     4.06,
     4.09,
-    4.11
+    4.11,
+    4.14
    ],
    "provenance": {
     "series": "LNU04032239",
@@ -922,7 +927,8 @@
     1.46,
     1.56,
     1.57,
-    1.67
+    1.63,
+    1.49
    ],
    "provenance": {
     "series": [
@@ -938,7 +944,7 @@
    "name": "realWageGrowth",
    "weight": 0.1,
    "norm": {
-    "lo": -1.88,
+    "lo": -1.87,
     "hi": 2.3,
     "inverted": false
    },
@@ -1080,7 +1086,8 @@
     0.4,
     0.0,
     -0.7,
-    -0.2
+    -0.3,
+    -0.5
    ],
    "provenance": {
     "series": [
@@ -1096,7 +1103,7 @@
    "weight": 0.12,
    "norm": {
     "lo": -0.1,
-    "hi": 2.06,
+    "hi": 2.05,
     "inverted": false
    },
    "values": [
@@ -1237,7 +1244,8 @@
     1.2,
     0.2,
     0.4,
-    0.7
+    0.7,
+    0.8
    ],
    "provenance": {
     "series": "Atlanta Fed Wage Growth Tracker (national)",
@@ -1249,19 +1257,19 @@
  "scores": [
   null,
   null,
-  52,
-  49,
-  52,
+  53,
   50,
-  48,
-  40,
-  42,
-  54,
-  58,
-  39,
-  44,
+  53,
+  51,
   49,
-  47,
+  41,
+  43,
+  54,
+  59,
+  40,
+  45,
+  49,
+  48,
   43,
   46,
   46,
@@ -1284,23 +1292,23 @@
   54,
   53,
   53,
-  51,
   52,
-  54,
+  53,
+  55,
   56,
   59,
   55,
   52,
-  48,
+  49,
   50,
   53,
   59,
   60,
+  64,
   63,
-  62,
   63,
   63,
-  62,
+  63,
   62,
   63,
   63,
@@ -1309,15 +1317,15 @@
   59,
   64,
   63,
-  58,
-  43,
-  37,
-  34,
-  37,
+  59,
+  44,
+  38,
+  35,
+  38,
   39,
   43,
   45,
-  48,
+  49,
   47,
   48,
   47,
@@ -1333,57 +1341,58 @@
   68,
   69,
   69,
-  75,
+  76,
   82,
   81,
   79,
   80,
   75,
   74,
-  68,
+  69,
   71,
   69,
   64,
-  55,
+  56,
+  58,
+  56,
+  57,
   57,
   55,
-  57,
-  57,
-  55,
-  46,
-  46,
+  47,
+  47,
   50,
   48,
-  46,
-  44,
+  47,
   45,
-  46,
-  41,
-  41,
+  45,
+  47,
+  42,
+  42,
   35,
   33,
-  32,
-  34,
-  34,
-  34,
-  36,
-  35,
-  36,
-  38,
-  39,
-  39,
   33,
   35,
+  35,
+  35,
+  36,
+  36,
+  36,
+  39,
+  39,
   40,
+  34,
+  36,
   41,
-  39,
-  35,
-  28,
+  42,
+  40,
+  36,
+  29,
   33,
   31,
-  30,
+  31,
   22,
-  24,
-  29
+  25,
+  29,
+  26
  ]
 }
