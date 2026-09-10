@@ -5,8 +5,8 @@
   "kind": "occupation",
   "soc": "11-3, 13-1 (family)",
   "methodology": "v3-phase2 (docs/sector-methodology-plan.md)",
-  "generated": "2026-09-07",
-  "dataThrough": "2026-08",
+  "generated": "2026-09-10",
+  "dataThrough": "2026-09",
   "historyStart": "2020",
   "caveats": [
    "Postings are Indeed's \"Project Management\" category \u2014 narrower than the full management/business-operations family, but the closest live demand signal for PM-type roles.",
@@ -98,15 +98,16 @@
   "May-26",
   "Jun-26",
   "Jul-26",
-  "Aug-26"
+  "Aug-26",
+  "Sep-26"
  ],
  "components": {
   "postings": {
    "name": "postings",
    "weight": 0.4,
    "norm": {
-    "lo": 99.38,
-    "hi": 182.36,
+    "lo": 99.39,
+    "hi": 182.255,
     "inverted": false
    },
    "values": [
@@ -188,7 +189,8 @@
     107.0,
     108.1,
     110.7,
-    112.5
+    112.6,
+    114.1
    ],
    "provenance": {
     "series": "IHLIDXUSTPPROJMANA",
@@ -283,7 +285,8 @@
     2.4,
     2.43,
     2.45,
-    2.46
+    2.46,
+    null
    ],
    "provenance": {
     "series": "LNU04032216",
@@ -301,31 +304,31 @@
    },
    "values": [
     1.7,
-    1.8,
+    1.7,
     1.8,
     2.0,
     2.0,
     2.1,
     2.2,
-    2.2,
     2.3,
     2.4,
-    2.4,
-    2.4,
+    2.5,
+    2.5,
+    2.5,
     2.4,
     2.3,
     2.0,
     1.5,
     1.1,
     0.8,
-    0.4,
-    0.2,
+    0.3,
+    0.1,
     -0.2,
-    -0.6,
+    -0.7,
     -0.9,
     -1.3,
     -1.5,
-    -1.8,
+    -1.9,
     -2.0,
     -2.1,
     -2.2,
@@ -334,7 +337,7 @@
     -2.3,
     -2.4,
     -2.1,
-    -2.0,
+    -2.1,
     -1.8,
     -1.5,
     -1.0,
@@ -378,6 +381,7 @@
     0.9,
     1.0,
     0.8,
+    null,
     null
    ],
    "provenance": {
@@ -389,14 +393,14 @@
  },
  "scores": [
   55,
-  54,
+  53,
   37,
   28,
   27,
   28,
   29,
   29,
-  29,
+  30,
   30,
   30,
   30,
@@ -406,10 +410,10 @@
   34,
   34,
   35,
-  35,
+  34,
+  36,
   37,
   37,
-  38,
   40,
   36,
   38,
@@ -424,7 +428,7 @@
   56,
   53,
   52,
-  50,
+  51,
   50,
   49,
   50,
@@ -466,6 +470,7 @@
   28,
   29,
   27,
-  28
+  28,
+  29
  ]
 }

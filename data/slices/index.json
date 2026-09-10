@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-07",
+ "generated": "2026-09-10",
  "methodology": "v3-phase1",
  "slices": [
   {
@@ -27,7 +27,7 @@
    "margin": 7,
    "coverage": "ok",
    "coveredWeight": 0.8,
-   "latestScore": 26,
+   "latestScore": 27,
    "components": [
     "hiresRate",
     "layoffsRate",
@@ -45,7 +45,7 @@
    "margin": 9,
    "coverage": "ok",
    "coveredWeight": 0.7,
-   "latestScore": 22,
+   "latestScore": 23,
    "components": [
     "hiresRate",
     "layoffsRate",
@@ -62,7 +62,7 @@
    "margin": 9,
    "coverage": "ok",
    "coveredWeight": 0.7,
-   "latestScore": 26,
+   "latestScore": 27,
    "components": [
     "hiresRate",
     "layoffsRate",
@@ -76,7 +76,7 @@
    "slug": "manufacturing",
    "name": "Manufacturing",
    "dataThrough": "2026-07",
-   "margin": 7,
+   "margin": 6,
    "coverage": "ok",
    "coveredWeight": 0.7,
    "latestScore": 45,
@@ -93,7 +93,7 @@
    "slug": "government-federal",
    "name": "Federal Government",
    "dataThrough": "2026-07",
-   "margin": 9,
+   "margin": 8,
    "coverage": "insufficient",
    "coveredWeight": 0.52,
    "latestScore": 58,
@@ -108,7 +108,7 @@
    "slug": "government-state-local",
    "name": "State & Local Government",
    "dataThrough": "2026-07",
-   "margin": 9,
+   "margin": 10,
    "coverage": "insufficient",
    "coveredWeight": 0.52,
    "latestScore": 34,
@@ -146,18 +146,18 @@
  "faceValidity": {
   "information_2023_below_health": {
    "pass": true,
-   "information": 48.2,
-   "health": 71.2
+   "information": 48.8,
+   "health": 71.6
   },
   "information_2023_below_pbs": {
    "pass": true,
-   "information": 48.2,
-   "pbs": 53.5
+   "information": 48.8,
+   "pbs": 54
   },
   "federal_falls_2025_26": {
    "pass": true,
-   "2024": 48.8,
-   "2025_26": 41.9
+   "2024": 48.9,
+   "2025_26": 42.4
   },
   "leisure_quits_spike_2021_22": {
    "pass": true,
