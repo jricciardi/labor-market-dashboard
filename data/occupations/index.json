@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-10",
+ "generated": "2026-09-14",
  "methodology": "v3-phase2",
  "occupations": [
   {
@@ -9,7 +9,7 @@
    "margin": 5,
    "coverage": "ok",
    "coveredWeight": 1.0,
-   "latestScore": 29,
+   "latestScore": 28,
    "components": [
     "postings",
     "realWageGrowth",

@@ -5,7 +5,7 @@
   "kind": "occupation",
   "soc": "15-125x (family)",
   "methodology": "v3-phase2 (docs/sector-methodology-plan.md)",
-  "generated": "2026-09-10",
+  "generated": "2026-09-14",
   "dataThrough": "2026-09",
   "historyStart": "2020",
   "caveats": [
@@ -298,7 +298,7 @@
    "name": "realWageGrowth",
    "weight": 0.3,
    "norm": {
-    "lo": -1.425,
+    "lo": -1.4,
     "hi": 2.2,
     "inverted": false
    },
@@ -381,7 +381,7 @@
     0.9,
     1.0,
     0.8,
-    null,
+    0.8,
     null
    ],
    "provenance": {
@@ -412,11 +412,11 @@
   39,
   38,
   40,
-  41,
   40,
-  42,
+  40,
+  41,
   39,
-  43,
+  42,
   46,
   49,
   54,
@@ -429,7 +429,7 @@
   44,
   43,
   42,
-  43,
+  42,
   43,
   47,
   48,

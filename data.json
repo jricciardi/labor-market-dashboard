@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "lastUpdated": "2026-09-10",
+    "lastUpdated": "2026-09-14",
     "dataThrough": "2026-08",
     "joltsThrough": "2026-07",
     "switcherPremiumSource": "live",
@@ -1566,7 +1566,7 @@
     -0.9,
     -0.1,
     -0.1,
-    null
+    -0.3
   ],
   "switcherPremium": [
     0.3,
