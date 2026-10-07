@@ -5,7 +5,7 @@
   "kind": "occupation",
   "soc": "11-3, 13-1 (family)",
   "methodology": "v3-phase2 (docs/sector-methodology-plan.md)",
-  "generated": "2026-09-14",
+  "generated": "2026-10-07",
   "dataThrough": "2026-09",
   "historyStart": "2020",
   "caveats": [
@@ -190,7 +190,7 @@
     108.1,
     110.7,
     112.6,
-    114.1
+    115.9
    ],
    "provenance": {
     "series": "IHLIDXUSTPPROJMANA",
@@ -203,7 +203,7 @@
    "weight": 0.3,
    "norm": {
     "lo": 1.76,
-    "hi": 2.475,
+    "hi": 2.479,
     "inverted": true
    },
    "values": [
@@ -286,7 +286,7 @@
     2.43,
     2.45,
     2.46,
-    null
+    2.47
    ],
    "provenance": {
     "series": "LNU04032216",
@@ -444,7 +444,7 @@
   55,
   55,
   53,
-  52,
+  53,
   50,
   49,
   50,
@@ -453,7 +453,7 @@
   45,
   44,
   44,
-  43,
+  44,
   43,
   39,
   40,
@@ -467,10 +467,10 @@
   34,
   31,
   29,
+  29,
+  29,
   28,
   28,
-  27,
-  28,
-  28
+  29
  ]
 }

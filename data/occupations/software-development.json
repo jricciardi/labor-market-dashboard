@@ -5,7 +5,7 @@
   "kind": "occupation",
   "soc": "15-125x (family)",
   "methodology": "v3-phase2 (docs/sector-methodology-plan.md)",
-  "generated": "2026-09-14",
+  "generated": "2026-10-07",
   "dataThrough": "2026-09",
   "historyStart": "2020",
   "caveats": [
@@ -190,7 +190,7 @@
     73.2,
     75.0,
     74.4,
-    75.4
+    76.5
    ],
    "provenance": {
     "series": "IHLIDXUSTPSOFTDEVE",
@@ -202,8 +202,8 @@
    "name": "unempRate",
    "weight": 0.3,
    "norm": {
-    "lo": 2.018,
-    "hi": 2.713,
+    "lo": 2.019,
+    "hi": 2.712,
     "inverted": true
    },
    "values": [
@@ -286,7 +286,7 @@
     2.71,
     2.68,
     2.71,
-    null
+    2.69
    ],
    "provenance": {
     "series": "LNU04032217",
@@ -471,6 +471,6 @@
   25,
   25,
   24,
-  24
+  25
  ]
 }

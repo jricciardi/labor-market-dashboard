@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-14",
+ "generated": "2026-10-07",
  "methodology": "v3-phase2",
  "occupations": [
   {
@@ -9,7 +9,7 @@
    "margin": 5,
    "coverage": "ok",
    "coveredWeight": 1.0,
-   "latestScore": 28,
+   "latestScore": 29,
    "components": [
     "postings",
     "realWageGrowth",
@@ -23,7 +23,7 @@
    "margin": 5,
    "coverage": "ok",
    "coveredWeight": 1.0,
-   "latestScore": 24,
+   "latestScore": 25,
    "components": [
     "postings",
     "realWageGrowth",
@@ -39,12 +39,12 @@
   "management-business-ops_postings_below_2022_peak": {
    "pass": true,
    "peak2022": 188.3,
-   "recentMean": 107.0
+   "recentMean": 107.2
   },
   "software-development_postings_below_2022_peak": {
    "pass": true,
    "peak2022": 229.2,
-   "recentMean": 71.1
+   "recentMean": 71.2
   }
  }
 }
